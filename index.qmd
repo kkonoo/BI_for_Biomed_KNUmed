@@ -1,0 +1,47 @@
+---
+title: "advanced bioinformatics (융합형 의사과학자 양성 사업)"
+sidebar: false
+author: "Eunji Ha"
+affiliation: 'School of Medicine, Kyungpook National Univ.'
+date: last-modified
+format: html
+editor: visual
+categories: [의학연구, bioinformatics, R, Omics]
+---
+
+## Course overview
+
+-   **Acquisition of Practical Bioinformatics Analysis Skills**
+
+    ✅ What is RNA-seq data and how to analyze them
+
+    ✅ Understanding fundamental statistics
+
+    ✅ How to interpret and visualize the results
+
+-   **Enhanced Data Convergence Capability for Translational Research**
+
+    ✅ How to link omics data to clinical data
+
+    ✅ How to explore public data of interest
+
+    ✅ What would be promising targets
+
+## Syllabus
+
+| Module | Week | Contents | Key tools |
+|----|----|----|----|
+| **Intro** | W1 | Review + Roadmap + R env | R, Bioconductor |
+| **Clinical Genomics** | W2 | GWAS & Post-GWAS | PLINK, LocusZoom |
+|  | W3 | PRS & Clinical application | PGPRSice, LDPred2 |
+| **Single-cell** | W4 | scRNA-seq tech, QC, Clustering | Seurat, scanpy |
+|  | W5 | Trajectory & Cell-cell communication | Monocle, CellChat |
+| **Spatial** | W6 | Spatial Transcriptomics 기초 | Seurat, Squidpy |
+|  | W7 | Spatial + scRNA integration, Deconvolution | CARD, SPOTlight |
+| **Proteomics** | W8 | MS/NGS-based Proteomics | theory |
+|  | W9 | Clinical proteomics & Biomarker | limma, MSstats |
+| **Integration** | W10 | Multi-omics integration | MOFA+, mixOmics |
+|  | W11 | Network & Drug target discovery | STRING, igraph |
+| **Capstone** | W12 | Result intepretation & visualization | ggplot2, Rmarkdown |
+|  | W13 | Rscript & vibe coding tips | — |
+|  | W14 | Individual project design | — |

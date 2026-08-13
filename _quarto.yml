@@ -19,15 +19,33 @@ project:
 website:
   title: "Bioinformatics for Medical Scientists"
   description: "의과학과 대학원 · 생물정보학 개론 (7주)"
+  favicon: assets/img/favicon.ico
+  page-navigation: true          # 챕터 하단에 이전/다음 주차 링크
+
   navbar:
-    logo: images/logo.jpg
-    favicon: assets/img/logo.ico
+    logo: assets/img/logo.jpg
     left:
       - href: index.qmd
         text: Home
+      - text: "Weeks"            # ← 드롭다운. 상단은 깔끔하게, 접근은 어디서나
+        menu:
+          - href: chapters/w1_intro.qmd
+            text: "W1 · Introduction to Bioinformatics"
+          - href: chapters/w2_genomics.qmd
+            text: "W2 · Genomics"
+          - href: chapters/w3_epigenomics.qmd
+            text: "W3 · Epigenomics"
+          - href: chapters/w4_transcriptomics.qmd
+            text: "W4 · Transcriptomics"
+          - href: chapters/w5_singlecell.qmd
+            text: "W5 · Single-cell Transcriptomics"
+          - href: chapters/w6_proteomics.qmd
+            text: "W6 · Proteomics"
+          - href: chapters/w7_metagenomics.qmd
+            text: "W7 · Metagenomics"
     right:
       - icon: github
-        href: https://github.com/kkonoo/advanced_BI_for_MD_PhD_KNUmed/
+        href: https://github.com/kkonoo/BI_for_Biomed_KNUmed/
 
   sidebar:
     style: "floating"

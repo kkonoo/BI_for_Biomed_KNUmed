@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Eunji Ha">
-<meta name="dcterms.date" content="2026-06-02">
+<meta name="dcterms.date" content="2026-08-13">
 
-<title>advanced bioinformatics (융합형 의사과학자 양성 사업) – advanced BI</title>
+<title>Bioinformatics for BioMedical Scientists – Bioinformatics for Medical Scientists</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -44,7 +44,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-acf12a64177840b8d86f2d4f01b2e9fb.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-7f128302b46659ec05c1cdf12d27b5f1.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-88d021f3aa3e9e2203f4422d19f5e8ad.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -90,7 +90,7 @@ ul.task-list li input[type="checkbox"] {
     <img src="./images/logo.jpg" alt="" class="navbar-logo dark-content">
     </a>
     <a class="navbar-brand" href="./index.html">
-    <span class="navbar-title">advanced BI</span>
+    <span class="navbar-title">Bioinformatics for Medical Scientists</span>
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
@@ -102,26 +102,6 @@ ul.task-list li input[type="checkbox"] {
   <li class="nav-item">
     <a class="nav-link active" href="./index.html" aria-current="page"> 
 <span class="menu-text">Home</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./chapters/part1/w1_intro.html"> 
-<span class="menu-text">1. Intro</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./chapters/part2/w2_gwas.html"> 
-<span class="menu-text">2. Clinical Genomics &amp; Risk Prediction</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./chapters/part3/w4_epigenomics_methylation.html"> 
-<span class="menu-text">3. High-Resolution Omics</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./chapters/part4/w11_multiomics.html"> 
-<span class="menu-text">4. Multi-omics &amp; Target Discovery</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./chapters/part5/w13_visualization.html"> 
-<span class="menu-text">5. Capstone</span></a>
   </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
@@ -146,8 +126,12 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">Contents</h2>
    
   <ul>
-  <li><a href="#course-overview" id="toc-course-overview" class="nav-link active" data-scroll-target="#course-overview">Course overview</a></li>
-  <li><a href="#syllabus" id="toc-syllabus" class="nav-link" data-scroll-target="#syllabus">Syllabus</a></li>
+  <li><a href="#course-overview" id="toc-course-overview" class="nav-link active" data-scroll-target="#course-overview">📖 Course overview</a></li>
+  <li><a href="#syllabus" id="toc-syllabus" class="nav-link" data-scroll-target="#syllabus">🗓️ Syllabus</a></li>
+  <li><a href="#what-is-inside-each-week" id="toc-what-is-inside-each-week" class="nav-link" data-scroll-target="#what-is-inside-each-week">📑 What is inside each week</a></li>
+  <li><a href="#three-threads-that-run-through-every-week" id="toc-three-threads-that-run-through-every-week" class="nav-link" data-scroll-target="#three-threads-that-run-through-every-week">🧵 Three threads that run through every week</a></li>
+  <li><a href="#the-traps-by-week" id="toc-the-traps-by-week" class="nav-link" data-scroll-target="#the-traps-by-week">⚠️ The traps, by week</a></li>
+  <li><a href="#how-to-read-each-chapter" id="toc-how-to-read-each-chapter" class="nav-link" data-scroll-target="#how-to-read-each-chapter">🧭 How to read each chapter</a></li>
   </ul>
 </nav>
     </div>
@@ -156,12 +140,11 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">advanced bioinformatics (융합형 의사과학자 양성 사업)</h1>
+<h1 class="title">Bioinformatics for BioMedical Scientists</h1>
   <div class="quarto-categories">
-    <div class="quarto-category">의학연구</div>
+    <div class="quarto-category">의과학</div>
     <div class="quarto-category">bioinformatics</div>
-    <div class="quarto-category">R</div>
-    <div class="quarto-category">Omics</div>
+    <div class="quarto-category">omics</div>
   </div>
   </div>
 
@@ -179,7 +162,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">June 2, 2026</p>
+      <p class="date">August 13, 2026</p>
     </div>
   </div>
   
@@ -192,122 +175,423 @@ ul.task-list li input[type="checkbox"] {
 
 
 <section id="course-overview" class="level2">
-<h2 class="anchored" data-anchor-id="course-overview">Course overview</h2>
-<ul>
-<li><p><strong>Acquisition of Practical Bioinformatics Analysis Skills</strong></p>
-<p>✅ What is RNA-seq data and how to analyze them</p>
-<p>✅ Understanding fundamental statistics</p>
-<p>✅ How to interpret and visualize the results</p></li>
-<li><p><strong>Enhanced Data Convergence Capability for Translational Research</strong></p>
-<p>✅ How to link omics data to clinical data</p>
-<p>✅ How to explore public data of interest</p>
-<p>✅ What would be promising targets</p></li>
-</ul>
+<h2 class="anchored" data-anchor-id="course-overview">📖 Course overview</h2>
+<p>This course is written for graduate students with a <strong>wet-lab background</strong> and little or no computational experience.</p>
+<p>Over seven weeks we walk up the central dogma: genome ➡️ epigenome ➡️ transcriptome ➡️ single-cell resolution ➡️ proteome ➡️ microbiome — asking the same three questions of every technology.</p>
+<blockquote class="blockquote">
+<p><strong>① What does the assay actually measure?</strong> <strong>② What does the data look like?</strong> <strong>③ What can go wrong?</strong></p>
+</blockquote>
+<div class="quarto-layout-panel" data-layout-ncol="2">
+<div class="quarto-layout-row">
+<section id="what-this-course-is" class="level3 quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<h3 class="anchored" data-anchor-id="what-this-course-is">What this course is</h3>
+<p>✅ Concepts, interpretation, and study design<br>
+✅ How to read a methods section and judge whether to believe a figure<br>
+✅ Enough vocabulary to have a productive conversation with a bioinformatician</p>
+</section>
+<section id="what-this-course-is-not" class="level3 quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<h3 class="anchored" data-anchor-id="what-this-course-is-not">What this course is <strong>not</strong></h3>
+<p>❌ A programming course. There is no R or Python here.<br>
+❌ A pipeline tutorial. Tool names appear only as landmarks.</p>
+</section>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>The practical course
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>A separate <strong>hands-on bioinformatics practicum</strong> is offered next semester. This course is its conceptual prerequisite — the goal here is that you know <em>what</em> you want to compute before you learn <em>how</em>.</p>
+</div>
+</div>
+</div>
+<hr>
 </section>
 <section id="syllabus" class="level2">
-<h2 class="anchored" data-anchor-id="syllabus">Syllabus</h2>
+<h2 class="anchored" data-anchor-id="syllabus">🗓️ Syllabus</h2>
+<p>Each week opens with a question a wet-lab scientist might actually be asked.</p>
 <table class="caption-top table">
-<colgroup>
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
-</colgroup>
 <thead>
 <tr class="header">
-<th>Module</th>
-<th>Week</th>
-<th>Contents</th>
-<th>Key tools</th>
+<th style="text-align: center;">Week</th>
+<th>Topic</th>
+<th>Central question</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><strong>Intro</strong></td>
-<td>W1</td>
-<td>Review + Roadmap + R env</td>
-<td>R, Bioconductor</td>
+<td style="text-align: center;"><strong>W1</strong></td>
+<td><a href="./chapters/w1_intro.html">Introduction to Bioinformatics</a></td>
+<td>You just generated 200 GB of sequencing data.<br>
+What now?</td>
 </tr>
 <tr class="even">
-<td><strong>Clinical Genomics</strong></td>
-<td>W2</td>
-<td>GWAS &amp; Post-GWAS</td>
-<td>PLINK, LocusZoom</td>
+<td style="text-align: center;"><strong>W2</strong></td>
+<td><a href="./chapters/w2_genomics.html">Genomics</a></td>
+<td>Two people differ at ~4–5 million positions.<br>
+Which differences cause disease?</td>
 </tr>
 <tr class="odd">
-<td></td>
-<td>W3</td>
-<td>PRS &amp; Clinical application</td>
-<td>PGPRSice, LDPred2</td>
+<td style="text-align: center;"><strong>W3</strong></td>
+<td><a href="./chapters/w3_epigenomics.html">Epigenomics</a></td>
+<td>Every cell has the same genome.<br>
+Why is a neuron not a hepatocyte?</td>
 </tr>
 <tr class="even">
-<td><strong>Single-cell</strong></td>
-<td>W4</td>
-<td>scRNA-seq tech, QC, Clustering</td>
-<td>Seurat, scanpy</td>
+<td style="text-align: center;"><strong>W4</strong></td>
+<td><a href="./chapters/w4_transcriptomics.html">Transcriptomics</a></td>
+<td>RNA-seq returns 847 genes.<br>
+Which of them mean anything?</td>
 </tr>
 <tr class="odd">
-<td></td>
-<td>W5</td>
-<td>Trajectory &amp; Cell-cell communication</td>
-<td>Monocle, CellChat</td>
+<td style="text-align: center;"><strong>W5</strong></td>
+<td><a href="./chapters/w5_singlecell.html">Single-cell Transcriptomics</a></td>
+<td>Every cell changing a little, or 5% of cells changing a lot?</td>
 </tr>
 <tr class="even">
-<td><strong>Spatial</strong></td>
-<td>W6</td>
-<td>Spatial Transcriptomics 기초</td>
-<td>Seurat, Squidpy</td>
+<td style="text-align: center;"><strong>W6</strong></td>
+<td><a href="./chapters/w6_proteomics.html">Proteomics</a></td>
+<td>mRNA and protein correlate at r ≈ 0.4.<br>
+What did RNA-seq tell you?</td>
 </tr>
 <tr class="odd">
-<td></td>
-<td>W7</td>
-<td>Spatial + scRNA integration, Deconvolution</td>
-<td>CARD, SPOTlight</td>
-</tr>
-<tr class="even">
-<td><strong>Proteomics</strong></td>
-<td>W8</td>
-<td>MS/NGS-based Proteomics</td>
-<td>theory</td>
-</tr>
-<tr class="odd">
-<td></td>
-<td>W9</td>
-<td>Clinical proteomics &amp; Biomarker</td>
-<td>limma, MSstats</td>
-</tr>
-<tr class="even">
-<td><strong>Integration</strong></td>
-<td>W10</td>
-<td>Multi-omics integration</td>
-<td>MOFA+, mixOmics</td>
-</tr>
-<tr class="odd">
-<td></td>
-<td>W11</td>
-<td>Network &amp; Drug target discovery</td>
-<td>STRING, igraph</td>
-</tr>
-<tr class="even">
-<td><strong>Capstone</strong></td>
-<td>W12</td>
-<td>Result intepretation &amp; visualization</td>
-<td>ggplot2, Rmarkdown</td>
-</tr>
-<tr class="odd">
-<td></td>
-<td>W13</td>
-<td>Rscript &amp; vibe coding tips</td>
-<td>—</td>
-</tr>
-<tr class="even">
-<td></td>
-<td>W14</td>
-<td>Individual project design</td>
-<td>—</td>
+<td style="text-align: center;"><strong>W7</strong></td>
+<td><a href="./chapters/w7_metagenomics.html">Metagenomics</a></td>
+<td>Cause, consequence, or artifact?</td>
 </tr>
 </tbody>
 </table>
+<hr>
+</section>
+<section id="what-is-inside-each-week" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-inside-each-week">📑 What is inside each week</h2>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>W1 · Introduction to Bioinformatics
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>What Bioinformatics Is 👩‍💻 — the three neighbouring fields; wet lab ➡️ dry lab; the five-stage omics workflow that maps the whole course</li>
+<li>Sequencing and Data 🧪 — Sanger, short-read, long-read; FASTQ / BAM / VCF / count matrix; the reference genome and reference bias</li>
+<li>Where the Data Lives 🗄️ — GEO, SRA, dbGaP, UK Biobank, GTEx, ENCODE, TCGA, HCA</li>
+<li>Statistics You Cannot Avoid 📊 — p-values, multiple testing, batch effects, power</li>
+<li>Reproducibility and Study Design ♻️ — the conversation to have <em>before</em> you sequence</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>W2 · Genomics
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>Human Genetic Variation 🧬 — SNVs, SVs, repeats; allele frequency and allelic architecture</li>
+<li>From Reads to Variants 🔬 — variant calling as inference; WGS vs WES vs array; imputation</li>
+<li>Genome-Wide Association Studies 📈 — population structure, the association test, Manhattan and QQ plots, 5×10⁻⁸, linkage disequilibrium</li>
+<li>From Association to Function 🔎 — fine-mapping, credible sets, eQTL, colocalization, TWAS</li>
+<li>Heritability and Prediction 🧮 — SNP heritability, polygenicity, polygenic risk scores</li>
+<li>Genomics in the Clinic 🏥 — cancer genomics, Mendelian randomization, drug target discovery</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>W3 · Epigenomics
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>What the Epigenome Is 🎛️ — four layers, four assays; one epigenome per cell type</li>
+<li>DNA Methylation 🔵 — bisulfite vs arrays, β and M values, DMPs and DMRs, epigenetic clocks</li>
+<li>Histone Modifications and ChIP-seq 🧵 — what the marks mean, input controls, peak calling</li>
+<li>Chromatin Accessibility: ATAC-seq 🔓 — the assay, its QC, and footprinting</li>
+<li>Reading the Regulatory Genome 📖 — motifs, ChromHMM, ENCODE/Roadmap, Hi-C and TADs</li>
+<li>Why This Matters Clinically 🏥 — the bridge from non-coding GWAS hits to mechanism</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>W4 · Transcriptomics
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>What RNA-seq Measures 📏 — abundance, not synthesis; and not protein</li>
+<li>Experimental Choices ⚙️ — poly(A) vs rRNA depletion, strandedness, replicates, design checklist</li>
+<li>From Reads to Counts 🔢 — spliced alignment vs pseudo-alignment; gene vs transcript level</li>
+<li>Normalization ⚖️ — library size, gene length, and the composition effect; CPM/TPM/TMM/RLE</li>
+<li>Differential Expression 📊 — the negative binomial model, shrinkage, sample size, volcano and MA plots</li>
+<li>Making Sense of a Gene List 🧠 — ORA vs GSEA and the three commonest misuses</li>
+<li>Beyond Differential Expression 🌐 — WGCNA, deconvolution, splicing, eQTLs</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>W5 · Single-cell Transcriptomics
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>Why Single Cell 🔬 — what averaging destroys, and when bulk is still better</li>
+<li>Platforms and Sample Choices 🧫 — droplet vs plate vs combinatorial; cells vs nuclei</li>
+<li>From Droplets to a Count Matrix 🧮 — barcodes, UMIs, zeros, and QC</li>
+<li>Finding Cell Types 🗺️ — HVGs, PCA, UMAP, clustering resolution, annotation</li>
+<li>Batch Effects and Integration 🔗 — Harmony/scVI, and over-correction</li>
+<li>Statistical Testing 📊 — why per-cell tests are invalid; pseudobulk; differential abundance</li>
+<li>Dynamics, Space, and Atlases 🌈 — trajectories, cell–cell communication, spatial, HCA</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>W6 · Proteomics
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>Why Measure Proteins 💪 — where the other 80% of protein variance comes from</li>
+<li>Mass Spectrometry Basics ⚗️ — the bottom-up workflow, MS2 spectra, DDA vs DIA vs targeted</li>
+<li>Identification and Quantification 🏷️ — target–decoy FDR, protein inference, LFQ/TMT/SILAC</li>
+<li>The Missing Value Problem 🕳️ — MNAR vs MAR, and why naive imputation is dangerous</li>
+<li>Statistical Analysis 📊 — how proteomics differs from RNA-seq statistically</li>
+<li>Affinity-Based and Population Proteomics 🩸 — dynamic range, Olink/SomaScan, pQTLs</li>
+<li>Frontiers and Pitfalls 🚧 — PTMs, AlphaFold, contamination and pre-analytical variation</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>W7 · Metagenomics
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>The Human Microbiome 🦠 — body sites, between-person variation, evidence tiers</li>
+<li>Study Design and Sample Handling 🧊 — extraction bias, confounders, the kit-ome</li>
+<li>Two Ways to Sequence a Community 🧬 — 16S amplicon vs shotgun; OTUs vs ASVs</li>
+<li>Reference Databases and Their Limits 📚 — SILVA, GTDB, microbial dark matter</li>
+<li>Diversity 🌿 — alpha, beta, rarefaction, PCoA and PERMANOVA</li>
+<li>Statistics for Compositional Data ⚠️ — CLR, and why DA methods disagree</li>
+<li>From Association to Causation 🔀 — artifact, confounding, reverse causation, causation</li>
+<li>Beyond Bacteria, Beyond DNA 🔭 — virome, metatranscriptomics, metabolomics</li>
+<li>🎓 <strong>Reading Any Omics Paper Critically</strong> — the closing checklist for the whole course</li>
+</ol>
+</div>
+</div>
+</div>
+<hr>
+</section>
+<section id="three-threads-that-run-through-every-week" class="level2">
+<h2 class="anchored" data-anchor-id="three-threads-that-run-through-every-week">🧵 Three threads that run through every week</h2>
+<p>Whatever the technology, the same three failure modes recur. Watch for them each week.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 24%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 21%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Week</th>
+<th style="text-align: left;">Confounding</th>
+<th style="text-align: left;">Multiple testing</th>
+<th style="text-align: left;">Reference bias</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>W1</strong> Introduction</td>
+<td style="text-align: left;">batch effects</td>
+<td style="text-align: left;">FDR vs.&nbsp;Bonferroni</td>
+<td style="text-align: left;">GRCh38 vs.&nbsp;T2T</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>W2</strong> Genomics</td>
+<td style="text-align: left;">population structure</td>
+<td style="text-align: left;">5×10⁻⁸</td>
+<td style="text-align: left;">LD reference panels</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>W3</strong> Epigenomics</td>
+<td style="text-align: left;">cell-type composition</td>
+<td style="text-align: left;">DMP burden</td>
+<td style="text-align: left;">chromatin atlases</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>W4</strong> Transcriptomics</td>
+<td style="text-align: left;">batch, RIN, composition</td>
+<td style="text-align: left;">DE gene lists</td>
+<td style="text-align: left;">annotation version</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>W5</strong> Single-cell</td>
+<td style="text-align: left;">donor vs.&nbsp;batch</td>
+<td style="text-align: left;">per-cell inflation</td>
+<td style="text-align: left;">annotation atlases</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>W6</strong> Proteomics</td>
+<td style="text-align: left;">TMT batch structure</td>
+<td style="text-align: left;">peptide vs.&nbsp;protein FDR</td>
+<td style="text-align: left;">search database</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>W7</strong> Metagenomics</td>
+<td style="text-align: left;">kit-ome, diet, drugs</td>
+<td style="text-align: left;">DA method disagreement</td>
+<td style="text-align: left;">SILVA / GTDB</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="the-traps-by-week" class="level2">
+<h2 class="anchored" data-anchor-id="the-traps-by-week">⚠️ The traps, by week</h2>
+<p>If you remember one thing from each chapter, remember these.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;">Week</th>
+<th>The trap</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><strong>W1</strong></td>
+<td><a href="./chapters/w1_intro.html">Batch confounded with condition cannot be fixed by any analysis</a> — randomise your sample layout</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong>W2</strong></td>
+<td><a href="./chapters/w2_genomics.html">The lead SNP is usually not causal, and the nearest gene is often the wrong gene</a></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><strong>W3</strong></td>
+<td><a href="./chapters/w3_epigenomics.html">Cell-type composition is the dominant confounder in tissue methylation studies</a></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong>W4</strong></td>
+<td><a href="./chapters/w4_transcriptomics.html">Bulk differential expression is frequently a composition difference</a></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><strong>W5</strong></td>
+<td><a href="./chapters/w5_singlecell.html">Per-cell tests are invalid across conditions — your n is the number of donors</a></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><strong>W6</strong></td>
+<td><a href="./chapters/w6_proteomics.html">You never observe a protein; naive imputation manufactures false positives</a></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><strong>W7</strong></td>
+<td><a href="./chapters/w7_metagenomics.html">Sequencing measures proportions, and DA methods disagree on the same data</a></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="how-to-read-each-chapter" class="level2">
+<h2 class="anchored" data-anchor-id="how-to-read-each-chapter">🧭 How to read each chapter</h2>
+<p>Every chapter follows the same shape:</p>
+<ul>
+<li><strong>🎯 Learning objectives</strong> — what you should be able to do afterwards</li>
+<li><strong>🤔 Motivating question</strong> — the problem the chapter exists to solve</li>
+<li><strong>Numbered sections</strong> — <code>1.</code> → <code>1)</code> → <code>①</code>, mirroring the lecture</li>
+<li><strong>⚠️ Pitfall boxes</strong> — the mistakes that show up in real manuscripts</li>
+<li><strong>💡 Tips</strong> — practical guidance for your own project</li>
+<li><strong>📝 Summary · 🔑 Key terms · ➕ References</strong></li>
+</ul>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Cross-links
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Sections marked 🔗 point back to an earlier week. Omics layers are not independent, and the connections are where most of the interesting biology lives — the clearest example runs W2 → W3 → W4 → W6, from a non-coding GWAS hit to a genetically validated drug target.</p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-10-contents" aria-controls="callout-10" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Where this ends up
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-10" class="callout-10-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>The course closes with a checklist in <a href="./chapters/w7_metagenomics.html"><strong>W7 §9</strong></a> for reading any omics paper critically — design, measurement, analysis, interpretation — with pointers back to the chapter that covers each question.</p>
+<p>If you can work through that list on a paper in your own field, this course has done its job.</p>
+</div>
+</div>
+</div>
 
 
 </section>

@@ -1,12 +1,24 @@
 project:
   type: website
   execute-dir: project
-  # output-dir: _site
+  output-dir: _site
+
+  # 렌더 대상을 명시 — 이 목록에 없는 .qmd 는 빌드하지 않음
+  # (chapters/example.qmd 는 스타일 참고용이라 제외)
+  render:
+    - index.qmd
+    - chapters/w1_intro.qmd
+    - chapters/w2_genomics.qmd
+    - chapters/w3_epigenomics.qmd
+    - chapters/w4_transcriptomics.qmd
+    - chapters/w5_singlecell.qmd
+    - chapters/w6_proteomics.qmd
+    - chapters/w7_metagenomics.qmd
 
 
 website:
-  title: "advanced BI"          # ← 변경
-  description: "융합형 의사과학자 양성 사업"           # ← 변경
+  title: "Bioinformatics for Medical Scientists"
+  description: "의과학과 대학원 · 생물정보학 개론 (7주)"
   navbar:
     logo: images/logo.jpg
     favicon: assets/img/logo.ico
@@ -23,21 +35,20 @@ website:
     contents:
       - text: "Home"
         href: index.qmd
-      - section: "1. Intro"
-        contents:
-          - chapters/part1/w1_intro.qmd
-      - section: "2. Genomics"
-        contents:
-          - chapters/part2/w2_gwas.qmd
-      - section: "3. Omics"
-        contents:
-          - chapters/part3/w4_epigenomics_methylation.qmd
-      - section: "4. Multi-Omics"
-        contents:
-          - chapters/part4/w11_multiomics.qmd
-      - section: "5. Capstone"
-        contents:
-          - chapters/part5/w13_visualization.qmd
+      - text: "W1. Introduction to Bioinformatics"
+        href: chapters/w1_intro.qmd
+      - text: "W2. Genomics"
+        href: chapters/w2_genomics.qmd
+      - text: "W3. Epigenomics"
+        href: chapters/w3_epigenomics.qmd
+      - text: "W4. Transcriptomics"
+        href: chapters/w4_transcriptomics.qmd
+      - text: "W5. Single-cell Transcriptomics"
+        href: chapters/w5_singlecell.qmd
+      - text: "W6. Proteomics"
+        href: chapters/w6_proteomics.qmd
+      - text: "W7. Metagenomics"
+        href: chapters/w7_metagenomics.qmd
 
   page-footer:
     left: "Copyright 2026, Eunji"

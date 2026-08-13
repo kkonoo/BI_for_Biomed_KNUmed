@@ -26,11 +26,15 @@ By the end of this chapter you should be able to:
 >
 > Transcript and protein levels correlate at roughly r ≈ 0.4. So what, exactly, did your RNA-seq tell you?
 
+![](images/clipboard-4216984541.png)
+
 ------------------------------------------------------------------------
 
 # 1. Why Measure Proteins 💪 {#w6-s1}
 
 ## 1) The correlation problem {#w6-s1-1}
+
+![Schwanhäusser et al., Nature, 2011 / Kosti et al., Scientific Reports, 201](images/clipboard-240159296.png){fig-align="center"}
 
 ![Across genes, mRNA abundance explains roughly a fifth of the variance in protein abundance.](/assets/img/w6/mrna_vs_protein.png){fig-align="center"}
 
@@ -292,7 +296,7 @@ Two technologies dominate large-cohort plasma proteomics. **Neither uses mass sp
 -   **SomaScan** — modified DNA aptamers (SOMAmers) bind targets; abundance read from aptamer quantity on an array
 
 |   | Mass spectrometry | Affinity (Olink / SomaScan) |
-|------------------|------------------|------------------|
+|------------------------|------------------------|------------------------|
 | Targets | Unbiased — whatever is there | Predefined panel only |
 | Proteins measured | \~3,000 (plasma, with effort) | Thousands, up to \~11,000 |
 | Sensitivity | Limited by dynamic range | Reaches pg/mL |
@@ -314,13 +318,15 @@ An Olink or SomaScan readout is a **binding signal** — and binding can be affe
 
 ## 3) 💊 Proteogenomics and pQTLs {#w6-s6-3}
 
+![Oh et al., Nature Medicine, 2025](images/clipboard-3472860519.png){fig-align="center"}
+
 **pQTL** — a genetic variant associated with a protein's abundance. The protein analogue of an eQTL (🔗 [W2 §4.4](w2_genomics.qmd#w2-s4-4), 🔗 [W4 §7.4](w4_transcriptomics.qmd#w4-s7-4)).
 
 Population-scale plasma proteomics on tens of thousands of biobank participants has made these available at scale.
 
 **This closes a loop that runs through the whole course:**
 
-```
+```         
 GWAS hit (W2)        → points to a locus
 pQTL (W6)            → which protein's level that locus controls
 Colocalization       → do the two signals share a causal variant?
@@ -331,8 +337,8 @@ a genetically validated, druggable target (🔗 W2 §6.3)
 
 ⚠️ Distinguish:
 
--   ***cis*-pQTL** — variant near the protein's own gene. Strong evidence, **but check for epitope effects**
--   ***trans*-pQTL** — variant elsewhere. Biologically interesting (a regulator, a clearance mechanism), harder to interpret
+-   ***cis*****-pQTL** — variant near the protein's own gene. Strong evidence, **but check for epitope effects**
+-   ***trans*****-pQTL** — variant elsewhere. Biologically interesting (a regulator, a clearance mechanism), harder to interpret
 
 ------------------------------------------------------------------------
 
@@ -384,26 +390,26 @@ Accurate structure prediction has changed what a protein list can support — va
 
 # 🔑 Key terms
 
-| Term | One-line meaning |
+| Term                 | One-line meaning                                  |
 |----------------------|---------------------------------------------------|
-| Bottom-up proteomics | Digest to peptides, then measure |
-| Tryptic peptide | Fragment produced by cutting after K/R |
-| MS1 / MS2 | Precursor survey scan / fragment scan |
-| b ion / y ion | N-terminal / C-terminal fragment series |
-| Target–decoy | FDR estimation using a reversed database |
-| Protein inference | Deciding which proteins the peptides came from |
-| Protein group | Indistinguishable proteins reported together |
-| DDA / DIA | Data-dependent / data-independent acquisition |
-| PRM / MRM | Targeted acquisition of a predefined list |
-| LFQ | Label-free quantification |
-| TMT / iTRAQ | Isobaric chemical labels, multiplexed in one run |
-| SILAC | Metabolic labelling with heavy amino acids |
-| Ratio compression | Co-isolation pulling TMT ratios toward 1 |
-| MNAR / MAR | Missing because low abundance / missing by chance |
-| Dynamic range | Span between most and least abundant protein |
-| PEA | Olink's dual-antibody DNA readout |
-| pQTL | Variant associated with a protein's level |
-| Phosphoproteomics | Enrichment and measurement of phosphopeptides |
+| Bottom-up proteomics | Digest to peptides, then measure                  |
+| Tryptic peptide      | Fragment produced by cutting after K/R            |
+| MS1 / MS2            | Precursor survey scan / fragment scan             |
+| b ion / y ion        | N-terminal / C-terminal fragment series           |
+| Target–decoy         | FDR estimation using a reversed database          |
+| Protein inference    | Deciding which proteins the peptides came from    |
+| Protein group        | Indistinguishable proteins reported together      |
+| DDA / DIA            | Data-dependent / data-independent acquisition     |
+| PRM / MRM            | Targeted acquisition of a predefined list         |
+| LFQ                  | Label-free quantification                         |
+| TMT / iTRAQ          | Isobaric chemical labels, multiplexed in one run  |
+| SILAC                | Metabolic labelling with heavy amino acids        |
+| Ratio compression    | Co-isolation pulling TMT ratios toward 1          |
+| MNAR / MAR           | Missing because low abundance / missing by chance |
+| Dynamic range        | Span between most and least abundant protein      |
+| PEA                  | Olink's dual-antibody DNA readout                 |
+| pQTL                 | Variant associated with a protein's level         |
+| Phosphoproteomics    | Enrichment and measurement of phosphopeptides     |
 
 ------------------------------------------------------------------------
 

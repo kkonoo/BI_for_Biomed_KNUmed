@@ -3759,7 +3759,7 @@
     "href": "chapters/w3_epigenomics.html#w3-s5-4",
     "title": "W3. Epigenomics",
     "section": "4) Epigenetic clocks ⏳",
-    "text": "4) Epigenetic clocks ⏳\nTake a few hundred CpGs whose methylation changes with age → fit a penalised regression against chronological age → a predictor accurate to within a few years.\n\n\n\nThe prediction is not the interesting part. The residual is.\n\n\nAge acceleration — the residual. How much older or younger someone looks epigenetically than their birth certificate says.\n\nAssociated with mortality, cardiovascular disease, and a long list of exposures\n\n\n\n\n\n\n\nWarningThree things to check before believing a clock result\n\n\n\n\n\n① Which clock?\n\n1st generation (Horvath, Hannum) — trained to predict chronological age → by construction, penalised for detecting biological ageing\n2nd generation (PhenoAge, GrimAge) — trained against clinical biomarkers and mortality → predict health outcomes considerably better\n→ not interchangeable; results do not transfer between them\n\n② Cell composition again. Blood clock signals are partly driven by immune cell proportions shifting with age. Adjusted or not?\n③ Association, not mechanism. Age acceleration is a biomarker. Nothing about a clock says whether methylation causes ageing or merely records it.",
+    "text": "4) Epigenetic clocks ⏳\n\n\n\nTeschendorff & Horvath et al., Nature Reviews Genetics, 2025\n\n\nTake a few hundred CpGs whose methylation changes with age → fit a penalised regression against chronological age → a predictor accurate to within a few years.\n\n\n\nThe prediction is not the interesting part. The residual is.\n\n\nAge acceleration — the residual. How much older or younger someone looks epigenetically than their birth certificate says.\n\nAssociated with mortality, cardiovascular disease, and a long list of exposures\n\n\n\n\n\n\n\nWarningThree things to check before believing a clock result\n\n\n\n\n\n① Which clock?\n\n1st generation (Horvath, Hannum) — trained to predict chronological age → by construction, penalised for detecting biological ageing\n2nd generation (PhenoAge, GrimAge) — trained against clinical biomarkers and mortality → predict health outcomes considerably better\n→ not interchangeable; results do not transfer between them\n\n② Cell composition again. Blood clock signals are partly driven by immune cell proportions shifting with age. Adjusted or not?\n③ Association, not mechanism. Age acceleration is a biomarker. Nothing about a clock says whether methylation causes ageing or merely records it.",
     "crumbs": [
       "Home",
       "W3. Epigenomics"
@@ -3814,7 +3814,7 @@
     "href": "chapters/w3_epigenomics.html#w3-s6-5",
     "title": "W3. Epigenomics",
     "section": "5) Where epigenetics is already clinical",
-    "text": "5) Where epigenetics is already clinical\n\nMethylation-based tumour classification — CNS tumour classifiers on methylation arrays now outperform histopathology for some entities; in routine diagnostic use\nCell-free DNA — plasma DNA methylation carries a tissue-of-origin signal → the basis of multi-cancer early detection assays\nEpigenetic drugs — DNMT inhibitors (azacitidine, decitabine) and HDAC inhibitors approved in haematological malignancy; EZH2 inhibitors in specific lymphomas and sarcoma\nImprinting disorders — Prader-Willi and Angelman syndromes diagnosed by methylation testing",
+    "text": "5) Where epigenetics is already clinical\n\nMethylation-based tumour classification — CNS tumour classifiers on methylation arrays now outperform histopathology for some entities; in routine diagnostic use\nCell-free DNA — plasma DNA methylation carries a tissue-of-origin signal → the basis of multi-cancer early detection assays\nEpigenetic drugs — DNMT inhibitors (azacitidine, decitabine) and HDAC inhibitors approved in haematological malignancy; EZH2 inhibitors in specific lymphomas and sarcoma\nImprinting disorders — Prader-Willi and Angelman syndromes diagnosed by methylation testing\n\n\n\n\nMarei, npj Precision Oncology, 2025",
     "crumbs": [
       "Home",
       "W3. Epigenomics"
@@ -4782,7 +4782,7 @@
     "href": "chapters/w5_singlecell.html#w5-s7-4",
     "title": "W5. Single-cell Transcriptomics",
     "section": "4) Reference atlases",
-    "text": "4) Reference atlases\n\n\n\nResource\nWhat it gives you\n\n\n\n\nHuman Cell Atlas\nCoordinated single-cell reference across human tissues\n\n\nCELLxGENE\nBrowse, subset, and download hundreds of published datasets interactively\n\n\nTabula Sapiens\nMulti-organ atlas from the same donors\n\n\nAzimuth\nReference-based annotation, in the browser\n\n\n\n💡 Before generating single-cell data, check whether the atlas already answers your question. For “which cell types express my gene”, it usually does.",
+    "text": "4) Reference atlases\n\n\n\nChen et al., Nature Medicine, 2024\n\n\n\n\n\nResource\nWhat it gives you\n\n\n\n\nHuman Cell Atlas\nCoordinated single-cell reference across human tissues\n\n\nCELLxGENE\nBrowse, subset, and download hundreds of published datasets interactively\n\n\nTabula Sapiens\nMulti-organ atlas from the same donors\n\n\nAzimuth\nReference-based annotation, in the browser\n\n\n\n💡 Before generating single-cell data, check whether the atlas already answers your question. For “which cell types express my gene”, it usually does.",
     "crumbs": [
       "Home",
       "W5. Single-cell Transcriptomics"
@@ -4804,7 +4804,7 @@
     "href": "chapters/w6_proteomics.html#w6-s1-1",
     "title": "W6. Proteomics",
     "section": "1) The correlation problem",
-    "text": "1) The correlation problem\n\n\n\nAcross genes, mRNA abundance explains roughly a fifth of the variance in protein abundance.\n\n\n\nProteins do the work — drug targets, biomarkers, enzymes\nRNA-seq measures none of them directly\n\nr ≈ 0.4 — read it carefully:\n\nAn across-genes correlation: gene A’s mRNA vs. gene A’s protein, over thousands of genes\nWithin one gene, across conditions → often better\n⚠️ For the common question “gene X’s transcript went up — did the protein?” the honest answer from RNA-seq alone is probably, maybe",
+    "text": "1) The correlation problem\n\n\n\nSchwanhäusser et al., Nature, 2011 / Kosti et al., Scientific Reports, 201\n\n\n\n\n\nAcross genes, mRNA abundance explains roughly a fifth of the variance in protein abundance.\n\n\n\nProteins do the work — drug targets, biomarkers, enzymes\nRNA-seq measures none of them directly\n\nr ≈ 0.4 — read it carefully:\n\nAn across-genes correlation: gene A’s mRNA vs. gene A’s protein, over thousands of genes\nWithin one gene, across conditions → often better\n⚠️ For the common question “gene X’s transcript went up — did the protein?” the honest answer from RNA-seq alone is probably, maybe",
     "crumbs": [
       "Home",
       "W6. Proteomics"
@@ -4936,7 +4936,7 @@
     "href": "chapters/w6_proteomics.html#w6-s6-3",
     "title": "W6. Proteomics",
     "section": "3) 💊 Proteogenomics and pQTLs",
-    "text": "3) 💊 Proteogenomics and pQTLs\npQTL — a genetic variant associated with a protein’s abundance. The protein analogue of an eQTL (🔗 W2 §4.4, 🔗 W4 §7.4).\nPopulation-scale plasma proteomics on tens of thousands of biobank participants has made these available at scale.\nThis closes a loop that runs through the whole course:\nGWAS hit (W2)        → points to a locus\npQTL (W6)            → which protein's level that locus controls\nColocalization       → do the two signals share a causal variant?\nMendelian rand. (W2) → does that protein causally affect disease?\n        ↓\na genetically validated, druggable target (🔗 W2 §6.3)\n⚠️ Distinguish:\n\ncis-pQTL — variant near the protein’s own gene. Strong evidence, but check for epitope effects\ntrans-pQTL — variant elsewhere. Biologically interesting (a regulator, a clearance mechanism), harder to interpret",
+    "text": "3) 💊 Proteogenomics and pQTLs\n\n\n\nOh et al., Nature Medicine, 2025\n\n\npQTL — a genetic variant associated with a protein’s abundance. The protein analogue of an eQTL (🔗 W2 §4.4, 🔗 W4 §7.4).\nPopulation-scale plasma proteomics on tens of thousands of biobank participants has made these available at scale.\nThis closes a loop that runs through the whole course:\nGWAS hit (W2)        → points to a locus\npQTL (W6)            → which protein's level that locus controls\nColocalization       → do the two signals share a causal variant?\nMendelian rand. (W2) → does that protein causally affect disease?\n        ↓\na genetically validated, druggable target (🔗 W2 §6.3)\n⚠️ Distinguish:\n\ncis-pQTL — variant near the protein’s own gene. Strong evidence, but check for epitope effects\ntrans-pQTL — variant elsewhere. Biologically interesting (a regulator, a clearance mechanism), harder to interpret",
     "crumbs": [
       "Home",
       "W6. Proteomics"
@@ -4991,7 +4991,7 @@
     "href": "chapters/w7_metagenomics.html#w7-s1-1",
     "title": "W7. Metagenomics",
     "section": "1) What lives where",
-    "text": "1) What lives where\n\nThe human body carries roughly as many bacterial cells as human cells — the once-quoted 10:1 ratio was an overestimate; current best estimate ≈ 1:1\nAlmost all of them are in the colon\n\n\n\n\nLeft: body sites are effectively different ecosystems. Right: and healthy individuals differ enormously from one another.\n\n\nTwo facts from this figure shape every microbiome study:\n\nBody sites are not comparable — gut, oral, skin, vaginal, and airway communities differ from each other more than most disease states differ from health\n⚠️ Between-person variation is enormous — two healthy adults can share a minority of their gut species\n\n→ detecting a disease effect requires large samples\n→ and most published microbiome studies are small",
+    "text": "1) What lives where\nThe human body carries roughly as many bacterial cells as human cells — the once-quoted 10:1 ratio was an overestimate; current best estimate ≈ 1:1\n\nAlmost all of them are in the colon\n\n\n\n\nLeft: body sites are effectively different ecosystems. Right: and healthy individuals differ enormously from one another.\n\n\nTwo facts from this figure shape every microbiome study:\n\nBody sites are not comparable — gut, oral, skin, vaginal, and airway communities differ from each other more than most disease states differ from health\n⚠️ Between-person variation is enormous — two healthy adults can share a minority of their gut species\n\n→ detecting a disease effect requires large samples\n→ and most published microbiome studies are small",
     "crumbs": [
       "Home",
       "W7. Metagenomics"
@@ -5002,7 +5002,7 @@
     "href": "chapters/w7_metagenomics.html#w7-s1-2",
     "title": "W7. Metagenomics",
     "section": "2) Disease associations, honestly",
-    "text": "2) Disease associations, honestly\nMicrobiome differences have been reported for nearly every disease studied. The strength of evidence varies enormously — be explicit about the tier:\n\n\n\n\n\n\n\nEvidence level\nExamples\n\n\n\n\nCausal, mechanistically established\nC. difficile infection (and FMT as treatment); H. pylori and gastric cancer\n\n\nStrong, with animal-model support\nDiet–microbiome–metabolite axes; bile acid metabolism; some drug metabolism (e.g. digoxin, irinotecan)\n\n\nReproducible association, causality unclear\nIBD, colorectal cancer, type 2 diabetes, obesity\n\n\nWidely reported, poorly replicated\nMost neuropsychiatric and behavioural “gut–brain” associations\n\n\n\n💡 Reading a microbiome paper → place it on this ladder before evaluating anything else.",
+    "text": "2) Disease associations, honestly\n\nMicrobiome differences have been reported for nearly every disease studied. The strength of evidence varies enormously — be explicit about the tier:\n\n\n\n\n\n\n\nEvidence level\nExamples\n\n\n\n\nCausal, mechanistically established\nC. difficile infection (and FMT as treatment); H. pylori and gastric cancer\n\n\nStrong, with animal-model support\nDiet–microbiome–metabolite axes; bile acid metabolism; some drug metabolism (e.g. digoxin, irinotecan)\n\n\nReproducible association, causality unclear\nIBD, colorectal cancer, type 2 diabetes, obesity\n\n\nWidely reported, poorly replicated\nMost neuropsychiatric and behavioural “gut–brain” associations\n\n\n\n\n\n\nYang et al., eBioMedicine , 2024\n\n\n💡 Reading a microbiome paper → place it on this ladder before evaluating anything else.",
     "crumbs": [
       "Home",
       "W7. Metagenomics"

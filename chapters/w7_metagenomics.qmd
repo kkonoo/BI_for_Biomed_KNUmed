@@ -26,13 +26,16 @@ By the end of this chapter you should be able to:
 >
 > Patients have less *Faecalibacterium* than controls. Is that a cause, a consequence, or an artifact?
 
+![](images/clipboard-2901442990.png)
+
 ------------------------------------------------------------------------
 
 # 1. The Human Microbiome 🦠 {#w7-s1}
 
 ## 1) What lives where {#w7-s1-1}
 
--   The human body carries **roughly as many bacterial cells as human cells** — the once-quoted 10:1 ratio was an overestimate; current best estimate ≈ 1:1
+The human body carries **roughly as many bacterial cells as human cells** — the once-quoted 10:1 ratio was an overestimate; current best estimate ≈ 1:1
+
 -   Almost all of them are in the colon
 
 ![Left: body sites are effectively different ecosystems. Right: and healthy individuals differ enormously from one another.](/assets/img/w7/taxonomic_composition.png){fig-align="center"}
@@ -46,6 +49,8 @@ Two facts from this figure shape every microbiome study:
 
 ## 2) Disease associations, honestly {#w7-s1-2}
 
+![](images/clipboard-2466041640.png)
+
 Microbiome differences have been reported for nearly every disease studied. **The strength of evidence varies enormously** — be explicit about the tier:
 
 | Evidence level | Examples |
@@ -54,6 +59,8 @@ Microbiome differences have been reported for nearly every disease studied. **Th
 | **Strong, with animal-model support** | Diet–microbiome–metabolite axes; bile acid metabolism; some drug metabolism (e.g. digoxin, irinotecan) |
 | **Reproducible association, causality unclear** | IBD, colorectal cancer, type 2 diabetes, obesity |
 | **Widely reported, poorly replicated** | Most neuropsychiatric and behavioural "gut–brain" associations |
+
+![Yang et al., eBioMedicine , 2024](images/clipboard-638520941.png){fig-align="center"}
 
 💡 Reading a microbiome paper → **place it on this ladder before evaluating anything else.**
 
@@ -173,20 +180,20 @@ The costs:
 
 ## 3) ✅ Choosing {#w7-s3-3}
 
-| Your question | Use |
-|----|----|
-| Broad survey, hundreds of samples, limited budget | 16S |
-| Low biomass where PCR amplification is needed | 16S |
-| Species or strain resolution | Shotgun |
-| What the community *does*, not just who is there | Shotgun |
-| Viruses, fungi, or mobile elements | Shotgun |
+| Your question                                     | Use     |
+|---------------------------------------------------|---------|
+| Broad survey, hundreds of samples, limited budget | 16S     |
+| Low biomass where PCR amplification is needed     | 16S     |
+| Species or strain resolution                      | Shotgun |
+| What the community *does*, not just who is there  | Shotgun |
+| Viruses, fungi, or mobile elements                | Shotgun |
 
 ------------------------------------------------------------------------
 
 # 4. Reference Databases and Their Limits 📚 {#w7-s4}
 
 | Database | Used for |
-|----|----|
+|------------------------------------|------------------------------------|
 | **SILVA**, **Greengenes2** | 16S taxonomy assignment |
 | **GTDB** | Genome-based taxonomy; increasingly the standard, and its names differ from older schemes |
 | **Kraken2 / Bracken** databases | Shotgun read classification — results depend heavily on which database was built |
@@ -218,7 +225,7 @@ The costs:
 
 **The problem** — sequencing depth varies between samples, and richness rises with depth. Something must be done.
 
-```
+```         
 Rarefaction (subsample all to equal depth)
    → was standard
    → criticised as statistically wasteful ("waste not, want not") — it discards data
@@ -310,7 +317,7 @@ A large benchmark across dozens of real datasets found:
 **Why they differ** — normalisation, whether compositionality is modelled, zero handling, and how conservative they are:
 
 | Method | Approach |
-|----|----|
+|------------------------------------|------------------------------------|
 | **ALDEx2** | CLR + Monte Carlo sampling from the Dirichlet posterior. Conservative |
 | **ANCOM-BC** | Estimates and corrects a sampling-fraction bias per sample |
 | **LinDA** | Linear model on CLR data with bias correction. Fast, handles complex designs |
@@ -445,13 +452,16 @@ Work through that list on a paper in your own field, and this course has done it
 -   ⚠️ **Differential abundance methods disagree substantially** on the same data. Run more than one, report the intersection
 -   For most microbiome–disease associations, causality is unknown. Artifact, confounding, and reverse causation must all be excluded first
 -   🎓 The critical-reading checklist in [§9](#w7-s9) applies to **every chapter of this course**
+-   You've now seen the major omics layers one by one. What really matters is [integrating]{.underline} them — **multi-omics**.
+
+![From genetic variation to actual players in pathogenesis](images/clipboard-959575580.png)
 
 ------------------------------------------------------------------------
 
 # 🔑 Key terms
 
 | Term | One-line meaning |
-|-------------------------|----------------------------------------------|
+|--------------------------|----------------------------------------------|
 | Microbiome / microbiota | The community, and its collective genomes |
 | 16S rRNA gene | Universal bacterial marker gene with variable regions |
 | OTU / ASV | 97%-similarity cluster / exact resolved sequence |

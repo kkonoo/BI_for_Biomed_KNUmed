@@ -27,6 +27,8 @@ By the end of this chapter you should be able to:
 >
 > Every cell in your body carries the same genome. So why is a neuron not a hepatocyte — and why does that matter for interpreting the 90% of GWAS hits that fall outside genes?
 
+![](images/clipboard-2383268863.png)
+
 ------------------------------------------------------------------------
 
 # 1. What the Epigenome Is 🎛️ {#w3-s1}
@@ -39,7 +41,7 @@ By the end of this chapter you should be able to:
 ![The DNA sequence is identical on both sides. Everything that differs is epigenetic.](/assets/img/w3/epigenome_layers.png){fig-align="center"}
 
 | Layer | What it is | Standard assay | Section |
-|----|----|----|----|
+|------------------|------------------|------------------|------------------|
 | **Chromatin accessibility** | How physically open the DNA is | ATAC-seq | [§2](#w3-s2) |
 | **Histone modification** | Chemical marks on histone tails | ChIP-seq, CUT&RUN | [§3](#w3-s3) |
 | **3D organization** | Which regions physically contact which | Hi-C, Micro-C | [§4](#w3-s4) |
@@ -159,7 +161,7 @@ You have an open region. What kind of element is it? The histone marks answer th
 Dozens exist. Five do most of the work in genomics.
 
 | Mark | Indicates | Shape of signal |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | **H3K4me3** | Active promoter | Sharp, at TSS |
 | **H3K27ac** | Active promoter **or** enhancer | Sharp-ish, flanking the element |
 | **H3K4me1** | Enhancer — primed or active | Broad |
@@ -363,6 +365,8 @@ Not hypothetical. Disease, infection, medication, age, and smoking all shift blo
 
 ## 4) Epigenetic clocks ⏳ {#w3-s5-4}
 
+![Teschendorff & Horvath et al., Nature Reviews Genetics, 2025](images/clipboard-3706154246.png){fig-align="center"}
+
 Take a few hundred CpGs whose methylation changes with age → fit a penalised regression against chronological age → a predictor accurate to within a few years.
 
 ![The prediction is not the interesting part. The residual is.](/assets/img/w3/epigenetic_clock.png){fig-align="center"}
@@ -403,7 +407,7 @@ Given a set of peaks: which TF binding motifs are over-represented relative to a
 **ChromHMM** — learns recurring combinations of marks, labels every genomic segment with a state ("active TSS", "weak enhancer", "heterochromatin"). Converts five noisy tracks into one interpretable annotation.
 
 | Resource | What it holds |
-|----|----|
+|------------------------------------|------------------------------------|
 | [**ENCODE**](https://www.encodeproject.org/) | Uniformly processed ChIP, ATAC, RNA across hundreds of cell types; candidate cis-regulatory elements (cCREs) |
 | [**Roadmap Epigenomics**](http://www.roadmapepigenomics.org/) | Chromatin states across 127 primary tissues and cell types |
 | [**UCSC**](https://genome.ucsc.edu/) / [**WashU**](https://epigenomegateway.wustl.edu/) browsers | Where you look at all of the above over your locus |
@@ -451,6 +455,8 @@ This is why the field pushed so hard toward single-cell chromatin profiling (�
 -   **Epigenetic drugs** — DNMT inhibitors (azacitidine, decitabine) and HDAC inhibitors approved in haematological malignancy; EZH2 inhibitors in specific lymphomas and sarcoma
 -   **Imprinting disorders** — Prader-Willi and Angelman syndromes diagnosed by methylation testing
 
+![Marei, npj Precision Oncology, 2025](images/clipboard-2486861774.png){fig-align="center"}
+
 ------------------------------------------------------------------------
 
 # 📝 Summary
@@ -472,7 +478,7 @@ This is why the field pushed so hard toward single-cell chromatin profiling (�
 # 🔑 Key terms
 
 | Term | One-line meaning |
-|----|----|
+|------------------------------------|------------------------------------|
 | ATAC-seq | Tn5-based map of open chromatin |
 | TSS enrichment | Signal at transcription start sites; core ATAC QC |
 | Footprint | Protection from cleavage by a bound protein |

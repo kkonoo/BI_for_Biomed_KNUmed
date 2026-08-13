@@ -26,6 +26,8 @@ By the end of this chapter you should be able to:
 >
 > Your bulk RNA-seq shows a clean two-fold increase. Is that every cell changing a little, 5% of cells changing a lot, or no cell changing at all?
 
+![](images/clipboard-2113067316.png){fig-align="center"}
+
 ------------------------------------------------------------------------
 
 # 1. Why Single Cell 🔬 {#w5-s1}
@@ -155,7 +157,7 @@ Zeros have two very different meanings:
 
 ## 1) The standard pipeline {#w5-s4-1}
 
-```
+```         
 normalise  →  select highly variable genes  →  PCA
            →  build a k-nearest-neighbour graph
            →  cluster (Leiden)  →  UMAP for visualisation
@@ -350,8 +352,10 @@ Dissociation discards everything about *where* a cell was. Spatial methods keep 
 
 ## 4) Reference atlases {#w5-s7-4}
 
+![Chen et al., Nature Medicine, 2024](images/clipboard-1059951960.png){fig-align="center"}
+
 | Resource | What it gives you |
-|----|----|
+|------------------------------------|------------------------------------|
 | [**Human Cell Atlas**](https://www.humancellatlas.org/) | Coordinated single-cell reference across human tissues |
 | [**CELLxGENE**](https://cellxgene.cziscience.com/) | Browse, subset, and download hundreds of published datasets interactively |
 | [**Tabula Sapiens**](https://tabula-sapiens.sf.czbiohub.org/) | Multi-organ atlas from the same donors |
@@ -379,7 +383,7 @@ Dissociation discards everything about *where* a cell was. Spatial methods keep 
 # 🔑 Key terms
 
 | Term | One-line meaning |
-|-------------------------|--------------------------------------------------|
+|-------------------------|------------------------------------------------|
 | Cell barcode | Sequence identifying which droplet a read came from |
 | UMI | Tag marking one original mRNA molecule |
 | Dropout | Expressed transcript not captured — a technical zero |

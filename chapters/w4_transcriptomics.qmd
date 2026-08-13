@@ -26,6 +26,8 @@ By the end of this chapter you should be able to:
 >
 > Your knockout has a phenotype. RNA-seq returns 847 differentially expressed genes. Which of them mean anything?
 
+![](images/clipboard-3691346398.png)
+
 ------------------------------------------------------------------------
 
 # 1. What RNA-seq Measures 📏 {#w4-s1}
@@ -92,7 +94,7 @@ Ribosomal RNA = \~80–90% of total RNA in a cell. Sequence total RNA directly �
 ## 3) Read length, depth, and paired-end {#w4-s2-3}
 
 | Choice | When it matters |
-|----|----|
+|------------------------------------|------------------------------------|
 | **Longer reads** (2×150 vs 1×50) | Isoform and splice junction work; less benefit for plain gene-level counting |
 | **Paired-end** | Isoforms, fusion detection, novel transcripts. For gene-level DE, single-end is often sufficient |
 | **Depth** | See [§5.4](#w4-s5-4) — saturates much earlier than people expect |
@@ -200,7 +202,7 @@ Both assume **the majority of genes do not change**. Usually safe.
 ## 3) Which measure, when {#w4-s4-3}
 
 | Method | Corrects | Comparable | Use for |
-|----|----|----|----|
+|------------------|------------------|------------------|------------------|
 | **Raw counts** | nothing | — | **Input to DESeq2 / edgeR** — do not pre-normalise |
 | **CPM** | depth | between samples | Filtering low-expression genes |
 | **RPKM / FPKM** | depth + length | within a sample only | Legacy; avoid for comparisons |
@@ -251,7 +253,7 @@ $$
 ## 3) The three standard tools {#w4-s5-3}
 
 | Tool | Model | Notes |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | **DESeq2** | Negative binomial; shrinkage of dispersion *and* log fold change | Conservative; good default; handles small n well |
 | **edgeR** | Negative binomial; empirical Bayes dispersion | Very similar in practice; quasi-likelihood mode slightly more conservative |
 | **limma-voom** | Transforms counts, models precision weights, then linear models | Fastest at large n; most flexible for complex designs |
@@ -322,7 +324,7 @@ You now have 847 genes. A list is not a result — **what do they have in common
 ## 2) Which databases {#w4-s6-2}
 
 | Resource | Content | Caution |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | **GO** | Biological process, molecular function, cellular component | Highly redundant; terms nested at wildly different specificity |
 | **KEGG** | Curated metabolic and signalling pathways | Manually curated but slow to update |
 | **Reactome** | Detailed, hierarchical reaction-level pathways | Deeper than KEGG, more complex to summarise |
@@ -424,28 +426,28 @@ Bring W2 back.
 
 # 🔑 Key terms
 
-| Term | One-line meaning |
-|-------------------------|-------------------------------------------------|
-| Poly(A) selection | Capturing polyadenylated transcripts with oligo-dT |
-| rRNA depletion | Removing ribosomal RNA with probes |
-| Stranded library | Records which strand a transcript came from |
-| Spliced alignment | Alignment allowing exon–exon junction gaps |
-| Pseudo-alignment | Transcript compatibility without base-level alignment |
-| Count matrix | Genes × samples table of read counts |
-| Library size | Total reads for a sample |
-| Composition effect | One gene's rise lowering every other proportion |
-| CPM / TPM / FPKM | Depth- and length-normalised expression units |
-| TMM / RLE | Composition-aware size factors (edgeR / DESeq2) |
-| Overdispersion | Variance exceeding the Poisson expectation |
-| Dispersion (φ) | The extra-Poisson variance parameter |
-| Shrinkage | Pulling noisy per-gene estimates toward a global trend |
-| log₂ fold change | Effect size on a log scale |
-| Volcano / MA plot | Significance vs. effect / effect vs. expression |
-| ORA | Fisher test on a thresholded gene list |
-| GSEA | Enrichment across a full ranked list |
-| WGCNA | Clustering genes into co-expression modules |
-| Deconvolution | Estimating cell type proportions from bulk data |
-| eQTL | Variant associated with a gene's expression |
+| Term               | One-line meaning                                       |
+|-------------------------|-----------------------------------------------|
+| Poly(A) selection  | Capturing polyadenylated transcripts with oligo-dT     |
+| rRNA depletion     | Removing ribosomal RNA with probes                     |
+| Stranded library   | Records which strand a transcript came from            |
+| Spliced alignment  | Alignment allowing exon–exon junction gaps             |
+| Pseudo-alignment   | Transcript compatibility without base-level alignment  |
+| Count matrix       | Genes × samples table of read counts                   |
+| Library size       | Total reads for a sample                               |
+| Composition effect | One gene's rise lowering every other proportion        |
+| CPM / TPM / FPKM   | Depth- and length-normalised expression units          |
+| TMM / RLE          | Composition-aware size factors (edgeR / DESeq2)        |
+| Overdispersion     | Variance exceeding the Poisson expectation             |
+| Dispersion (φ)     | The extra-Poisson variance parameter                   |
+| Shrinkage          | Pulling noisy per-gene estimates toward a global trend |
+| log₂ fold change   | Effect size on a log scale                             |
+| Volcano / MA plot  | Significance vs. effect / effect vs. expression        |
+| ORA                | Fisher test on a thresholded gene list                 |
+| GSEA               | Enrichment across a full ranked list                   |
+| WGCNA              | Clustering genes into co-expression modules            |
+| Deconvolution      | Estimating cell type proportions from bulk data        |
+| eQTL               | Variant associated with a gene's expression            |
 
 ------------------------------------------------------------------------
 

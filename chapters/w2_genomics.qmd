@@ -26,6 +26,8 @@ By the end of this chapter you should be able to:
 >
 > Any two people differ at roughly 4–5 million positions in their genome. Which of those differences cause disease?
 
+![](images/clipboard-2115945549.png)
+
 ------------------------------------------------------------------------
 
 # 1. Human Genetic Variation 🧬 {#w2-s1}
@@ -107,7 +109,7 @@ This figure is also a history of the field:
 ## 3) Germline vs. somatic {#w2-s1-3}
 
 |   | Germline | Somatic |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | Present in | Every cell | A subset of cells |
 | Inherited | Yes | No |
 | Allele fraction | \~0.5 or \~1.0 | Anything from \<0.01 to 1.0 |
@@ -168,7 +170,7 @@ A VCF looks like a list of facts. It is a list of **inferences**, each with a co
 ![The same locus, three technologies. Coverage patterns are schematic but the qualitative differences are real.](/assets/img/w2/platform_comparison.png){fig-align="center"}
 
 |   | WGS | WES | Array |
-|----|----|----|----|
+|------------------|------------------|------------------|------------------|
 | Genome covered | \~100% | \~1–2% (coding) | \~0.02% (selected sites) |
 | Detects novel variants | ✅ | ✅ (coding only) | ❌ |
 | Structural variants | Partially (well with long reads) | Poorly | Large CNVs only |
@@ -215,7 +217,7 @@ An imputed genotype is a **prediction**. Treating predictions as measurements is
 ## 1) Study designs {#w2-s3-1}
 
 | Design | Outcome | Notes |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | **Case–control** | Binary (disease / no disease) | Effect reported as odds ratio |
 | **Quantitative trait** | Continuous (BMI, blood pressure, lipid level) | Usually better powered per sample |
 | **Biobank / PheWAS** | Thousands of phenotypes at once | One genotype set, many outcomes ([§6](#w2-s6)) |
@@ -390,7 +392,7 @@ Enhancers routinely skip over intervening genes to reach their target.
 ## 4) Variant to gene: the toolkit {#w2-s4-4}
 
 | Approach | Question | Limitation |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | **eQTL mapping** | Which variants associate with expression of which genes? | Tissue- and cell-type-specific; needs the right tissue |
 | **Colocalization** | Do the GWAS and eQTL signals share the same causal variant? | Statistically distinguishes shared cause from coincidence — but low power |
 | **TWAS** | Which genes' predicted expression associates with the trait? | Efficient screen; does not establish causality |
@@ -413,7 +415,7 @@ Two things to hold onto:
 -   ⚠️ **Context-dependent.** Rises when the environment is uniform, falls when it varies → the same trait can have different heritability in different populations or eras
 
 | Estimate | From | Typically |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | **Twin h²** | Comparing MZ and DZ twin similarity | Highest; includes all genetic variation, and inflates if shared-environment assumptions fail |
 | **SNP h²** | Genome-wide relatedness among unrelated individuals | Lower; captures only what common SNPs tag |
 | **h² from genome-wide significant hits** | Summing effects of significant loci | Lowest by far |
@@ -552,7 +554,7 @@ Cancer is a **somatic** genetic disease → different questions.
 # 🔑 Key terms
 
 | Term | One-line meaning |
-|----|----|
+|------------------------------------|------------------------------------|
 | SNV / SNP | One base changed relative to reference |
 | Structural variant | Variant larger than \~50 bp |
 | Copy number variant | Region present in abnormal dosage |

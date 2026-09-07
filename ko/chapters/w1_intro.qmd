@@ -370,12 +370,12 @@ BAM은 대부분의 프로젝트에서 read-level 정보가 끝나는 지점입�
 
 | 자료원 | 내용 | 접근 |
 |---|---|---|
-| **GEO**(NCBI) | 모든 분석법의 처리된 행렬과 metadata | 공개 |
-| **SRA**(NCBI) | 원시 리드(FASTQ) | 공개 |
-| **ENA**(EMBL-EBI) | 원시 리드, SRA의 유럽 mirror | 공개 |
-| **ArrayExpress/BioStudies** | 기능유전체 실험 | 공개 |
-| **PRIDE** | 질량분석 단백체(🔗 W6) | 공개 |
-| **MetaboLights** | 대사체 | 공개 |
+| **[GEO](https://www.ncbi.nlm.nih.gov/geo/)**(NCBI) | 모든 분석법의 처리된 행렬과 metadata | 공개 |
+| **[SRA](https://www.ncbi.nlm.nih.gov/sra/)**(NCBI) | 원시 리드(FASTQ) | 공개 |
+| **[ENA](https://www.ebi.ac.uk/ena/)**(EMBL-EBI) | 원시 리드, SRA의 유럽 mirror | 공개 |
+| **[ArrayExpress/BioStudies](https://www.ebi.ac.uk/biostudies/arrayexpress)** | 기능유전체 실험 | 공개 |
+| **[PRIDE](https://www.ebi.ac.uk/pride/)** | 질량분석 단백체(🔗 W6) | 공개 |
+| **[MetaboLights](https://www.ebi.ac.uk/metabolights/)** | 대사체 | 공개 |
 
 ## 2) 제한 접근 자료 {#w1-s3-2}
 
@@ -383,10 +383,10 @@ BAM은 대부분의 프로젝트에서 read-level 정보가 끝나는 지점입�
 
 | 자료원 | 내용 | 접근 |
 |---|---|---|
-| **dbGaP** | 미국의 개인 수준 genotype/phenotype | 신청 |
-| **EGA** | 유럽의 대응 자료원 | 신청 |
-| **UK Biobank** | 약 50만 명의 genotype, 영상, EHR 연계 | 신청+비용 |
-| **All of Us** | 다양성에 초점을 둔 미국 코호트 | 신청 |
+| **[dbGaP](https://www.ncbi.nlm.nih.gov/gap/)** | 미국의 개인 수준 genotype/phenotype | 신청 |
+| **[EGA](https://ega-archive.org/)** | 유럽의 대응 자료원 | 신청 |
+| **[UK Biobank](https://www.ukbiobank.ac.uk/)** | 약 50만 명의 genotype, 영상, EHR 연계 | 신청+비용 |
+| **[All of Us](https://www.researchallofus.org/data-tools/workbench/)** | 다양성에 초점을 둔 미국 코호트 | 신청 |
 
 💡 승인에는 **몇 주에서 몇 달**이 걸립니다. 분석 직전이 아니라 *연구계획서* 단계에서 시작하세요.
 
@@ -396,12 +396,12 @@ BAM은 대부분의 프로젝트에서 read-level 정보가 끝나는 지점입�
 
 | 자료원 | 제공하는 정보 | 등장 주차 |
 |---|---|---|
-| **GTEx** | 약 54개 정상 조직의 발현과 eQTL | W2, W4 |
-| **ENCODE/Roadmap** | 세포 유형별 조절 요소와 크로마틴 지도 | W3 |
-| **TCGA** | 33개 암종의 multi-omics와 임상 추적 | W2, W4 |
-| **Human Cell Atlas/Tabula Sapiens** | 단일세포 참조 아틀라스 | W5 |
-| **1000 Genomes/gnomAD** | 집단별 대립유전자 빈도 | W2 |
-| **Human Protein Atlas** | 단백질 발현과 위치 | W6 |
+| **[GTEx](https://gtexportal.org/)** | 약 54개 정상 조직의 발현과 eQTL | W2, W4 |
+| **[ENCODE](https://www.encodeproject.org/)/[Roadmap](https://www.ncbi.nlm.nih.gov/geo/roadmap/epigenomics/)** | 세포 유형별 조절 요소와 크로마틴 지도 | W3 |
+| **[TCGA](https://portal.gdc.cancer.gov/)** | 33개 암종의 multi-omics와 임상 추적 | W2, W4 |
+| **[Human Cell Atlas](https://www.humancellatlas.org/)/[Tabula Sapiens](https://tabula-sapiens-portal.ds.czbiohub.org/)** | 단일세포 참조 아틀라스 | W5 |
+| **[1000 Genomes](https://www.internationalgenome.org/)/[gnomAD](https://gnomad.broadinstitute.org/)** | 집단별 대립유전자 빈도 | W2 |
+| **[Human Protein Atlas](https://www.proteinatlas.org/)** | 단백질 발현과 위치 | W6 |
 
 ## 4) 💡 재분석할 가치가 있는 공개 데이터 {#w1-s3-4}
 

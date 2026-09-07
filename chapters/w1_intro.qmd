@@ -377,12 +377,12 @@ More usable public omics data exists than any lab could generate. For many quest
 
 | Resource | Contents | Access |
 |----------------------|-----------------------------------|----------------|
-| **GEO** (NCBI) | Processed matrices + metadata, all assay types | Open |
-| **SRA** (NCBI) | Raw reads (FASTQ) | Open |
-| **ENA** (EMBL-EBI) | Raw reads, European mirror of SRA | Open |
-| **ArrayExpress / BioStudies** | Functional genomics experiments | Open |
-| **PRIDE** | Mass spectrometry proteomics (🔗 W6) | Open |
-| **MetaboLights** | Metabolomics | Open |
+| **[GEO](https://www.ncbi.nlm.nih.gov/geo/)** (NCBI) | Processed matrices + metadata, all assay types | Open |
+| **[SRA](https://www.ncbi.nlm.nih.gov/sra/)** (NCBI) | Raw reads (FASTQ) | Open |
+| **[ENA](https://www.ebi.ac.uk/ena/)** (EMBL-EBI) | Raw reads, European mirror of SRA | Open |
+| **[ArrayExpress / BioStudies](https://www.ebi.ac.uk/biostudies/arrayexpress)** | Functional genomics experiments | Open |
+| **[PRIDE](https://www.ebi.ac.uk/pride/)** | Mass spectrometry proteomics (🔗 W6) | Open |
+| **[MetaboLights](https://www.ebi.ac.uk/metabolights/)** | Metabolomics | Open |
 
 ## 2) Controlled access {#w1-s3-2}
 
@@ -390,10 +390,10 @@ Individual-level human genotype data is identifying → cannot be posted openly.
 
 | Resource | Contents | Access |
 |----------------|---------------------------------------|----------------|
-| **dbGaP** | US individual-level genotype/phenotype | Application |
-| **EGA** | European equivalent | Application |
-| **UK Biobank** | \~500,000 participants: genotype, imaging, EHR linkage | Application + fee |
-| **All of Us** | US diversity-focused cohort | Application |
+| **[dbGaP](https://www.ncbi.nlm.nih.gov/gap/)** | US individual-level genotype/phenotype | Application |
+| **[EGA](https://ega-archive.org/)** | European equivalent | Application |
+| **[UK Biobank](https://www.ukbiobank.ac.uk/)** | \~500,000 participants: genotype, imaging, EHR linkage | Application + fee |
+| **[All of Us](https://www.researchallofus.org/data-tools/workbench/)** | US diversity-focused cohort | Application |
 
 💡 Applications take **weeks to months**. Start at the *proposal* stage, not when you are ready to analyze.
 
@@ -403,12 +403,12 @@ Reference resources rather than experiments — you look things up in them.
 
 | Resource | What it gives you | Appears in |
 |--------------------------|------------------------------|----------------|
-| **GTEx** | Normal-tissue expression across \~54 tissues; eQTLs | W2, W4 |
-| **ENCODE / Roadmap** | Regulatory element and chromatin maps across cell types | W3 |
-| **TCGA** | Multi-omics across 33 cancer types, with clinical follow-up | W2, W4 |
-| **Human Cell Atlas / Tabula Sapiens** | Single-cell reference atlases | W5 |
-| **1000 Genomes / gnomAD** | Population allele frequencies | W2 |
-| **Human Protein Atlas** | Protein expression and localization | W6 |
+| **[GTEx](https://gtexportal.org/)** | Normal-tissue expression across \~54 tissues; eQTLs | W2, W4 |
+| **[ENCODE](https://www.encodeproject.org/) / [Roadmap](https://www.ncbi.nlm.nih.gov/geo/roadmap/epigenomics/)** | Regulatory element and chromatin maps across cell types | W3 |
+| **[TCGA](https://portal.gdc.cancer.gov/)** | Multi-omics across 33 cancer types, with clinical follow-up | W2, W4 |
+| **[Human Cell Atlas](https://www.humancellatlas.org/) / [Tabula Sapiens](https://tabula-sapiens-portal.ds.czbiohub.org/)** | Single-cell reference atlases | W5 |
+| **[1000 Genomes](https://www.internationalgenome.org/) / [gnomAD](https://gnomad.broadinstitute.org/)** | Population allele frequencies | W2 |
+| **[Human Protein Atlas](https://www.proteinatlas.org/)** | Protein expression and localization | W6 |
 
 ## 4) 💡 What makes a public dataset worth reanalyzing {#w1-s3-4}
 

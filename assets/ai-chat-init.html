@@ -4,14 +4,15 @@
   // ★ Cloudflare Worker 배포 후 URL로 교체하세요
   const WORKER_URL = "https://falling-wave-447f.eh0129s.workers.dev/";
 
-  // 각 .qmd 파일의 YAML에서 ai-context를 읽어옵니다
-  // (없으면 빈 문자열 → 기본 안내 메시지)
+  // ai-context 메타태그가 있으면 우선 사용하고, 없으면 현재 본문을 읽습니다.
   const metaContext = document.querySelector('meta[name="ai-context"]');
   const metaTitle   = document.querySelector('meta[name="ai-title"]') || { content: document.title };
+  const pageContent = document.querySelector('#quarto-document-content, main.content, main');
+  const derivedContext = pageContent ? pageContent.innerText.trim().slice(0, 24000) : "";
 
   window.AI_CHAT_CONFIG = {
     workerUrl:      WORKER_URL,
-    chapterContext: metaContext ? metaContext.content : "",
+    chapterContext: metaContext ? metaContext.content : derivedContext,
     chapterTitle:   metaTitle  ? metaTitle.content   : document.title,
   };
 </script>
@@ -79,6 +80,33 @@ ${CHAPTER_CONTEXT}
     #ai-chat-panel.open {
       transform: scale(1) translateY(0);
       opacity: 1; pointer-events: all;
+    }
+
+    body.quarto-dark #ai-chat-panel {
+      background: #171b22;
+      color: #e8eaed;
+      border: 1px solid #343a46;
+    }
+
+    body.quarto-dark .ai-msg.assistant,
+    body.quarto-dark .ai-typing {
+      background: #252b35;
+      color: #e8eaed;
+    }
+
+    body.quarto-dark .ai-msg.assistant code {
+      background: #343b47;
+      color: #f1f3f5;
+    }
+
+    body.quarto-dark #ai-chat-input-row {
+      border-top-color: #343a46;
+    }
+
+    body.quarto-dark #ai-chat-input {
+      background: #202630;
+      border-color: #434b59;
+      color: #f1f3f5;
     }
 
     #ai-chat-header {
@@ -233,11 +261,11 @@ ${CHAPTER_CONTEXT}
     const div = document.createElement("div");
     div.className = `ai-msg ${role}`;
     // 간단한 코드블록 렌더링
-    div.innerHTML = text
+    div.innerHTML = escHtml(text)
       .replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) =>
-        `<pre><code>${escHtml(code.trim())}</code></pre>`
+        `<pre><code>${code.trim()}</code></pre>`
       )
-      .replace(/`([^`]+)`/g, (_, c) => `<code>${escHtml(c)}</code>`)
+      .replace(/`([^`]+)`/g, (_, c) => `<code>${c}</code>`)
       .replace(/\n/g, "<br>");
     messages.appendChild(div);
     messages.scrollTop = messages.scrollHeight;
@@ -275,8 +303,6 @@ ${CHAPTER_CONTEXT}
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: "claude-sonnet-5",
-          max_tokens: 4096,
           system: SYSTEM_PROMPT,
           messages: history,
         }),

@@ -6,7 +6,6 @@ affiliation: 'School of Medicine, Kyungpook National Univ.'
 date: last-modified
 format: html
 editor: visual
-categories: [의과학, bioinformatics, omics]
 ---
 
 ## 📖 Course overview

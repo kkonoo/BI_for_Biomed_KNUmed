@@ -1,0 +1,644 @@
+---
+title: "W1. 생물정보학 입문"
+author: "Eunji Ha"
+date: last-modified
+format: html
+execute:
+  echo: true
+  eval: false
+---
+
+::: {.callout-note collapse="true"}
+## 🎯 학습목표
+
+이 장을 마치면 다음을 할 수 있어야 합니다.
+
+-   생물정보학자가 하는 일과 연구자에게 필요한 정보를 설명한다.
+-   세 가지 주요 시퀀싱 기술과 각각의 장점을 설명한다.
+-   파일을 직접 열지 않고도 FASTQ, BAM, VCF, count matrix에 무엇이 들어 있는지 말한다.
+-   참조 유전체와 annotation 선택이 결과를 바꾸는 이유를 설명한다.
+-   주요 공개 오믹스 저장소와 각 저장소의 데이터 종류를 구분한다.
+-   대부분의 오믹스 분석을 망치는 세 가지 통계적 함정을 알아본다.
+-   시료를 시퀀싱에 보내기 *전에* 생산적인 연구 설계 대화를 나눈다.
+:::
+
+> 🤔 **출발 질문**
+>
+> 시료 분석이 끝났고 한 번도 접속해 본 적 없는 서버에 200 GB 데이터 링크가 도착했습니다. 이제 무엇을 해야 할까요?
+
+------------------------------------------------------------------------
+
+# 1. 생물정보학이란 무엇인가 👩‍💻 {#w1-s1}
+
+## 1) Bio + Information {#w1-s1-1}
+
+두 단어가 합쳐진 말이며, 양쪽 모두 중요합니다.
+
+-   **Bio** ➡️ 표현형 정보가 연결된 사람의 검체, 세포, 조직
+-   **Information** ➡️ 데이터, 대개 오믹스 데이터이며 보통 매우 큰 표
+
+![생물정보학은 생물학, 컴퓨터과학, 통계학의 교차점에 있으며 시료에서 해석에 이르는 전 과정을 다룹니다.](/assets/img/w1/bioinformatics.png){fig-align="center"}
+
+**하는 일** — 두 번째 것을 첫 번째에 관한 설명으로 바꾸는 것입니다.
+
+**어려운 점** — 이 번역 과정에서는 *양방향으로 정보가 손실*됩니다.
+
+-   종양 ➡️ 숫자로 이루어진 행렬
+-   숫자 행렬 ➡️ 종양에 관한 주장
+
+이 강의의 상당 부분은 각 단계에서 정보가 어디로 빠져나가는지를 다룹니다.
+
+------------------------------------------------------------------------
+
+## 2) 서로 인접한 세 분야 {#w1-s1-2}
+
+흔히 같은 뜻으로 쓰지만 서로 다른 일을 합니다.
+
+| 분야 | 중심 질문 | 대표 결과물 |
+|---|---|---|
+| **생물정보학** | 원시 데이터에서 해석할 수 있는 측정값까지 어떻게 갈 것인가? | 처리된 행렬, variant call, annotation된 유전자 목록 |
+| **계산생물학** | 생물학을 설명하거나 예측하는 모형을 만들 수 있는가? | 시뮬레이션, 예측 모형, 기전 이론 |
+| **생물통계학** | 이 연구 설계로 어떤 결론을 정당하게 내릴 수 있는가? | 추정치, 신뢰구간, p-value, 연구 설계 |
+
+실제로는 한 사람이 세 역할을 모두 수행하기도 합니다. 하지만 **누구에게 물어볼지** 정할 때는 구분이 중요합니다.
+
+-   “Aligner가 리드의 40%를 버립니다.” → 생물정보학
+-   “n = 3이면 충분한가요?” → 생물통계학. 그리고 이 질문은 몇 달 전에 했어야 합니다.
+
+::: {.callout-tip collapse="true"}
+## 이번 학기에 배울 가장 유용한 것
+
+어떤 프로그램을 실행하는 법이 아닙니다.
+
+지금 묻는 것이 **세 질문 중 어느 것인지 알아보는 능력**입니다. 잘못된 전문가에게 질문하면 몇 달을 낭비할 수 있습니다.
+:::
+
+------------------------------------------------------------------------
+
+## 3) Wet lab ➡️ dry lab {#w1-s1-3}
+
+여러분에게는 이미 올바른 반사작용이 있습니다. 멋진 Western blot을 보면 loading control은 무엇인지, 생물학적 반복은 몇 개인지, 노출이 포화되지는 않았는지 묻습니다.
+
+Dry lab에서도 같은 감각을 다른 인공물에 적용합니다.
+
+| Wet lab의 습관 | Dry lab에서 대응하는 것 |
+|---|---|
+| Loading control | 정규화(W4) |
+| 항체 검증 | 참조 데이터베이스와 annotation 선택(W1, W6) |
+| 맹검과 무작위화 | 배치 설계와 무작위 시료 배치(W1) |
+| 기술적 반복과 생물학적 반복 | 같은 구분이지만 결과에 더 큰 영향을 줌(W4) |
+| “한 번은 됐어요” | 두 번째 코호트에서 재현되지 않는 발견 |
+
+**계산 분석에만 있는 실패 유형**은 분석이 언제나 답을 만들어낸다는 것입니다.
+
+-   실패한 PCR → 빈 gel이라서 실패가 명확함
+-   실패한 RNA-seq 분석 → p-value 순으로 잘 정리된 유전자 847개. **겉모습만으로는 틀렸다는 사실을 알 수 없음**
+
+------------------------------------------------------------------------
+
+## 4) 일반적인 오믹스 워크플로 🗺️ {#w1-s1-4}
+
+다음 6주에 배울 오믹스 층위를 중심원리에 따라 정리하면 각 층위의 특징적인 질문이 보입니다.
+
+![W2는 유전체, W3는 조절 상태, W4–W5는 전사체, W6는 단백체를 다룹니다. W7은 두 번째 유전체인 마이크로바이옴에 같은 질문을 던집니다.](/assets/img/w1/central_dogma.png){fig-align="center"}
+
+유전체학, 후성유전체학, 전사체학, 단백체학, 메타유전체학의 모든 분석은 같은 다섯 단계를 따릅니다.
+
+```         
+① 품질관리          → 이 데이터를 사용할 수 있는가?
+② 정렬/정량         → 각 측정값은 어디에서 왔으며 얼마나 있는가?
+③ 정규화            → 시료들을 서로 비교할 수 있게 만들기
+④ 통계 검정         → 어떤 차이가 잡음보다 큰가?
+⑤ 해석              → 생물학적으로 무엇을 의미하는가?
+```
+
+::: {.callout-important collapse="true"}
+## 강의 전체를 보는 지도
+
+W2부터는 항상 다섯 단계 중 어디에 있는지 물으세요. 기술은 크게 달라도 단계는 거의 바뀌지 않습니다.
+
+오류도 이 단계들에서 생기며 **위험의 크기는 서로 다릅니다**.
+
+-   ①·②단계 오류 → **시끄러운 오류**. 파이프라인이 멈추거나 숫자가 터무니없습니다.
+-   ③·④단계 오류 → **조용한 오류**. 논문까지 도달하는 것은 주로 이 오류들입니다.
+:::
+
+------------------------------------------------------------------------
+
+# 2. 시퀀싱과 데이터 🧪 {#w1-s2}
+
+## 1) 한 시간에 이해하는 시퀀싱 기술 {#w1-s2-1}
+
+RNA, 크로마틴, 단백질 결합을 묻는 경우에도 거의 모든 오믹스 데이터는 **DNA 시퀀싱**에서 나옵니다. 모든 분자적 질문을 “DNA 조각의 수를 세기”로 바꾼 것이 오믹스를 가능하게 한 핵심 아이디어입니다.
+
+또 하나의 동력은 경제성이었습니다. 유전체당 비용은 무어의 법칙보다 빠르게 하락해 2001년 약 1억 달러에서 오늘날 수백 달러 수준이 되었습니다.
+
+![인간 유전체당 비용. 2007–2008년 무렵의 급격한 변화는 대규모 병렬 short-read 시퀀싱의 등장에 해당합니다. 출처: NHGRI.](/assets/img/w1/cost_per_genome.jpg){fig-align="center"}
+
+::: {.callout-note collapse="true"}
+## 이 그래프가 중요한 이유
+
+-   **과거** — 병목은 데이터 *생산*이었습니다.
+-   **현재** — 병목은 데이터 *해석*이며, 점점 더 해석할 가치가 있는 설계를 만드는 일이 되고 있습니다.
+
+이 변화가 바로 이 강의가 필요한 이유입니다.
+:::
+
+### ① Sanger sequencing {#w1-s2-1-1}
+
+> 형광 표지 ddNTP를 이용한 사슬 종결
+
+-   최초의 방법이며 단일 변이를 확인하는 임상적 표준으로 여전히 사용됩니다.
+-   한 반응에서 한 template을 읽으며 약 800–1,000 base까지 가능합니다.
+-   Base당 정확도가 매우 높습니다.
+
+![ddNTP에는 다음 phosphodiester bond에 필요한 3′-OH가 없어 삽입되는 순간 사슬이 끝납니다. 각 길이의 절편과 말단 염기를 읽어 서열을 알아냅니다.](/assets/img/w1/sanger_seq.png){fig-align="center"}
+
+⚠️ 한계는 품질이 아니라 **처리량**입니다. 유전자 하나는 간단하지만 유전체 하나에는 13년과 약 30억 달러가 들었습니다.
+
+### ② Short-read sequencing(Illumina) {#w1-s2-1-2}
+
+> 대규모 병렬 sequencing by synthesis
+
+**핵심은 병렬성**입니다. 한 분자를 매우 잘 읽는 대신 수억 개 분자를 동시에 상당히 정확하게 읽습니다.
+
+-   **Library preparation** — DNA를 절단하고 양 끝에 adapter를 연결
+-   **Cluster generation** — 각 절편을 flow cell의 제자리에서 증폭
+-   **Sequencing by synthesis** — 주기마다 형광으로 표지되고 가역적으로 종결되는 염기 하나를 추가하고 촬영한 뒤 차단을 해제; 50–300회 반복
+
+![왼쪽: 절단, adapter 연결, 변성으로 이루어진 library preparation. 오른쪽: 한 분자를 촬영 가능한 밝기의 cluster로 만드는 flow cell 위 bridge amplification.](/assets/img/w1/library_prep.png){fig-align="center"}
+
+##### Library 분자
+
+Sequencer에 들어가는 모든 분자는 **adapter + insert + adapter** 구조이며 각 부분마다 역할이 있습니다.
+
+![P5/P7은 flow cell에 결합합니다. Rd1/Rd2 SP는 sequencing primer 결합 부위이며 Index1/Index2는 시료를 식별합니다.](/assets/img/w1/ngs_adapter.png){fig-align="center" width="700"}
+
+해석에서 중요한 특징은 두 가지입니다.
+
+-   **Index(barcode)** — 6–12 nt 길이로 시료를 식별
+    -   한 lane에 여러 시료를 넣고 나중에 분리하는 *multiplexing*을 가능하게 함
+    -   ⚠️ 시료 뒤바뀜과 **index hopping**도 여기서 발생함. Dual indexing은 single indexing의 신뢰도가 충분하지 않아 도입됨
+-   **Single-end와 paired-end** — 절편의 한쪽 끝만 읽는가, 양쪽 끝을 읽는가
+
+![Single-end는 절편당 리드 하나, paired-end는 대략적인 간격을 아는 리드 두 개를 만듭니다. 이 간격 덕분에 반복 영역에서 더 정확히 정렬하고 splice junction과 재배열을 찾을 수 있습니다.](/assets/img/w1/paired_end.png){fig-align="center"}
+
+-   Paired-end는 비용이 더 들지만 반복 영역 정렬, 구조 재배열, splice junction 탐지에 유리합니다(🔗 W4).
+-   오늘날 대표 출력은 2 × 150 bp이고 base당 오류율은 약 0.1%입니다.
+-   ⚠️ **Read length가 근본적인 한계**입니다. 150 base는 대부분의 반복서열, 구조 변이, 전장 transcript보다 짧습니다.
+
+### ③ Long-read sequencing(PacBio, Oxford Nanopore) {#w1-s2-1-3}
+
+> 분자 전체를 읽는 대신 base당 오류를 더 허용
+
+-   **PacBio HiFi** — 원형 template을 여러 번 읽어 consensus를 만듭니다. 리드 길이는 약 15–25 kb이며 정확도는 short read와 비슷합니다.
+-   **Oxford Nanopore** — 단일 가닥을 단백질 pore에 통과시키며 이온 전류를 해독합니다.
+    -   리드 길이가 1 Mb를 넘을 수 있습니다.
+    -   원시 정확도는 Illumina보다 낮지만 최신 chemistry에서 격차가 크게 줄었습니다.
+    -   Bisulfite 변환 없이 DNA methylation 같은 염기 변형을 직접 찾습니다(🔗 W3).
+
+### ④ 상충관계의 삼각형 {#w1-s2-1-4}
+
+Read length, base당 정확도, base당 비용을 모두 최대화할 수는 없습니다. 플랫폼마다 한쪽을 선택합니다.
+
+| | Read length | 정확도 | 비용/Gb | 가장 적합한 용도 |
+|---|---|---|---|---|
+| **Sanger** | 약 800 bp | 매우 높음 | 매우 높음 | 단일 변이 확인 |
+| **Illumina** | 50–300 bp | 높음 | 낮음 | 계수: RNA-seq, ChIP, 대규모 WGS/WES |
+| **PacBio HiFi** | 15–25 kb | 높음 | 중간 | Assembly, 구조 변이, phasing |
+| **Nanopore** | 최대 Mb | 중간 | 중간 | 초장거리 연결, 직접 변형 탐지, 휴대성 |
+
+::: {.callout-tip collapse="true"}
+## 모든 데이터셋에서 물어야 할 질문
+
+“어떤 플랫폼인가?”보다 **“내 질문에 답할 만큼 리드가 긴가?”**를 물으세요.
+
+-   Segmental duplication 안의 변이? → 150 bp 리드로 해결되지 않습니다.
+-   3′ 말단이 서로 다른 isoform 10개? → 마찬가지입니다.
+
+깊이를 아무리 늘려도 read-length 문제는 해결되지 않습니다.
+:::
+
+------------------------------------------------------------------------
+
+## 2) 생물학 데이터의 모양 {#w1-s2-2}
+
+이 파일을 직접 열 일은 거의 없지만 Methods에서 마주치고 reviewer의 질문을 받게 됩니다. 중요한 것은 **각 형식에 무엇이 있고 무엇이 이미 버려졌는가**입니다.
+
+### ① FASTQ — 원시 리드 {#w1-s2-2-1}
+
+리드마다 네 줄이며 시료 하나에 수천만 리드가 있습니다.
+
+```         
+@SRR21484222.626.1 626 length=51           ← read ID
+GCCTTGGTGGTGAAATGGTAGACTGGAATTCTCGGGTGCC   ← sequence
++SRR21484222.626.1 626 length=51           ← description
+F:FFFFFFFFFFFFFFFFFFFFFFFFFFF:FFFFFFFFFF   ← base quality (Phred)
+```
+
+-   **알고 있는 것** — 염기서열과 각 base call에 대한 장비의 신뢰도
+-   **모르는 것** — 리드가 유전체 어디에서 왔는지. 아직 그 정보는 존재하지 않습니다.
+
+##### Phred 품질 점수
+
+$$Q = -10 \log_{10} P$$
+
+$P$는 base call이 틀릴 확률입니다.
+
+| Phred 점수 | 오류율 | Base call 정확도 |
+|---|---|---|
+| 10 | 10개 중 1개 | 90% |
+| 20 | 100개 중 1개 | 99% |
+| 30 | 1,000개 중 1개 | 99.9% |
+| 40 | 10,000개 중 1개 | 99.99% |
+
+관례적 기준은 Q30입니다. 분석 기관 보고서에서 “base의 80% 이상이 Q30 이상” 같은 문장을 보게 됩니다.
+
+### ② BAM — 유전체에 배치된 리드 {#w1-s2-2-2}
+
+모든 리드에 aligner가 지정한 좌표와 그 지정에 대한 **mapping quality**가 붙습니다.
+
+⚠️ **Alignment는 관찰이 아니라 추론입니다.**
+
+-   반복 영역 리드는 여러 위치에서 왔을 가능성이 있습니다.
+-   Aligner는 한 위치를 선택하고 mapping quality를 낮춰 불확실성을 표시합니다.
+-   Mapping quality를 무시하는 분석은 잘못 배치된 리드를 조용히 받아들입니다.
+
+BAM은 대부분의 프로젝트에서 read-level 정보가 끝나는 지점입니다. WGS 시료당 수십 GB로 크며 이후의 모든 결과는 이를 요약한 것입니다.
+
+### ③ VCF — 참조서열과의 차이 {#w1-s2-2-3}
+
+시료가 참조서열과 다른 위치에 genotype과 품질 정보를 기록합니다. 참조서열과 같은 부분은 암묵적이며 파일에는 없습니다.
+
+⚠️ **VCF는 유전체가 아니라 차이(diff)입니다.**
+
+-   정렬할 수 없는 영역에서는 변이가 호출되지 않습니다.
+-   이는 변이가 없는 영역과 똑같아 보입니다.
+-   **Call이 없음 ≠ 없다고 call함**
+
+### ④ Count matrix — 대부분의 분석이 실제로 시작되는 곳 {#w1-s2-2-4}
+
+행에는 feature(유전자, peak, 단백질, taxon), 열에는 시료가 있으며 셀마다 측정값 하나가 들어 있습니다.
+
+-   공개 저장소가 배포하고 통계 분석법이 입력으로 받는 형식입니다.
+-   동시에 **정보 손실이 가장 큰 지점**입니다. 모든 리드, 정렬, 품질 점수가 유전자·시료당 정수 하나로 압축됩니다.
+
+::: {.callout-warning collapse="true"}
+## Count matrix에 도착하기 전에 이미 결정된 것
+
+-   참조 유전체 build
+-   Annotation 버전
+-   Aligner
+-   정량 방법
+-   Multi-mapping 리드 처리 규칙
+
+행렬에서는 모두 보이지 않지만 결과를 크게 바꿀 수 있습니다.
+
+→ GEO에서 행렬을 받았다면 **원 논문의 Methods도 여러분의 Methods 일부입니다.**
+:::
+
+------------------------------------------------------------------------
+
+## 3) 참조 유전체 {#w1-s2-3}
+
+### ① GRCh38과 T2T-CHM13 {#w1-s2-3-1}
+
+한 사람의 유전체가 아니라 여러 공여자의 서열을 20년 넘게 다듬어 만든 모자이크입니다. 모두가 사용하기로 합의한 이상적인 좌표계입니다.
+
+-   **GRCh38**(2013) — 현재의 주력 참조서열입니다. 이미 거대한 데이터가 여기에 정렬되어 있어 대부분의 임상·집단 자료에서 기본값입니다.
+-   **T2T-CHM13**(2022) — centromere, acrocentric short arm 등 GRCh38의 빈틈을 채운 최초의 완전한 assembly로, 이전에 정렬되지 않던 약 200 Mb가 추가되었습니다.
+-   **Pangenome reference** — 하나의 선형 서열 대신 여러 haplotype으로 만든 graph입니다. 분야가 향하는 방향이지만 아직 기본값은 아닙니다.
+
+⚠️ **Build가 다르면 좌표를 그대로 바꿔 쓸 수 없습니다.**
+
+-   GRCh37(hg19)의 한 위치는 GRCh38에서 다른 위치입니다.
+-   Liftover는 흔히 쓰지만 정보 손실이 있습니다.
+-   Build 혼용은 학생 프로젝트에서 의미 없는 결과를 만드는 가장 흔한 원인 중 하나입니다.
+
+### ② Annotation: 유전자가 있는 곳 {#w1-s2-3-2}
+
+-   **참조서열** — 염기서열이 무엇인지 정의
+-   **Annotation** — 어느 구간이 유전자, exon, transcript, 조절 요소인지 정의
+
+서로 다른 파일이며 별도로 버전이 관리되고 서로 일치하지도 않습니다.
+
+-   **GENCODE** — 포괄적이며 ENCODE와 GTEx가 사용합니다. 많은 lncRNA와 예측 transcript를 포함합니다.
+-   **RefSeq** — NCBI가 보수적으로 수동 큐레이션한 자료로 임상 보고의 표준입니다.
+
+단백질 암호화 유전자는 약 20,000개로 매우 안정적입니다. 그러나 *transcript* 수는 출처와 버전에 따라 수만 개씩 달라집니다.
+
+::: {.callout-warning collapse="true"}
+## Annotation 버전은 숨은 변수입니다
+
+같은 FASTQ 파일 + 다른 GENCODE release →
+
+-   다른 유전자 count
+-   다른 library total
+-   → 다른 normalization factor
+-   → 다른 DE 결과
+
+대개 차이는 작지만 때로는 그렇지 않습니다.
+
+**Build와 annotation 버전을 항상 함께 보고하세요.**
+:::
+
+### ③ 참조 편향 {#w1-s2-3-3}
+
+모든 것을 한 서열에 상대적으로 측정하므로 그 서열에 잘 표현되지 않은 것은 체계적으로 덜 검출됩니다.
+
+-   **Divergent haplotype** — 주로 유럽계 공여자로 만든 참조서열에는 비유럽계 개인의 리드가 조금 덜 잘 정렬되어 대립유전자 빈도와 coverage에 미묘한 편향이 생깁니다(🔗 W2).
+-   **다형성이 매우 높은 locus** — 대표적으로 HLA는 표준 정렬에서 심하게 왜곡됩니다.
+-   **반복·중복 영역** — 리드가 모호하게 정렬되거나 전혀 정렬되지 않습니다.
+-   **참조서열에 없는 서열** — 정의상 검출할 수 없습니다.
+
+🗺️ 강의 전체에 이어지는 **참조 편향**이라는 주제가 처음 등장했습니다.
+
+-   W3 → 크로마틴 아틀라스
+-   W4 → annotation 버전
+-   W6 → 단백질 검색 데이터베이스
+-   W7 → 16S 분류 데이터베이스
+
+이름만 다르고 같은 문제입니다.
+
+------------------------------------------------------------------------
+
+# 3. 데이터가 있는 곳 🗄️ {#w1-s3}
+
+어떤 연구실도 모두 생산할 수 없을 만큼 많은 공개 오믹스 데이터가 있습니다. 많은 질문에서 가장 빠른 답은 새 실험이 아니라 **재분석**입니다.
+
+## 1) 공개 저장소 {#w1-s3-1}
+
+| 자료원 | 내용 | 접근 |
+|---|---|---|
+| **GEO**(NCBI) | 모든 분석법의 처리된 행렬과 metadata | 공개 |
+| **SRA**(NCBI) | 원시 리드(FASTQ) | 공개 |
+| **ENA**(EMBL-EBI) | 원시 리드, SRA의 유럽 mirror | 공개 |
+| **ArrayExpress/BioStudies** | 기능유전체 실험 | 공개 |
+| **PRIDE** | 질량분석 단백체(🔗 W6) | 공개 |
+| **MetaboLights** | 대사체 | 공개 |
+
+## 2) 제한 접근 자료 {#w1-s3-2}
+
+개인 수준의 인간 genotype 데이터로 신원을 알아낼 수 있으므로 공개할 수 없습니다. 사용 목적을 설명하는 신청이 필요합니다.
+
+| 자료원 | 내용 | 접근 |
+|---|---|---|
+| **dbGaP** | 미국의 개인 수준 genotype/phenotype | 신청 |
+| **EGA** | 유럽의 대응 자료원 | 신청 |
+| **UK Biobank** | 약 50만 명의 genotype, 영상, EHR 연계 | 신청+비용 |
+| **All of Us** | 다양성에 초점을 둔 미국 코호트 | 신청 |
+
+💡 승인에는 **몇 주에서 몇 달**이 걸립니다. 분석 직전이 아니라 *연구계획서* 단계에서 시작하세요.
+
+## 3) 컨소시엄 아틀라스 {#w1-s3-3}
+
+개별 실험이라기보다 필요한 정보를 찾아보는 참조 자료입니다.
+
+| 자료원 | 제공하는 정보 | 등장 주차 |
+|---|---|---|
+| **GTEx** | 약 54개 정상 조직의 발현과 eQTL | W2, W4 |
+| **ENCODE/Roadmap** | 세포 유형별 조절 요소와 크로마틴 지도 | W3 |
+| **TCGA** | 33개 암종의 multi-omics와 임상 추적 | W2, W4 |
+| **Human Cell Atlas/Tabula Sapiens** | 단일세포 참조 아틀라스 | W5 |
+| **1000 Genomes/gnomAD** | 집단별 대립유전자 빈도 | W2 |
+| **Human Protein Atlas** | 단백질 발현과 위치 | W6 |
+
+## 4) 💡 재분석할 가치가 있는 공개 데이터 {#w1-s3-4}
+
+저장된 모든 데이터를 사용할 수 있는 것은 아닙니다. 한 학기를 GEO accession 하나에 쓰기 전에 확인하세요.
+
+-   ✅ **표본 수** — 대부분의 bulk 질문에서 군당 n > 30. 아무리 깨끗해도 작은 연구는 검정력이 부족합니다.
+-   ✅ **명확한 설계** — 명확한 case-control 또는 paired design. 후자는 환자 내 변이를 통계적으로 통제해 더 강력합니다.
+-   ✅ **풍부한 metadata** — 나이, 성별, 배치, 조직, 치료. 공변량이 없는 행렬에서는 교란을 보정할 수 없습니다.
+-   ✅ **원시 데이터 제공** — 자신의 annotation으로 재처리하려면 행렬만이 아니라 FASTQ가 필요합니다.
+-   ⚠️ **복원 가능한 배치 구조** — 모든 case가 한 배치이고 control이 다른 배치라면 회복할 수 없습니다. 흔한 문제이므로 먼저 확인하세요.
+
+------------------------------------------------------------------------
+
+# 4. 피할 수 없는 통계 📊 {#w1-s4}
+
+오믹스 데이터는 큰 *p*(feature 수)와 작은 *n*(시료 수)을 가진 **고차원 데이터**입니다. 유전자 20,000개와 환자 12명처럼 반대 비율에서 만들어진 직관이 모두 흔들립니다.
+
+## 1) p-value가 말하는 것과 말하지 않는 것 {#w1-s4-1}
+
+**말하는 것** — 귀무가설이 참일 때 현재와 같거나 더 극단적인 데이터를 관찰할 확률입니다. 그 이상은 아닙니다.
+
+**말하지 않는 것** —
+
+-   귀무가설이 참일 확률
+-   발견이 재현될 확률
+-   효과 크기
+-   생물학적 중요성
+
+예를 들면:
+
+-   군당 n = 200이면 3% 발현 차이도 p < 0.001이 될 수 있지만 의미가 없을 수 있습니다.
+-   n = 3이면 실제 2배 변화도 유의성에 도달하지 못할 수 있습니다.
+
+→ **항상 p-value와 효과 크기를 함께 읽으세요.**
+
+## 2) 다중검정 {#w1-s4-2}
+
+-   α = 0.05에서 유전자 하나를 검사하면 위양성 확률은 5%입니다.
+-   진짜 신호가 전혀 없는 유전자 20,000개를 검사하면 **약 1,000개의 위양성**이 예상됩니다.
+
+두 보정법이 주로 사용됩니다.
+
+| 방법 | 통제하는 것 | 성격 | 사용 상황 |
+|---|---|---|---|
+| **Bonferroni** | Family-wise error rate, 즉 하나 이상의 위양성이 생길 확률 | 매우 보수적 | 모든 hit에 거의 확실성이 필요할 때(예: GWAS, 🔗 W2) |
+| **Benjamini–Hochberg(FDR)** | Hit 중 위양성이 차지하는 기대 비율 | 훨씬 관대함 | 선별·발견 단계(예: RNA-seq, 🔗 W4) |
+
+오믹스에서는 후속 연구를 위한 *순위화된 후보 목록*이 목적이므로 FDR을 기본으로 사용합니다.
+
+“FDR < 0.05”는 이 목록에 든 유전자의 약 5%가 위양성일 것으로 기대된다는 뜻입니다.
+
+-   다음 단계가 **검증**이면 받아들일 수 있는 거래입니다.
+-   다음 단계가 **임상 결정**이면 받아들일 수 없습니다.
+
+::: {.callout-warning collapse="true"}
+## 보정은 사후에 적용할 수 없습니다
+
+-   유전자 20,000개를 검사한 뒤 흥미로운 하나만 보정하지 않은 p-value로 보고했다면 다중검정을 피한 것이 아니라 **숨긴 것**입니다.
+-   정규화 방법 여섯 개를 시도하고 가장 예쁜 volcano plot을 고른 것도 다중검정이며, 이를 위한 보정법은 없습니다.
+:::
+
+## 3) 배치 효과와 교란 ⚠️ {#w1-s4-3}
+
+**배치 효과**는 서로 다른 날, reagent lot, flow cell, 작업자, extraction kit처럼 함께 처리된 시료군 사이의 체계적 기술 변이입니다. 오믹스에서는 찾으려는 생물학적 효과보다 더 큰 경우가 흔합니다.
+
+배치 효과는 성가시지만 견딜 수 있습니다. **교란은 치명적입니다.**
+
+```         
+복원 가능:   Batch 1 = case 5 + control 5
+             Batch 2 = case 5 + control 5
+             → batch를 모형화하고 제거할 수 있음
+
+복원 불가:   Batch 1 = case 10
+             Batch 2 = control 10
+             → batch와 질병이 같은 변수이므로
+               어떤 통계 방법도 둘을 분리할 수 없음
+```
+
+두 번째 경우에는 배치 효과를 제거하는 모든 방법이 신호도 제거하고, 신호를 보존하는 모든 방법이 인공물도 보존합니다. 분석으로 실험을 구할 수 없으며 다시 설계해야 합니다.
+
+::: {.callout-important collapse="true"}
+## 시료 배치를 무작위화하세요
+
+비용이 들지 않으면서 오믹스 연구에서 가장 흔한 복구 불가능 오류를 막습니다.
+
+Plate, row, run, day, operator 등 **모든 기술적 묶음에 조건을 고르게 분산**하세요. 이 장에서 실용적인 내용 하나만 가져간다면 바로 이것입니다.
+:::
+
+## 4) 검정력, 효과 크기, n {#w1-s4-4}
+
+**통계적 검정력**은 주어진 크기의 실제 효과를 검출할 확률입니다. 효과 크기, 변이, n, 그리고 오믹스에서는 0.05보다 훨씬 엄격한 다중검정 역치에 좌우됩니다.
+
+규칙이 아닌 대략적 방향은 다음과 같습니다.
+
+-   **Bulk RNA-seq** — n = 3은 크고 일관된 변화만 찾습니다. 인간 조직은 n = 6–10이 실무적 최솟값이며 임상적으로 이질적인 phenotype은 n > 20이 필요합니다.
+-   **GWAS** — 개별 변이 효과가 작아 수천에서 수십만 명이 필요합니다(🔗 W2).
+-   **Single-cell** — 중요한 n은 세포 수가 아니라 *공여자 수*입니다. 세포를 300개 읽든 30만 개 읽든 공여자가 3명이면 n = 3입니다(🔗 W5).
+
+::: {.callout-warning collapse="true"}
+## 검정력이 부족한 연구는 연구하지 않는 것보다 나쁩니다
+
+단지 아무것도 찾지 못하는 데서 끝나지 않습니다. 발견된 결과도 위양성이 많고 **효과 크기가 체계적으로 과대 추정**됩니다. 가장 커 보이는 효과만 유의성 필터를 통과하기 때문입니다.
+
+작은 pilot 연구에서 보고한 효과 크기가 재현되지 않는 중요한 이유입니다.
+:::
+
+------------------------------------------------------------------------
+
+# 5. 재현성과 연구 설계 ♻️ {#w1-s5}
+
+## 1) 같은 데이터가 다른 답을 내는 이유 {#w1-s5-1}
+
+같은 FASTQ를 유능한 분석가 두 명에게 주어도 서로 다른 유전자 목록이 나옵니다. 대개 많이 겹치지만 완전히 같지는 않습니다.
+
+차이는 각각 합리적인 선택들이 누적되어 생깁니다.
+
+-   참조 build와 annotation 버전
+-   Aligner와 parameter
+-   Multi-mapping 리드 처리
+-   저발현 feature 필터 역치
+-   정규화 방법
+-   통계 모형과 포함할 공변량
+-   유의성·효과 크기 역치
+
+어느 하나도 반드시 *틀린* 선택은 아닙니다. 하지만 선택지가 충분히 많아 분석가는 거의 어떤 결론에도 도달할 수 있습니다. 보통은 의도적 조작이 아니라 생물학적으로 그럴듯한 결과가 보일 때 탐색을 멈추면서 생깁니다.
+
+::: {.callout-tip collapse="true"}
+## 방어 방법
+
+-   결과를 보기 **전에** 분석 계획을 정합니다.
+-   계획을 기록합니다.
+-   탐색이 필요하다면 하되 탐색적 발견이라고 표시합니다.
+
+바로 이 이유로 임상시험에서 쓰는 표준 관행이며 오믹스도 그만큼 취약합니다.
+:::
+
+## 2) 좋은 Methods에 들어갈 내용 {#w1-s5-2}
+
+여러분이 쓰기도 하고 심사하기도 할 내용입니다.
+
+-   ✅ Release 번호를 포함한 참조 build와 annotation 버전
+-   ✅ 모든 도구와 버전
+-   ✅ 기본값이 아닌 parameter
+-   ✅ 필터 기준: 제거한 feature·시료 수와 이유
+-   ✅ 공변량을 포함한 전체 통계 모형
+-   ✅ 다중검정 보정법과 역치
+-   ✅ 데이터 accession과 분석 코드 링크
+
+❌ “Data were analyzed using standard pipelines”는 Methods가 아닙니다. 하지만 출판된 논문에서 계속 보게 될 문장입니다.
+
+## 3) 🗣️ 시퀀싱 전에 나눌 대화 {#w1-s5-3}
+
+이 장에서 가장 가치 있는 절입니다. **대부분의 분석 문제는 너무 늦게 드러난 설계 문제입니다.** 시료가 실험대를 떠나기 전에 합의하세요.
+
+| 질문 | 중요한 이유 |
+|---|---|
+| **무엇을 비교하는가?** | 전체 설계를 결정합니다. “무엇이 다른지 봅시다”는 비교가 아닙니다. |
+| **생물학적 반복은 몇 개인가?** | 무엇을 검출할 수 있는지 결정하는 가장 큰 요인입니다. |
+| **반복의 단위는 무엇인가?** | 환자, 생쥐, well, 세포 중 무엇입니까? n이 가장 흔히 부풀려지는 지점입니다. |
+| **어떤 공변량이 필요한가?** | 나이, 성별, 배치, RIN, 세포 조성은 지금 수집해야 하며 나중에 추가할 수 없습니다. |
+| **시료를 어떻게 배치할 것인가?** | 배치 전체에 무작위화해야 하며 타협할 수 없습니다. |
+| **기술적 제약은 무엇인가?** | Read length, depth, single/paired-end는 가격표가 아니라 질문에 따라 결정합니다. |
+| **검증 계획이 있는가?** | 독립된 분석법이나 코호트가 필요하며 reviewer가 물을 것입니다. |
+
+::: {.callout-important collapse="true"}
+## 분석가에게 한 가지를 물으세요
+
+**“실험이 완벽하게 성공한다면 이 설계로 무엇을 결론 내릴 수 있나요?”**
+
+정직한 답이 “별로 없습니다”라면 돈을 쓰기 전에 1년을 아낀 것입니다.
+:::
+
+------------------------------------------------------------------------
+
+# 📝 요약
+
+-   생물정보학은 시료를 데이터로, 데이터를 다시 생물학적 주장으로 바꾸며 양방향에서 정보가 손실됩니다.
+-   거의 모든 오믹스 분석법은 **DNA 절편 수 세기**로 환원됩니다. 기술의 주된 차이는 read length, 정확도, 비용입니다.
+-   FASTQ ➡️ BAM ➡️ VCF/count matrix로 갈수록 요약이 증가하며 각 단계에서 정보가 버려지고 분석 선택이 내장됩니다.
+-   모든 분석은 **QC ➡️ 정량 ➡️ 정규화 ➡️ 검정 ➡️ 해석**을 따르며 ③·④단계에 위험한 오류가 숨어 있습니다.
+-   참조 유전체와 annotation은 사실이 아니라 선택이며 결과를 체계적으로 편향시킵니다.
+-   공개 데이터는 풍부합니다. 병목은 양이 아니라 metadata 품질과 배치 구조입니다.
+-   큰 *p*와 작은 *n*에서는 다중검정이 불가피합니다. 발견에는 FDR, 확실성이 중요할 때는 Bonferroni를 사용합니다.
+-   ⚠️ **배치와 조건이 교란되면 어떤 분석으로도 고칠 수 없습니다.** 시료 배치를 무작위화하세요.
+-   생물정보학자가 하는 가장 가치 있는 일은 시퀀싱 **전에** 일어납니다.
+
+------------------------------------------------------------------------
+
+# 🔑 핵심 용어
+
+| 용어 | 한 줄 정의 |
+|---|---|
+| Read | 시퀀싱한 절편 하나 |
+| Phred score | Base call이 틀릴 확률을 로그 척도로 표현한 값 |
+| Coverage/depth | 각 위치를 덮는 평균 리드 수 |
+| Alignment/mapping | 리드가 유전체 어디에서 왔는지 추론하는 과정 |
+| Mapping quality | 그 추론에 대한 신뢰도 |
+| Multiplexing | Barcode를 붙인 시료들을 한 번의 시퀀싱 run에 함께 넣는 것 |
+| Reference genome | 한 종에서 합의하여 사용하는 좌표계 |
+| Annotation | 그 좌표계에서 유전자, exon, element의 위치를 정의한 정보 |
+| Reference bias | 참조서열과 다른 것을 체계적으로 덜 검출하는 현상 |
+| Count matrix | Feature × sample 측정값 표 |
+| Batch effect | 처리 집단 사이의 체계적 기술 변이 |
+| Confounding | 두 변수가 함께 변해 통계적으로 분리할 수 없는 상태 |
+| FDR | 유의한 결과 중 위양성이 차지하는 기대 비율 |
+| Statistical power | 주어진 크기의 실제 효과를 검출할 확률 |
+
+------------------------------------------------------------------------
+
+# ➕ 참고문헌
+
+### 시퀀싱 기술
+
+[NGS vs. Sanger sequencing (Illumina)](https://www.illumina.com/science/technology/next-generation-sequencing/beginners.html)\
+[Sequencing by synthesis (video)](https://www.youtube.com/watch?v=fCd6B5HRaZ8)\
+Goodwin S, McPherson JD, McCombie WR. [*Coming of age: ten years of next-generation sequencing technologies.*](https://pubmed.ncbi.nlm.nih.gov/?term=Coming+of+age%3A+ten+years+of+next-generation+sequencing+technologies) Nat Rev Genet. 2016.\
+Logsdon GA, Vollger MR, Eichler EE. [*Long-read human genome sequencing and its applications.*](https://pubmed.ncbi.nlm.nih.gov/?term=Long-read+human+genome+sequencing+and+its+applications) Nat Rev Genet. 2020.
+
+### 참조 유전체
+
+[NHGRI — DNA sequencing costs](https://www.genome.gov/about-genomics/fact-sheets/DNA-Sequencing-Costs-Data)\
+Nurk S, et al. [*The complete sequence of a human genome.*](https://doi.org/10.1126/science.abj6987) Science. 2022. (T2T-CHM13)\
+Liao WW, et al. [*A draft human pangenome reference.*](https://pubmed.ncbi.nlm.nih.gov/?term=A+draft+human+pangenome+reference) Nature. 2023.
+
+### 데이터 형식
+
+[FASTQ format (Wikipedia)](https://en.wikipedia.org/wiki/FASTQ_format)\
+[Phred quality score (Wikipedia)](https://en.wikipedia.org/wiki/Phred_quality_score)\
+[SAM/BAM format specification](https://samtools.github.io/hts-specs/)
+
+### 통계와 연구 설계
+
+Benjamini Y, Hochberg Y. [*Controlling the false discovery rate.*](https://pubmed.ncbi.nlm.nih.gov/?term=Controlling+the+false+discovery+rate) J R Stat Soc B. 1995.\
+Leek JT, et al. [*Tackling the widespread and critical impact of batch effects in high-throughput data.*](https://pubmed.ncbi.nlm.nih.gov/?term=Tackling+the+widespread+and+critical+impact+of+batch+effects+in+high-throughput+data) Nat Rev Genet. 2010.\
+Button KS, et al. [*Power failure: why small sample size undermines the reliability of neuroscience.*](https://pubmed.ncbi.nlm.nih.gov/?term=Power+failure%3A+why+small+sample+size+undermines+the+reliability+of+neuroscience) Nat Rev Neurosci. 2013.\
+Conesa A, et al. [*A survey of best practices for RNA-seq data analysis.*](https://doi.org/10.1186/s13059-016-0881-8) Genome Biol. 2016.
+
+### 공개 데이터
+
+[GEO](https://www.ncbi.nlm.nih.gov/geo/) · [SRA](https://www.ncbi.nlm.nih.gov/sra/) · [ENA](https://www.ebi.ac.uk/ena/) · [GTEx](https://gtexportal.org/) · [gnomAD](https://gnomad.broadinstitute.org/) · [ENCODE](https://www.encodeproject.org/) · [GDC (TCGA)](https://portal.gdc.cancer.gov/) · [Human Cell Atlas](https://www.humancellatlas.org/)

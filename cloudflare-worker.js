@@ -36,9 +36,7 @@ export default {
     }
 
     // Origin 검사 (등록된 도메인만 허용)
-    const isAllowed =
-      ALLOWED_ORIGINS.some((o) => origin.startsWith(o)) ||
-      origin === ""; // Worker 직접 테스트 허용
+    const isAllowed = ALLOWED_ORIGINS.includes(origin);
 
     if (!isAllowed) {
       return corsResponse(
@@ -98,9 +96,7 @@ export default {
 function corsResponse(body, origin, status) {
   const headers = {
     "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": ALLOWED_ORIGINS.some((o) =>
-      origin.startsWith(o)
-    )
+    "Access-Control-Allow-Origin": ALLOWED_ORIGINS.includes(origin)
       ? origin
       : ALLOWED_ORIGINS[0],
     "Access-Control-Allow-Methods": "POST, OPTIONS",

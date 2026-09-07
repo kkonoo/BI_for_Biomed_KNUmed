@@ -3,6 +3,26 @@
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 @import url('https://cdn.jsdelivr.net/gh/wan2land/d2coding/d2coding-ligature-full.css');
 
+:root {
+  --course-heading-1: #4A3D6B;
+  --course-heading-1-bg: #f3f0f7;
+  --course-heading-2: #5B4D80;
+  --course-heading-2-border: #cfc4e2;
+  --course-heading-3: #7A6A99;
+  --course-code-bg: #f5f5f5;
+  --course-muted-text: #555;
+}
+
+body.quarto-dark {
+  --course-heading-1: #e1d7f4;
+  --course-heading-1-bg: #2a2438;
+  --course-heading-2: #d1c2ee;
+  --course-heading-2-border: #76639d;
+  --course-heading-3: #bca9df;
+  --course-code-bg: #20242b;
+  --course-muted-text: #d4d4d4;
+}
+
 body {
   font-family: "Pretendard", sans-serif;
   font-size: 1.1em;   /* 기본 16px → ~17.6px */
@@ -14,28 +34,28 @@ body {
    :not(.title) 로 문서 제목 블록은 제외.        */
 
 h1:not(.title) {
-  color: #4A3D6B;
+  color: var(--course-heading-1);
   font-size: 1.6em;
   font-weight: 700;
-  background-color: #f3f0f7;
+  background-color: var(--course-heading-1-bg);
   padding: 0.4em 0.6em;
   border-radius: 8px;
   margin: 1.6em 0 0.7em;
 }
 
 h2 {
-  color: #5B4D80;
+  color: var(--course-heading-2);
   font-size: 1.35em;
   font-weight: 600;
   background: none;          /* 배경 제거 */
-  border-left: 4px solid #cfc4e2;
+  border-left: 4px solid var(--course-heading-2-border);
   padding: 0 0 0 0.55em;
   border-radius: 0;
   margin: 1.3em 0 0.45em;
 }
 
 h3 {
-  color: #7A6A99;
+  color: var(--course-heading-3);
   font-size: 1.2em;
   font-weight: 600;
   background: none;
@@ -44,7 +64,7 @@ h3 {
 }
 
 h4, h5 {
-  color: #5B4D80;
+  color: var(--course-heading-2);
   font-size: 1.1em;
   font-weight: 600;
   background: none;
@@ -70,7 +90,7 @@ h4, h5 {
 code, pre code {
   font-family: 'D2Coding', 'Fira Code', monospace;
   font-size: 1em;
-  font-weight: 500
+  font-weight: 500;
   border-radius: 6px;
 }
 
@@ -83,15 +103,15 @@ pre {
 
 /* 일반 코드 블록 (``` 만 쓴 것) */
 pre:not(.sourceCode) {
-  background: #f5f5f5;
+  background: var(--course-code-bg);
 }
 pre:not(.sourceCode) code {
-  color: #555;
+  color: var(--course-muted-text);
 }
 
 /* R 코드 블록 */
 pre.sourceCode, pre.sourceCode code {
-  background: #f5f5f5; /* #f3f0f7: 연보라 */
+  background: var(--course-code-bg);
   margin: 0;
 }
 .cell-output,
@@ -111,7 +131,7 @@ pre.sourceCode, pre.sourceCode code {
   font-family: 'Pretendard', sans-serif;
   font-size: 1.2em;
   font-weight: 500;  /* Medium */
-  color: #555;
+  color: var(--course-muted-text);
 }
 
 /* callout 제목 글씨체 */
@@ -120,7 +140,7 @@ pre.sourceCode, pre.sourceCode code {
   font-weight: 700;
   font-size: 1.2em;
   font-weight: 500;  /* Medium */
-  color: #555;
+  color: var(--course-muted-text);
 }
 
 /* callout 컬러바 */
@@ -134,7 +154,7 @@ pre.sourceCode, pre.sourceCode code {
 /* definition */
 dd,
 .callout-body-container {
-  color: #555;
+  color: var(--course-muted-text);
 }
 
 
@@ -142,5 +162,102 @@ dd,
 .cell-output-display {
   display: flex;
   justify-content: center;
+}
+
+/* EN/KO page-pair switch, placed beside Quarto's native theme toggle. */
+.course-language-switch {
+  display: inline-flex;
+  align-items: center;
+  height: 46px;
+  margin-right: 0.65rem;
+  padding: 3px;
+  border: 1px solid rgba(126, 207, 205, 0.22);
+  border-radius: 999px;
+  background: rgba(4, 22, 21, 0.5);
+}
+
+.course-language-switch a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  height: 38px;
+  padding: 0 0.45rem;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  text-decoration: none;
+  transition: color 0.18s ease, background-color 0.18s ease;
+}
+
+.course-language-switch a:hover {
+  color: #fff;
+}
+
+.course-language-switch a.active {
+  background: #78d0cf;
+  color: #fff;
+}
+
+/* Quarto's theme behavior stays native; only the control is restyled. */
+.quarto-navbar-tools .quarto-color-scheme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  padding: 0 !important;
+  border: 1px solid rgba(126, 207, 205, 0.22);
+  border-radius: 50%;
+  background: rgba(4, 22, 21, 0.5);
+  text-decoration: none;
+  transition: border-color 0.18s ease, background-color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.quarto-navbar-tools .quarto-color-scheme-toggle:hover {
+  border-color: rgba(126, 207, 205, 0.52);
+  background: rgba(4, 22, 21, 0.72);
+  transform: rotate(8deg);
+}
+
+.navbar .quarto-color-scheme-toggle .bi::before,
+.navbar .quarto-color-scheme-toggle:not(.alternate) .bi::before,
+.navbar .quarto-color-scheme-toggle.alternate .bi::before {
+  width: auto;
+  height: auto;
+  background-image: none;
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.navbar .quarto-color-scheme-toggle:not(.alternate) .bi::before {
+  content: "🌙";
+}
+
+.navbar .quarto-color-scheme-toggle.alternate .bi::before {
+  content: "☀️";
+}
+
+@media (max-width: 576px) {
+  .course-language-switch {
+    height: 40px;
+    margin-right: 0.35rem;
+  }
+
+  .course-language-switch a {
+    min-width: 33px;
+    height: 32px;
+    padding-inline: 0.35rem;
+  }
+
+  .quarto-navbar-tools .quarto-color-scheme-toggle {
+    width: 40px;
+    height: 40px;
+  }
 }
 

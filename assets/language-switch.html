@@ -1,0 +1,71 @@
+<!-- EN/KO page-pair navigation for the bilingual Quarto site. -->
+<script>
+(function () {
+  function initLanguageSwitch() {
+    var meta = document.querySelector('meta[name="quarto:offset"]');
+    var rootUrl = new URL(meta ? meta.content || './' : './', document.baseURI);
+    var currentUrl = new URL(window.location.href);
+    var relativePath = decodeURIComponent(currentUrl.pathname.slice(rootUrl.pathname.length));
+    if (!relativePath || relativePath.endsWith('/')) relativePath += 'index.html';
+
+    var isKorean = relativePath.indexOf('ko/') === 0;
+    var englishPath = isKorean ? relativePath.slice(3) : relativePath;
+    var koreanPath = 'ko/' + englishPath;
+
+    function pageUrl(path) {
+      var url = new URL(path, rootUrl);
+      url.search = currentUrl.search;
+      url.hash = currentUrl.hash;
+      return url.href;
+    }
+
+    var switcher = document.createElement('div');
+    switcher.className = 'course-language-switch';
+    switcher.setAttribute('role', 'group');
+    switcher.setAttribute('aria-label', isKorean ? '언어 선택' : 'Choose language');
+    switcher.innerHTML =
+      '<a href="' + pageUrl(englishPath) + '" lang="en">EN</a>' +
+      '<a href="' + pageUrl(koreanPath) + '" lang="ko">KO</a>';
+
+    var links = switcher.querySelectorAll('a');
+    var active = links[isKorean ? 1 : 0];
+    active.classList.add('active');
+    active.setAttribute('aria-current', 'page');
+
+    var tools = document.querySelector('.quarto-navbar-tools');
+    if (tools) tools.insertBefore(switcher, tools.firstChild);
+
+    if (isKorean) {
+      var navLabels = {
+        'Home': '홈',
+        'Weeks': '주차별 강의',
+        'Contents': '목차',
+        'W1 · Introduction to Bioinformatics': 'W1 · 생물정보학 입문',
+        'W2 · Genomics': 'W2 · 유전체학',
+        'W3 · Epigenomics': 'W3 · 후성유전체학',
+        'W4 · Transcriptomics': 'W4 · 전사체학',
+        'W5 · Single-cell Transcriptomics': 'W5 · 단일세포 전사체학',
+        'W6 · Proteomics': 'W6 · 단백체학',
+        'W7 · Metagenomics': 'W7 · 메타유전체학'
+      };
+      document.querySelectorAll('.menu-text, .dropdown-text').forEach(function (node) {
+        var label = node.textContent.trim();
+        if (navLabels[label]) node.textContent = navLabels[label];
+      });
+
+      document.querySelectorAll('.navbar-nav a[href], .navbar-brand[href]').forEach(function (link) {
+        var target = new URL(link.href, document.baseURI);
+        if (target.origin !== currentUrl.origin || target.pathname.indexOf(rootUrl.pathname) !== 0) return;
+        var targetPath = decodeURIComponent(target.pathname.slice(rootUrl.pathname.length));
+        if (targetPath.indexOf('ko/') !== 0) link.href = pageUrl('ko/' + targetPath);
+      });
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initLanguageSwitch);
+  } else {
+    initLanguageSwitch();
+  }
+})();
+</script>

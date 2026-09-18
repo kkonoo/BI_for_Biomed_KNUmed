@@ -39,34 +39,28 @@ editor: visual
 
 ## 🗓️ 강의 계획
 
-매주 습식실험 연구자가 실제로 받을 법한 질문으로 시작합니다.
-
-| 주차 | 주제 | 중심 질문 |
-|---|---|---|
-| **W1** | [생물정보학 입문](chapters/w1_intro.qmd) | 방금 200 GB의 시퀀싱 데이터가 생겼습니다. 이제 무엇을 해야 할까요? |
-| **W2** | [유전체학](chapters/w2_genomics.qmd) | 두 사람은 약 400만–500만 위치에서 다릅니다. 어떤 차이가 질병을 일으킬까요? |
-| **W3** | [후성유전체학](chapters/w3_epigenomics.qmd) | 모든 세포가 같은 유전체를 가집니다. 그런데 왜 신경세포는 간세포와 다를까요? |
-| **W4** | [전사체학](chapters/w4_transcriptomics.qmd) | RNA-seq 결과로 유전자 847개가 나왔습니다. 그중 무엇이 실제 의미가 있을까요? |
-| **W5** | [단일세포 전사체학](chapters/w5_singlecell.qmd) | 모든 세포가 조금씩 변한 것일까요, 아니면 세포의 5%가 크게 변한 것일까요? |
-| **W6** | [단백체학](chapters/w6_proteomics.qmd) | mRNA와 단백질의 상관은 약 r = 0.4입니다. 그렇다면 RNA-seq는 무엇을 알려준 것일까요? |
-| **W7** | [메타유전체학](chapters/w7_metagenomics.qmd) | 원인일까요, 결과일까요, 아니면 인공물(artifact)일까요? |
-
-------------------------------------------------------------------------
-
-## 📑 주차별 내용
+매주 습식실험 연구자가 실제로 받을 법한 질문으로 시작하고, 꼭 기억해야 할 한 가지로 끝납니다. 주차를 펼치면 세부 내용이 나옵니다.
 
 ::: {.callout-note collapse="true"}
 ## W1 · 생물정보학 입문
+
+> **방금 200 GB의 시퀀싱 데이터가 생겼습니다. 이제 무엇을 해야 할까요?**
 
 1.  생물정보학이란 무엇인가 👩‍💻 — 인접한 세 분야, wet lab ➡️ dry lab, 강의 전체를 관통하는 5단계 오믹스 워크플로
 2.  시퀀싱과 데이터 🧪 — Sanger, short-read, long-read, FASTQ/BAM/VCF/count matrix, 참조 유전체와 reference bias
 3.  데이터가 있는 곳 🗄️ — GEO, SRA, dbGaP, UK Biobank, GTEx, ENCODE, TCGA, HCA
 4.  피할 수 없는 통계 📊 — p-value, 다중검정, 배치 효과, 검정력
 5.  재현성과 연구 설계 ♻️ — 시퀀싱 *전에* 나누어야 할 대화
+
+⚠️ **함정** — 배치와 조건이 뒤섞이면 어떤 분석으로도 해결할 수 없습니다. 처음부터 시료 배치를 무작위화하세요.
+
+➡️ [W1 읽기](chapters/w1_intro.qmd)
 :::
 
 ::: {.callout-note collapse="true"}
 ## W2 · 유전체학
+
+> **두 사람은 약 400만–500만 위치에서 다릅니다. 어떤 차이가 질병을 일으킬까요?**
 
 1.  인간 유전 변이 🧬 — SNV, SV, 반복서열, 대립유전자 빈도와 allelic architecture
 2.  리드에서 변이까지 🔬 — 추론으로서의 variant calling, WGS·WES·array, imputation
@@ -74,10 +68,16 @@ editor: visual
 4.  연관성에서 기능으로 🔎 — fine-mapping, credible set, eQTL, colocalization, TWAS
 5.  유전력과 예측 🧮 — SNP heritability, polygenicity, polygenic risk score
 6.  임상 유전체학 🏥 — 암 유전체학, Mendelian randomization, 약물 표적 발굴
+
+⚠️ **함정** — Lead SNP가 원인 변이인 경우는 드물고, 가장 가까운 유전자가 원인 유전자가 아닌 경우도 많습니다.
+
+➡️ [W2 읽기](chapters/w2_genomics.qmd)
 :::
 
 ::: {.callout-note collapse="true"}
 ## W3 · 후성유전체학
+
+> **모든 세포가 같은 유전체를 가집니다. 그런데 왜 신경세포는 간세포와 다를까요?**
 
 1.  후성유전체란 무엇인가 🎛️ — 네 층위와 네 분석법, 세포 유형마다 다른 후성유전체
 2.  DNA 메틸화 🔵 — bisulfite와 array, β값과 M값, DMP·DMR, 후성유전학적 시계
@@ -85,10 +85,16 @@ editor: visual
 4.  크로마틴 접근성과 ATAC-seq 🔓 — 분석 원리, 품질관리, footprinting
 5.  조절 유전체 읽기 📖 — motif, ChromHMM, ENCODE/Roadmap, Hi-C와 TAD
 6.  임상적으로 중요한 이유 🏥 — 비암호화 GWAS 신호에서 기전으로 이어지는 다리
+
+⚠️ **함정** — 조직 메틸화 연구에서 가장 큰 교란요인은 세포 유형 조성입니다.
+
+➡️ [W3 읽기](chapters/w3_epigenomics.qmd)
 :::
 
 ::: {.callout-note collapse="true"}
 ## W4 · 전사체학
+
+> **RNA-seq 결과로 유전자 847개가 나왔습니다. 그중 무엇이 실제 의미가 있을까요?**
 
 1.  RNA-seq가 측정하는 것 📏 — 합성량이 아닌 존재량이며, 단백질도 아님
 2.  실험 선택 ⚙️ — poly(A)와 rRNA depletion, strandedness, 반복 수, 설계 체크리스트
@@ -97,10 +103,16 @@ editor: visual
 5.  차등발현 📊 — 음이항 모형, shrinkage, 표본 수, volcano·MA plot
 6.  유전자 목록 해석하기 🧠 — ORA와 GSEA, 가장 흔한 세 가지 오용
 7.  차등발현 너머 🌐 — WGCNA, deconvolution, splicing, eQTL
+
+⚠️ **함정** — Bulk 차등발현은 흔히 세포 조성 차이를 반영합니다.
+
+➡️ [W4 읽기](chapters/w4_transcriptomics.qmd)
 :::
 
 ::: {.callout-note collapse="true"}
 ## W5 · 단일세포 전사체학
+
+> **모든 세포가 조금씩 변한 것일까요, 아니면 세포의 5%가 크게 변한 것일까요?**
 
 1.  왜 단일세포인가 🔬 — 평균이 지워버리는 것과 bulk가 여전히 더 나은 경우
 2.  플랫폼과 시료 선택 🧫 — droplet·plate·combinatorial, cell과 nucleus
@@ -109,10 +121,16 @@ editor: visual
 5.  배치 효과와 통합 🔗 — Harmony/scVI와 과도한 보정
 6.  통계 검정 📊 — 세포 단위 검정이 잘못된 이유, pseudobulk, differential abundance
 7.  동역학·공간·아틀라스 🌈 — trajectory, 세포 간 소통, spatial, HCA
+
+⚠️ **함정** — 조건 간 세포 단위 검정은 잘못된 방법입니다. n은 세포 수가 아니라 공여자 수입니다.
+
+➡️ [W5 읽기](chapters/w5_singlecell.qmd)
 :::
 
 ::: {.callout-note collapse="true"}
 ## W6 · 단백체학
+
+> **mRNA와 단백질의 상관은 약 r = 0.4입니다. 그렇다면 RNA-seq는 무엇을 알려준 것일까요?**
 
 1.  왜 단백질을 측정하는가 💪 — 단백질 변이의 나머지 80%는 어디에서 오는가
 2.  질량분석 기초 ⚗️ — bottom-up 워크플로, MS2 spectrum, DDA·DIA·targeted 분석
@@ -121,10 +139,16 @@ editor: visual
 5.  통계 분석 📊 — 단백체 분석은 통계적으로 RNA-seq와 어떻게 다른가
 6.  친화성 기반·집단 단백체학 🩸 — dynamic range, Olink/SomaScan, pQTL
 7.  최전선과 함정 🚧 — PTM, AlphaFold, 오염과 분석 전 변이
+
+⚠️ **함정** — 단백질 자체를 직접 관찰하는 것이 아니며, 단순 결측치 대치는 위양성을 만들어냅니다.
+
+➡️ [W6 읽기](chapters/w6_proteomics.qmd)
 :::
 
 ::: {.callout-note collapse="true"}
 ## W7 · 메타유전체학
+
+> **원인일까요, 결과일까요, 아니면 인공물(artifact)일까요?**
 
 1.  인간 마이크로바이옴 🦠 — 신체 부위, 개인 간 차이, 근거의 단계
 2.  연구 설계와 검체 처리 🧊 — 추출 편향, 교란, kit-ome
@@ -135,6 +159,10 @@ editor: visual
 7.  연관성에서 인과성으로 🔀 — 인공물, 교란, 역인과, 인과
 8.  세균과 DNA 너머 🔭 — virome, metatranscriptomics, metabolomics
 9.  🎓 **모든 오믹스 논문을 비판적으로 읽기** — 강의 전체를 마무리하는 체크리스트
+
+⚠️ **함정** — 시퀀싱은 비율을 측정하며, 같은 데이터에서도 DA 분석법은 서로 다른 결과를 냅니다.
+
+➡️ [W7 읽기](chapters/w7_metagenomics.qmd)
 :::
 
 ------------------------------------------------------------------------
@@ -152,22 +180,6 @@ editor: visual
 | **W5** 단일세포 | 공여자와 배치 | 세포 단위 검정의 과대 추정 | annotation 아틀라스 |
 | **W6** 단백체학 | TMT 배치 구조 | peptide와 protein FDR | 검색 데이터베이스 |
 | **W7** 메타유전체학 | kit-ome, 식이, 약물 | DA 분석법 불일치 | SILVA/GTDB |
-
-------------------------------------------------------------------------
-
-## ⚠️ 주차별 핵심 함정
-
-각 장에서 한 가지만 기억한다면 다음 내용을 기억하세요.
-
-| 주차 | 함정 |
-|---|---|
-| **W1** | [배치와 조건이 뒤섞이면 어떤 분석으로도 해결할 수 없습니다](chapters/w1_intro.qmd). 처음부터 시료 배치를 무작위화하세요. |
-| **W2** | [Lead SNP가 원인 변이인 경우는 드물고, 가장 가까운 유전자가 원인 유전자가 아닌 경우도 많습니다](chapters/w2_genomics.qmd). |
-| **W3** | [조직 메틸화 연구에서 가장 큰 교란요인은 세포 유형 조성입니다](chapters/w3_epigenomics.qmd). |
-| **W4** | [Bulk 차등발현은 흔히 세포 조성 차이를 반영합니다](chapters/w4_transcriptomics.qmd). |
-| **W5** | [조건 간 세포 단위 검정은 잘못된 방법입니다. n은 세포 수가 아니라 공여자 수입니다](chapters/w5_singlecell.qmd). |
-| **W6** | [단백질 자체를 직접 관찰하는 것이 아니며, 단순 결측치 대치는 위양성을 만들어냅니다](chapters/w6_proteomics.qmd). |
-| **W7** | [시퀀싱은 비율을 측정하며, 같은 데이터에서도 DA 분석법은 서로 다른 결과를 냅니다](chapters/w7_metagenomics.qmd). |
 
 ------------------------------------------------------------------------
 

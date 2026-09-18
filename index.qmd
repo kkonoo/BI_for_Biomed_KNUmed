@@ -39,47 +39,28 @@ A separate **hands-on bioinformatics practicum** is offered next semester. This 
 
 ## 🗓️ Syllabus
 
-Each week opens with a question a wet-lab scientist might actually be asked.
-
-+--------+-----------------------------------------------------------+--------------------------------------------------------------+
-| Week   | Topic                                                     | Central question                                             |
-+:======:+===========================================================+==============================================================+
-| **W1** | [Introduction to Bioinformatics](chapters/w1_intro.qmd)   | You just generated 200 GB of sequencing data.\               |
-|        |                                                           | What now?                                                    |
-+--------+-----------------------------------------------------------+--------------------------------------------------------------+
-| **W2** | [Genomics](chapters/w2_genomics.qmd)                      | Two people differ at \~4–5 million positions.\               |
-|        |                                                           | Which differences cause disease?                             |
-+--------+-----------------------------------------------------------+--------------------------------------------------------------+
-| **W3** | [Epigenomics](chapters/w3_epigenomics.qmd)                | Every cell has the same genome.\                             |
-|        |                                                           | Why is a neuron not a hepatocyte?                            |
-+--------+-----------------------------------------------------------+--------------------------------------------------------------+
-| **W4** | [Transcriptomics](chapters/w4_transcriptomics.qmd)        | RNA-seq returns 847 genes.\                                  |
-|        |                                                           | Which of them mean anything?                                 |
-+--------+-----------------------------------------------------------+--------------------------------------------------------------+
-| **W5** | [Single-cell Transcriptomics](chapters/w5_singlecell.qmd) | Every cell changing a little, or 5% of cells changing a lot? |
-+--------+-----------------------------------------------------------+--------------------------------------------------------------+
-| **W6** | [Proteomics](chapters/w6_proteomics.qmd)                  | mRNA and protein correlate at r ≈ 0.4.\                      |
-|        |                                                           | What did RNA-seq tell you?                                   |
-+--------+-----------------------------------------------------------+--------------------------------------------------------------+
-| **W7** | [Metagenomics](chapters/w7_metagenomics.qmd)              | Cause, consequence, or artifact?                             |
-+--------+-----------------------------------------------------------+--------------------------------------------------------------+
-
-------------------------------------------------------------------------
-
-## 📑 What is inside each week
+Each week opens with a question a wet-lab scientist might actually be asked, and closes with the one thing worth remembering. Expand a week to see what is inside it.
 
 ::: {.callout-note collapse="true"}
 ## W1 · Introduction to Bioinformatics
+
+> **You just generated 200 GB of sequencing data. What now?**
 
 1.  What Bioinformatics Is 👩‍💻 — the three neighbouring fields; wet lab ➡️ dry lab; the five-stage omics workflow that maps the whole course
 2.  Sequencing and Data 🧪 — Sanger, short-read, long-read; FASTQ / BAM / VCF / count matrix; the reference genome and reference bias
 3.  Where the Data Lives 🗄️ — GEO, SRA, dbGaP, UK Biobank, GTEx, ENCODE, TCGA, HCA
 4.  Statistics You Cannot Avoid 📊 — p-values, multiple testing, batch effects, power
 5.  Reproducibility and Study Design ♻️ — the conversation to have *before* you sequence
+
+⚠️ **The trap** — batch confounded with condition cannot be fixed by any analysis; randomise your sample layout.
+
+➡️ [Read W1](chapters/w1_intro.qmd)
 :::
 
 ::: {.callout-note collapse="true"}
 ## W2 · Genomics
+
+> **Two people differ at \~4–5 million positions. Which differences cause disease?**
 
 1.  Human Genetic Variation 🧬 — SNVs, SVs, repeats; allele frequency and allelic architecture
 2.  From Reads to Variants 🔬 — variant calling as inference; WGS vs WES vs array; imputation
@@ -87,10 +68,16 @@ Each week opens with a question a wet-lab scientist might actually be asked.
 4.  From Association to Function 🔎 — fine-mapping, credible sets, eQTL, colocalization, TWAS
 5.  Heritability and Prediction 🧮 — SNP heritability, polygenicity, polygenic risk scores
 6.  Genomics in the Clinic 🏥 — cancer genomics, Mendelian randomization, drug target discovery
+
+⚠️ **The trap** — the lead SNP is usually not causal, and the nearest gene is often the wrong gene.
+
+➡️ [Read W2](chapters/w2_genomics.qmd)
 :::
 
 ::: {.callout-note collapse="true"}
 ## W3 · Epigenomics
+
+> **Every cell has the same genome. Why is a neuron not a hepatocyte?**
 
 1.  What the Epigenome Is 🎛️ — four layers, four assays; one epigenome per cell type
 2.  DNA Methylation 🔵 — bisulfite vs arrays, β and M values, DMPs and DMRs, epigenetic clocks
@@ -98,10 +85,16 @@ Each week opens with a question a wet-lab scientist might actually be asked.
 4.  Chromatin Accessibility: ATAC-seq 🔓 — the assay, its QC, and footprinting
 5.  Reading the Regulatory Genome 📖 — motifs, ChromHMM, ENCODE/Roadmap, Hi-C and TADs
 6.  Why This Matters Clinically 🏥 — the bridge from non-coding GWAS hits to mechanism
+
+⚠️ **The trap** — cell-type composition is the dominant confounder in tissue methylation studies.
+
+➡️ [Read W3](chapters/w3_epigenomics.qmd)
 :::
 
 ::: {.callout-note collapse="true"}
 ## W4 · Transcriptomics
+
+> **RNA-seq returns 847 genes. Which of them mean anything?**
 
 1.  What RNA-seq Measures 📏 — abundance, not synthesis; and not protein
 2.  Experimental Choices ⚙️ — poly(A) vs rRNA depletion, strandedness, replicates, design checklist
@@ -110,10 +103,16 @@ Each week opens with a question a wet-lab scientist might actually be asked.
 5.  Differential Expression 📊 — the negative binomial model, shrinkage, sample size, volcano and MA plots
 6.  Making Sense of a Gene List 🧠 — ORA vs GSEA and the three commonest misuses
 7.  Beyond Differential Expression 🌐 — WGCNA, deconvolution, splicing, eQTLs
+
+⚠️ **The trap** — bulk differential expression is frequently a composition difference.
+
+➡️ [Read W4](chapters/w4_transcriptomics.qmd)
 :::
 
 ::: {.callout-note collapse="true"}
 ## W5 · Single-cell Transcriptomics
+
+> **Every cell changing a little, or 5% of cells changing a lot?**
 
 1.  Why Single Cell 🔬 — what averaging destroys, and when bulk is still better
 2.  Platforms and Sample Choices 🧫 — droplet vs plate vs combinatorial; cells vs nuclei
@@ -122,10 +121,16 @@ Each week opens with a question a wet-lab scientist might actually be asked.
 5.  Batch Effects and Integration 🔗 — Harmony/scVI, and over-correction
 6.  Statistical Testing 📊 — why per-cell tests are invalid; pseudobulk; differential abundance
 7.  Dynamics, Space, and Atlases 🌈 — trajectories, cell–cell communication, spatial, HCA
+
+⚠️ **The trap** — per-cell tests are invalid across conditions; your n is the number of donors.
+
+➡️ [Read W5](chapters/w5_singlecell.qmd)
 :::
 
 ::: {.callout-note collapse="true"}
 ## W6 · Proteomics
+
+> **mRNA and protein correlate at r ≈ 0.4. What did RNA-seq tell you?**
 
 1.  Why Measure Proteins 💪 — where the other 80% of protein variance comes from
 2.  Mass Spectrometry Basics ⚗️ — the bottom-up workflow, MS2 spectra, DDA vs DIA vs targeted
@@ -134,10 +139,16 @@ Each week opens with a question a wet-lab scientist might actually be asked.
 5.  Statistical Analysis 📊 — how proteomics differs from RNA-seq statistically
 6.  Affinity-Based and Population Proteomics 🩸 — dynamic range, Olink/SomaScan, pQTLs
 7.  Frontiers and Pitfalls 🚧 — PTMs, AlphaFold, contamination and pre-analytical variation
+
+⚠️ **The trap** — you never observe a protein; naive imputation manufactures false positives.
+
+➡️ [Read W6](chapters/w6_proteomics.qmd)
 :::
 
 ::: {.callout-note collapse="true"}
 ## W7 · Metagenomics
+
+> **Cause, consequence, or artifact?**
 
 1.  The Human Microbiome 🦠 — body sites, between-person variation, evidence tiers
 2.  Study Design and Sample Handling 🧊 — extraction bias, confounders, the kit-ome
@@ -148,6 +159,10 @@ Each week opens with a question a wet-lab scientist might actually be asked.
 7.  From Association to Causation 🔀 — artifact, confounding, reverse causation, causation
 8.  Beyond Bacteria, Beyond DNA 🔭 — virome, metatranscriptomics, metabolomics
 9.  🎓 **Reading Any Omics Paper Critically** — the closing checklist for the whole course
+
+⚠️ **The trap** — sequencing measures proportions, and DA methods disagree on the same data.
+
+➡️ [Read W7](chapters/w7_metagenomics.qmd)
 :::
 
 ------------------------------------------------------------------------
@@ -173,30 +188,6 @@ Whatever the technology, the same three failure modes recur. Watch for them each
 +------------------------+-------------------------+-------------------------+---------------------+
 | **W7** Metagenomics    | kit-ome, diet, drugs    | DA method disagreement  | SILVA / GTDB        |
 +------------------------+-------------------------+-------------------------+---------------------+
-
-------------------------------------------------------------------------
-
-## ⚠️ The traps, by week
-
-If you remember one thing from each chapter, remember these.
-
-+--------+-------------------------------------------------------------------------------------------------------------------------+
-| Week   | The trap                                                                                                                |
-+:======:+=========================================================================================================================+
-| **W1** | [Batch confounded with condition cannot be fixed by any analysis](chapters/w1_intro.qmd) — randomise your sample layout |
-+--------+-------------------------------------------------------------------------------------------------------------------------+
-| **W2** | [The lead SNP is usually not causal, and the nearest gene is often the wrong gene](chapters/w2_genomics.qmd)            |
-+--------+-------------------------------------------------------------------------------------------------------------------------+
-| **W3** | [Cell-type composition is the dominant confounder in tissue methylation studies](chapters/w3_epigenomics.qmd)           |
-+--------+-------------------------------------------------------------------------------------------------------------------------+
-| **W4** | [Bulk differential expression is frequently a composition difference](chapters/w4_transcriptomics.qmd)                  |
-+--------+-------------------------------------------------------------------------------------------------------------------------+
-| **W5** | [Per-cell tests are invalid across conditions — your n is the number of donors](chapters/w5_singlecell.qmd)             |
-+--------+-------------------------------------------------------------------------------------------------------------------------+
-| **W6** | [You never observe a protein; naive imputation manufactures false positives](chapters/w6_proteomics.qmd)                |
-+--------+-------------------------------------------------------------------------------------------------------------------------+
-| **W7** | [Sequencing measures proportions, and DA methods disagree on the same data](chapters/w7_metagenomics.qmd)               |
-+--------+-------------------------------------------------------------------------------------------------------------------------+
 
 ------------------------------------------------------------------------
 

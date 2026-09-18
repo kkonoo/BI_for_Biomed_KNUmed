@@ -39,15 +39,6 @@ execute:
 
 ![생물정보학은 생물학, 컴퓨터과학, 통계학의 교차점에 있으며 시료에서 해석에 이르는 전 과정을 다룹니다.](/assets/img/w1/bioinformatics.png){fig-align="center"}
 
-**하는 일** — 두 번째 것을 첫 번째에 관한 설명으로 바꾸는 것입니다.
-
-**어려운 점** — 이 번역 과정에서는 *양방향으로 정보가 손실*됩니다.
-
--   종양 ➡️ 숫자로 이루어진 행렬
--   숫자 행렬 ➡️ 종양에 관한 주장
-
-이 강의의 상당 부분은 각 단계에서 정보가 어디로 빠져나가는지를 다룹니다.
-
 ------------------------------------------------------------------------
 
 ## 2) 서로 인접한 세 분야 {#w1-s1-2}
@@ -55,7 +46,7 @@ execute:
 흔히 같은 뜻으로 쓰지만 서로 다른 일을 합니다.
 
 | 분야 | 중심 질문 | 대표 결과물 |
-|---|---|---|
+|------------------------|------------------------|------------------------|
 | **생물정보학** | 원시 데이터에서 해석할 수 있는 측정값까지 어떻게 갈 것인가? | 처리된 행렬, variant call, annotation된 유전자 목록 |
 | **계산생물학** | 생물학을 설명하거나 예측하는 모형을 만들 수 있는가? | 시뮬레이션, 예측 모형, 기전 이론 |
 | **생물통계학** | 이 연구 설계로 어떤 결론을 정당하게 내릴 수 있는가? | 추정치, 신뢰구간, p-value, 연구 설계 |
@@ -81,13 +72,13 @@ execute:
 
 Dry lab에서도 같은 감각을 다른 인공물에 적용합니다.
 
-| Wet lab의 습관 | Dry lab에서 대응하는 것 |
-|---|---|
-| Loading control | 정규화(W4) |
-| 항체 검증 | 참조 데이터베이스와 annotation 선택(W1, W6) |
-| 맹검과 무작위화 | 배치 설계와 무작위 시료 배치(W1) |
-| 기술적 반복과 생물학적 반복 | 같은 구분이지만 결과에 더 큰 영향을 줌(W4) |
-| “한 번은 됐어요” | 두 번째 코호트에서 재현되지 않는 발견 |
+| Wet lab의 습관              | Dry lab에서 대응하는 것                     |
+|------------------------------------|------------------------------------|
+| Loading control             | 정규화(W4)                                  |
+| 항체 검증                   | 참조 데이터베이스와 annotation 선택(W1, W6) |
+| 맹검과 무작위화             | 배치 설계와 무작위 시료 배치(W1)            |
+| 기술적 반복과 생물학적 반복 | 같은 구분이지만 결과에 더 큰 영향을 줌(W4)  |
+| “한 번은 됐어요”            | 두 번째 코호트에서 재현되지 않는 발견       |
 
 **계산 분석에만 있는 실패 유형**은 분석이 언제나 답을 만들어낸다는 것입니다.
 
@@ -201,8 +192,8 @@ Sequencer에 들어가는 모든 분자는 **adapter + insert + adapter** 구조
 
 Read length, base당 정확도, base당 비용을 모두 최대화할 수는 없습니다. 플랫폼마다 한쪽을 선택합니다.
 
-| | Read length | 정확도 | 비용/Gb | 가장 적합한 용도 |
-|---|---|---|---|---|
+|   | Read length | 정확도 | 비용/Gb | 가장 적합한 용도 |
+|---------------|---------------|---------------|---------------|---------------|
 | **Sanger** | 약 800 bp | 매우 높음 | 매우 높음 | 단일 변이 확인 |
 | **Illumina** | 50–300 bp | 높음 | 낮음 | 계수: RNA-seq, ChIP, 대규모 WGS/WES |
 | **PacBio HiFi** | 15–25 kb | 높음 | 중간 | Assembly, 구조 변이, phasing |
@@ -245,12 +236,12 @@ $$Q = -10 \log_{10} P$$
 
 $P$는 base call이 틀릴 확률입니다.
 
-| Phred 점수 | 오류율 | Base call 정확도 |
-|---|---|---|
-| 10 | 10개 중 1개 | 90% |
-| 20 | 100개 중 1개 | 99% |
-| 30 | 1,000개 중 1개 | 99.9% |
-| 40 | 10,000개 중 1개 | 99.99% |
+| Phred 점수 | 오류율          | Base call 정확도 |
+|------------|-----------------|------------------|
+| 10         | 10개 중 1개     | 90%              |
+| 20         | 100개 중 1개    | 99%              |
+| 30         | 1,000개 중 1개  | 99.9%            |
+| 40         | 10,000개 중 1개 | 99.99%           |
 
 관례적 기준은 Q30입니다. 분석 기관 보고서에서 “base의 80% 이상이 Q30 이상” 같은 문장을 보게 됩니다.
 
@@ -369,24 +360,24 @@ BAM은 대부분의 프로젝트에서 read-level 정보가 끝나는 지점입�
 ## 1) 공개 저장소 {#w1-s3-1}
 
 | 자료원 | 내용 | 접근 |
-|---|---|---|
-| **[GEO](https://www.ncbi.nlm.nih.gov/geo/)**(NCBI) | 모든 분석법의 처리된 행렬과 metadata | 공개 |
-| **[SRA](https://www.ncbi.nlm.nih.gov/sra/)**(NCBI) | 원시 리드(FASTQ) | 공개 |
-| **[ENA](https://www.ebi.ac.uk/ena/)**(EMBL-EBI) | 원시 리드, SRA의 유럽 mirror | 공개 |
-| **[ArrayExpress/BioStudies](https://www.ebi.ac.uk/biostudies/arrayexpress)** | 기능유전체 실험 | 공개 |
-| **[PRIDE](https://www.ebi.ac.uk/pride/)** | 질량분석 단백체(🔗 W6) | 공개 |
-| **[MetaboLights](https://www.ebi.ac.uk/metabolights/)** | 대사체 | 공개 |
+|------------------------|------------------------|------------------------|
+| [**GEO**](https://www.ncbi.nlm.nih.gov/geo/)(NCBI) | 모든 분석법의 처리된 행렬과 metadata | 공개 |
+| [**SRA**](https://www.ncbi.nlm.nih.gov/sra/)(NCBI) | 원시 리드(FASTQ) | 공개 |
+| [**ENA**](https://www.ebi.ac.uk/ena/)(EMBL-EBI) | 원시 리드, SRA의 유럽 mirror | 공개 |
+| [**ArrayExpress/BioStudies**](https://www.ebi.ac.uk/biostudies/arrayexpress) | 기능유전체 실험 | 공개 |
+| [**PRIDE**](https://www.ebi.ac.uk/pride/) | 질량분석 단백체(🔗 W6) | 공개 |
+| [**MetaboLights**](https://www.ebi.ac.uk/metabolights/) | 대사체 | 공개 |
 
 ## 2) 제한 접근 자료 {#w1-s3-2}
 
 개인 수준의 인간 genotype 데이터로 신원을 알아낼 수 있으므로 공개할 수 없습니다. 사용 목적을 설명하는 신청이 필요합니다.
 
 | 자료원 | 내용 | 접근 |
-|---|---|---|
-| **[dbGaP](https://www.ncbi.nlm.nih.gov/gap/)** | 미국의 개인 수준 genotype/phenotype | 신청 |
-| **[EGA](https://ega-archive.org/)** | 유럽의 대응 자료원 | 신청 |
-| **[UK Biobank](https://www.ukbiobank.ac.uk/)** | 약 50만 명의 genotype, 영상, EHR 연계 | 신청+비용 |
-| **[All of Us](https://www.researchallofus.org/data-tools/workbench/)** | 다양성에 초점을 둔 미국 코호트 | 신청 |
+|------------------------|------------------------|------------------------|
+| [**dbGaP**](https://www.ncbi.nlm.nih.gov/gap/) | 미국의 개인 수준 genotype/phenotype | 신청 |
+| [**EGA**](https://ega-archive.org/) | 유럽의 대응 자료원 | 신청 |
+| [**UK Biobank**](https://www.ukbiobank.ac.uk/) | 약 50만 명의 genotype, 영상, EHR 연계 | 신청+비용 |
+| [**All of Us**](https://www.researchallofus.org/data-tools/workbench/) | 다양성에 초점을 둔 미국 코호트 | 신청 |
 
 💡 승인에는 **몇 주에서 몇 달**이 걸립니다. 분석 직전이 아니라 *연구계획서* 단계에서 시작하세요.
 
@@ -395,19 +386,19 @@ BAM은 대부분의 프로젝트에서 read-level 정보가 끝나는 지점입�
 개별 실험이라기보다 필요한 정보를 찾아보는 참조 자료입니다.
 
 | 자료원 | 제공하는 정보 | 등장 주차 |
-|---|---|---|
-| **[GTEx](https://gtexportal.org/)** | 약 54개 정상 조직의 발현과 eQTL | W2, W4 |
-| **[ENCODE](https://www.encodeproject.org/)/[Roadmap](https://www.ncbi.nlm.nih.gov/geo/roadmap/epigenomics/)** | 세포 유형별 조절 요소와 크로마틴 지도 | W3 |
-| **[TCGA](https://portal.gdc.cancer.gov/)** | 33개 암종의 multi-omics와 임상 추적 | W2, W4 |
-| **[Human Cell Atlas](https://www.humancellatlas.org/)/[Tabula Sapiens](https://tabula-sapiens-portal.ds.czbiohub.org/)** | 단일세포 참조 아틀라스 | W5 |
-| **[1000 Genomes](https://www.internationalgenome.org/)/[gnomAD](https://gnomad.broadinstitute.org/)** | 집단별 대립유전자 빈도 | W2 |
-| **[Human Protein Atlas](https://www.proteinatlas.org/)** | 단백질 발현과 위치 | W6 |
+|------------------------|------------------------|------------------------|
+| [**GTEx**](https://gtexportal.org/) | 약 54개 정상 조직의 발현과 eQTL | W2, W4 |
+| [**ENCODE**](https://www.encodeproject.org/)**/[Roadmap](https://www.ncbi.nlm.nih.gov/geo/roadmap/epigenomics/)** | 세포 유형별 조절 요소와 크로마틴 지도 | W3 |
+| [**TCGA**](https://portal.gdc.cancer.gov/) | 33개 암종의 multi-omics와 임상 추적 | W2, W4 |
+| [**Human Cell Atlas**](https://www.humancellatlas.org/)**/[Tabula Sapiens](https://tabula-sapiens-portal.ds.czbiohub.org/)** | 단일세포 참조 아틀라스 | W5 |
+| [**1000 Genomes**](https://www.internationalgenome.org/)**/[gnomAD](https://gnomad.broadinstitute.org/)** | 집단별 대립유전자 빈도 | W2 |
+| [**Human Protein Atlas**](https://www.proteinatlas.org/) | 단백질 발현과 위치 | W6 |
 
 ## 4) 💡 재분석할 가치가 있는 공개 데이터 {#w1-s3-4}
 
 저장된 모든 데이터를 사용할 수 있는 것은 아닙니다. 한 학기를 GEO accession 하나에 쓰기 전에 확인하세요.
 
--   ✅ **표본 수** — 대부분의 bulk 질문에서 군당 n > 30. 아무리 깨끗해도 작은 연구는 검정력이 부족합니다.
+-   ✅ **표본 수** — 대부분의 bulk 질문에서 군당 n \> 30. 아무리 깨끗해도 작은 연구는 검정력이 부족합니다.
 -   ✅ **명확한 설계** — 명확한 case-control 또는 paired design. 후자는 환자 내 변이를 통계적으로 통제해 더 강력합니다.
 -   ✅ **풍부한 metadata** — 나이, 성별, 배치, 조직, 치료. 공변량이 없는 행렬에서는 교란을 보정할 수 없습니다.
 -   ✅ **원시 데이터 제공** — 자신의 annotation으로 재처리하려면 행렬만이 아니라 FASTQ가 필요합니다.
@@ -432,7 +423,7 @@ BAM은 대부분의 프로젝트에서 read-level 정보가 끝나는 지점입�
 
 예를 들면:
 
--   군당 n = 200이면 3% 발현 차이도 p < 0.001이 될 수 있지만 의미가 없을 수 있습니다.
+-   군당 n = 200이면 3% 발현 차이도 p \< 0.001이 될 수 있지만 의미가 없을 수 있습니다.
 -   n = 3이면 실제 2배 변화도 유의성에 도달하지 못할 수 있습니다.
 
 → **항상 p-value와 효과 크기를 함께 읽으세요.**
@@ -445,13 +436,13 @@ BAM은 대부분의 프로젝트에서 read-level 정보가 끝나는 지점입�
 두 보정법이 주로 사용됩니다.
 
 | 방법 | 통제하는 것 | 성격 | 사용 상황 |
-|---|---|---|---|
+|------------------|------------------|------------------|------------------|
 | **Bonferroni** | Family-wise error rate, 즉 하나 이상의 위양성이 생길 확률 | 매우 보수적 | 모든 hit에 거의 확실성이 필요할 때(예: GWAS, 🔗 W2) |
 | **Benjamini–Hochberg(FDR)** | Hit 중 위양성이 차지하는 기대 비율 | 훨씬 관대함 | 선별·발견 단계(예: RNA-seq, 🔗 W4) |
 
 오믹스에서는 후속 연구를 위한 *순위화된 후보 목록*이 목적이므로 FDR을 기본으로 사용합니다.
 
-“FDR < 0.05”는 이 목록에 든 유전자의 약 5%가 위양성일 것으로 기대된다는 뜻입니다.
+“FDR \< 0.05”는 이 목록에 든 유전자의 약 5%가 위양성일 것으로 기대된다는 뜻입니다.
 
 -   다음 단계가 **검증**이면 받아들일 수 있는 거래입니다.
 -   다음 단계가 **임상 결정**이면 받아들일 수 없습니다.
@@ -496,7 +487,7 @@ Plate, row, run, day, operator 등 **모든 기술적 묶음에 조건을 고르
 
 규칙이 아닌 대략적 방향은 다음과 같습니다.
 
--   **Bulk RNA-seq** — n = 3은 크고 일관된 변화만 찾습니다. 인간 조직은 n = 6–10이 실무적 최솟값이며 임상적으로 이질적인 phenotype은 n > 20이 필요합니다.
+-   **Bulk RNA-seq** — n = 3은 크고 일관된 변화만 찾습니다. 인간 조직은 n = 6–10이 실무적 최솟값이며 임상적으로 이질적인 phenotype은 n \> 20이 필요합니다.
 -   **GWAS** — 개별 변이 효과가 작아 수천에서 수십만 명이 필요합니다(🔗 W2).
 -   **Single-cell** — 중요한 n은 세포 수가 아니라 *공여자 수*입니다. 세포를 300개 읽든 30만 개 읽든 공여자가 3명이면 n = 3입니다(🔗 W5).
 
@@ -557,7 +548,7 @@ Plate, row, run, day, operator 등 **모든 기술적 묶음에 조건을 고르
 이 장에서 가장 가치 있는 절입니다. **대부분의 분석 문제는 너무 늦게 드러난 설계 문제입니다.** 시료가 실험대를 떠나기 전에 합의하세요.
 
 | 질문 | 중요한 이유 |
-|---|---|
+|------------------------------------|------------------------------------|
 | **무엇을 비교하는가?** | 전체 설계를 결정합니다. “무엇이 다른지 봅시다”는 비교가 아닙니다. |
 | **생물학적 반복은 몇 개인가?** | 무엇을 검출할 수 있는지 결정하는 가장 큰 요인입니다. |
 | **반복의 단위는 무엇인가?** | 환자, 생쥐, well, 세포 중 무엇입니까? n이 가장 흔히 부풀려지는 지점입니다. |
@@ -593,7 +584,7 @@ Plate, row, run, day, operator 등 **모든 기술적 묶음에 조건을 고르
 # 🔑 핵심 용어
 
 | 용어 | 한 줄 정의 |
-|---|---|
+|------------------------------------|------------------------------------|
 | Read | 시퀀싱한 절편 하나 |
 | Phred score | Base call이 틀릴 확률을 로그 척도로 표현한 값 |
 | Coverage/depth | 각 위치를 덮는 평균 리드 수 |

@@ -10,9 +10,9 @@ editor: visual
 
 ## 📖 Course overview
 
-This course is written for graduate students with a **wet-lab background** and little or no computational experience.
-
-Over seven weeks we walk up the central dogma: genome ➡️ epigenome ➡️ transcriptome ➡️ single-cell resolution ➡️ proteome ➡️ microbiome — asking the same three questions of every technology.
+-   For: graduate students with a **wet-lab background** and little or no computational experience
+-   Seven weeks up the central dogma: genome ➡️ epigenome ➡️ transcriptome ➡️ single-cell resolution ➡️ proteome ➡️ microbiome
+-   The same three questions of every technology
 
 > **① What does the assay actually measure?** **② What does the data look like?** **③ What can go wrong?**
 
@@ -21,30 +21,33 @@ Over seven weeks we walk up the central dogma: genome ➡️ epigenome ➡️ tr
 
 ✅ Concepts, interpretation, and study design\
 ✅ How to read a methods section and judge whether to believe a figure\
-✅ Enough vocabulary to have a productive conversation with a bioinformatician
+✅ Vocabulary for a productive conversation with a bioinformatician
 
 ### What this course is **not**
 
-❌ A programming course. There is no R or Python here.\
-❌ A pipeline tutorial. Tool names appear only as landmarks.
+❌ Not a programming course — no R or Python\
+❌ Not a pipeline tutorial — tool names appear only as landmarks
 :::
 
 ::: {.callout-note collapse="true"}
 ## The practical course
 
-A separate **hands-on bioinformatics practicum** is offered next semester. This course is its conceptual prerequisite — the goal here is that you know *what* you want to compute before you learn *how*.
+-   A separate **hands-on bioinformatics practicum** runs next semester
+-   This course = its conceptual prerequisite
+-   Goal: know *what* you want to compute before you learn *how*
 :::
 
 ------------------------------------------------------------------------
 
 ## 🗓️ Syllabus
 
-Each week opens with a question a wet-lab scientist might actually be asked, and closes with the one thing worth remembering. Expand a week to see what is inside it.
+-   Each week opens with a question a wet-lab scientist might actually be asked → closes with the one thing worth remembering
+-   Expand a week to see what is inside
 
 ::: {.callout-note collapse="true"}
 ## W1 · Introduction to Bioinformatics
 
-> **You just generated 200 GB of sequencing data. What now?**
+> **200 GB of sequencing data just arrived. What now?**
 
 1.  What Bioinformatics Is 👩‍💻 — the three neighbouring fields; wet lab ➡️ dry lab; the five-stage omics workflow that maps the whole course
 2.  Sequencing and Data 🧪 — Sanger, short-read, long-read; FASTQ / BAM / VCF / count matrix; the reference genome and reference bias
@@ -52,7 +55,7 @@ Each week opens with a question a wet-lab scientist might actually be asked, and
 4.  Statistics You Cannot Avoid 📊 — p-values, multiple testing, batch effects, power
 5.  Reproducibility and Study Design ♻️ — the conversation to have *before* you sequence
 
-⚠️ **The trap** — batch confounded with condition cannot be fixed by any analysis; randomise your sample layout.
+⚠️ **The trap** — batch confounded with condition cannot be fixed by any analysis → randomise the sample layout from the start
 
 ➡️ [Read W1](chapters/w1_intro.qmd)
 :::
@@ -69,7 +72,7 @@ Each week opens with a question a wet-lab scientist might actually be asked, and
 5.  Heritability and Prediction 🧮 — SNP heritability, polygenicity, polygenic risk scores
 6.  Genomics in the Clinic 🏥 — cancer genomics, Mendelian randomization, drug target discovery
 
-⚠️ **The trap** — the lead SNP is usually not causal, and the nearest gene is often the wrong gene.
+⚠️ **The trap** — the lead SNP is rarely causal; the nearest gene ≠ the causal gene in many cases
 
 ➡️ [Read W2](chapters/w2_genomics.qmd)
 :::
@@ -86,7 +89,7 @@ Each week opens with a question a wet-lab scientist might actually be asked, and
 5.  Reading the Regulatory Genome 📖 — motifs, ChromHMM, ENCODE/Roadmap, Hi-C and TADs
 6.  Why This Matters Clinically 🏥 — the bridge from non-coding GWAS hits to mechanism
 
-⚠️ **The trap** — cell-type composition is the dominant confounder in tissue methylation studies.
+⚠️ **The trap** — the biggest confounder in tissue methylation studies = cell-type composition
 
 ➡️ [Read W3](chapters/w3_epigenomics.qmd)
 :::
@@ -94,7 +97,7 @@ Each week opens with a question a wet-lab scientist might actually be asked, and
 ::: {.callout-note collapse="true"}
 ## W4 · Transcriptomics
 
-> **RNA-seq returns 847 genes. Which of them mean anything?**
+> **RNA-seq returns 847 genes. Which of them actually matter?**
 
 1.  What RNA-seq Measures 📏 — abundance, not synthesis; and not protein
 2.  Experimental Choices ⚙️ — poly(A) vs rRNA depletion, strandedness, replicates, design checklist
@@ -104,7 +107,7 @@ Each week opens with a question a wet-lab scientist might actually be asked, and
 6.  Making Sense of a Gene List 🧠 — ORA vs GSEA and the three commonest misuses
 7.  Beyond Differential Expression 🌐 — WGCNA, deconvolution, splicing, eQTLs
 
-⚠️ **The trap** — bulk differential expression is frequently a composition difference.
+⚠️ **The trap** — bulk differential expression often reflects a composition difference
 
 ➡️ [Read W4](chapters/w4_transcriptomics.qmd)
 :::
@@ -122,7 +125,7 @@ Each week opens with a question a wet-lab scientist might actually be asked, and
 6.  Statistical Testing 📊 — why per-cell tests are invalid; pseudobulk; differential abundance
 7.  Dynamics, Mechanism, Space, and Atlases 🌈 — trajectories, regulons, cell–cell communication, spatial, HCA, strength of evidence
 
-⚠️ **The trap** — per-cell tests are invalid across conditions; your n is the number of donors.
+⚠️ **The trap** — per-cell tests across conditions are invalid. n = the number of donors, not cells
 
 ➡️ [Read W5](chapters/w5_singlecell.qmd)
 :::
@@ -130,7 +133,7 @@ Each week opens with a question a wet-lab scientist might actually be asked, and
 ::: {.callout-note collapse="true"}
 ## W6 · Proteomics
 
-> **mRNA and protein correlate at r ≈ 0.4. What did RNA-seq tell you?**
+> **mRNA and protein correlate at r ≈ 0.4. So what did RNA-seq tell you?**
 
 1.  Why Measure Proteins 💪 — where the other 80% of protein variance comes from
 2.  Mass Spectrometry Basics ⚗️ — the bottom-up workflow, MS2 spectra, DDA vs DIA vs targeted
@@ -140,7 +143,7 @@ Each week opens with a question a wet-lab scientist might actually be asked, and
 6.  Affinity-Based and Population Proteomics 🩸 — dynamic range, Olink/SomaScan, pQTLs
 7.  Frontiers and Pitfalls 🚧 — PTMs, AlphaFold, contamination and pre-analytical variation
 
-⚠️ **The trap** — you never observe a protein; naive imputation manufactures false positives.
+⚠️ **The trap** — you never observe a protein directly. Naive imputation → false positives
 
 ➡️ [Read W6](chapters/w6_proteomics.qmd)
 :::
@@ -160,7 +163,7 @@ Each week opens with a question a wet-lab scientist might actually be asked, and
 8.  Beyond Bacteria, Beyond DNA 🔭 — virome, metatranscriptomics, metabolomics
 9.  🎓 **Reading Any Omics Paper Critically** — the closing checklist for the whole course
 
-⚠️ **The trap** — sequencing measures proportions, and DA methods disagree on the same data.
+⚠️ **The trap** — sequencing measures proportions. DA methods give different answers on the same data
 
 ➡️ [Read W7](chapters/w7_metagenomics.qmd)
 :::
@@ -169,7 +172,8 @@ Each week opens with a question a wet-lab scientist might actually be asked, and
 
 ## 🧵 Three threads that run through every week
 
-Whatever the technology, the same three failure modes recur. Watch for them each week.
+-   Whatever the technology, the same three failure modes recur
+-   Watch for them each week
 
 +------------------------+-------------------------+-------------------------+---------------------+
 | Week                   | Confounding             | Multiple testing        | Reference bias      |
@@ -193,7 +197,7 @@ Whatever the technology, the same three failure modes recur. Watch for them each
 
 ## 🧭 How to read each chapter
 
-Every chapter follows the same shape:
+The shape every chapter follows:
 
 -   **🎯 Learning objectives** — what you should be able to do afterwards
 -   **🤔 Motivating question** — the problem the chapter exists to solve
@@ -207,13 +211,16 @@ Every chapter follows the same shape:
 ::: {.callout-tip collapse="true"}
 ## Cross-links
 
-Sections marked 🔗 point back to an earlier week. Omics layers are not independent, and the connections are where most of the interesting biology lives — the clearest example runs W2 → W3 → W4 → W6, from a non-coding GWAS hit to a genetically validated drug target.
+-   🔗 = a section that points back to an earlier week
+-   Omics layers are not independent → the connections are where most of the interesting biology lives
+-   The clearest example: W2 → W3 → W4 → W6 (non-coding GWAS hit → genetically validated drug target)
 :::
 
 ::: {.callout-important collapse="true"}
 ## Where this ends up
 
-The course closes with a checklist in [**W7 §9**](chapters/w7_metagenomics.qmd#w7-s9) for reading any omics paper critically — design, measurement, analysis, interpretation — with pointers back to the chapter that covers each question.
+-   The course closes with a checklist for reading any omics paper critically: [**W7 §9**](chapters/w7_metagenomics.qmd#w7-s9)
+-   Design, measurement, analysis, interpretation → each question points back to the chapter that covers it
 
-If you can work through that list on a paper in your own field, this course has done its job.
+→ If you can work through that list on a paper in your own field, the course has done its job
 :::

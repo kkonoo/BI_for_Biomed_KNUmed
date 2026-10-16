@@ -11,20 +11,25 @@ execute:
 ::: {.callout-note collapse="true"}
 ## 🎯 학습목표
 
-이 장을 마치면 다음을 할 수 있어야 합니다.
+이 장을 마치면:
 
--   Bulk로는 답할 수 없지만 single-cell RNA-seq으로 답할 수 있는 질문을 말할 수 있습니다.
--   Droplet 방식과 plate 방식, 세포와 핵 중 연구에 맞는 방법을 선택할 수 있습니다.
--   UMI가 무엇이며 count matrix의 대부분이 0인 이유를 설명할 수 있습니다.
--   Knee plot과 표준 QC scatter plot을 해석하고 각 artifact의 양상을 말할 수 있습니다.
--   ⚠️ UMAP을 책임 있게 읽고 UMAP의 거리가 의미하는 것과 의미하지 않는 것을 말할 수 있습니다.
--   Clustering resolution이 임의적인 이유와 결과를 무엇에 비추어 확인해야 하는지 설명할 수 있습니다.
--   ⚠️ 세포별 차등 발현 검정이 타당하지 않은 이유와 pseudobulk가 대신 무엇을 하는지 설명할 수 있습니다.
+-   Bulk로는 구조적으로 답할 수 없고 single cell로만 답할 수 있는 질문 구분 — 그리고 bulk가 여전히 나은 경우
+-   Droplet vs plate, 3′ vs 5′, ⚠️ 세포 vs 핵 중 연구에 맞는 선택
+-   ⚠️ 해리(dissociation)가 측정되는 세포 조성을 바꾸는 이유
+-   UMI가 무엇이며 count matrix의 대부분이 0인 이유
+-   ⚠️ Knee plot과 QC plot 해석 — 각 threshold가 어떤 세포 집단을 지우는지
+-   Doublet을 찾는 핵심 아이디어, 그리고 어떤 방법으로도 못 잡는 doublet
+-   Clustering과 UMAP이 같은 이웃 graph에서 출발한다는 점
+-   ⚠️ UMAP의 거리가 의미하는 것과 의미하지 않는 것
+-   ⚠️ 조건 간 세포별 차등 발현 검정이 무효인 이유와 pseudobulk의 해결 방식
+-   Trajectory, regulon, 세포 간 소통 결과를 finding이 아니라 가설로 읽기
 :::
 
 > 🤔 **출발 질문**
 >
-> Bulk RNA-seq에서 명확한 2배 증가가 관찰되었습니다. 모든 세포가 조금씩 변한 것일까요, 5%의 세포가 크게 변한 것일까요, 아니면 어떤 세포도 변하지 않은 것일까요?
+> Bulk RNA-seq에서 뚜렷한 2배 증가, *p* = 0.001
+>
+> → 모든 세포가 조금씩 변했나? 세포의 5%만 크게 변했나? 아니면 어떤 세포도 변하지 않았나?
 
 ![](../../chapters/images/clipboard-2113067316.png){fig-align="center"}
 
@@ -32,323 +37,567 @@ execute:
 
 # 1. 단일세포 분석이 필요한 이유 🔬 {#w5-s1}
 
+> 🔑 **핵심** — Bulk = 평균. 같은 평균 뒤에 전혀 다른 생물학이 숨어 있을 수 있음
+
 ## 1) 평균을 내면 사라지는 것 {#w5-s1-1}
 
-![하나의 bulk 측정값은 이 세 상황 모두와 일치합니다. Bulk는 구분하지 못하지만 single-cell은 구분할 수 있습니다.](/assets/img/w5/bulk_vs_singlecell.png){fig-align="center"}
+![](/assets/img/w5/bulk_vs_singlecell.svg){fig-align="center"}
 
-**이 기술이 필요한 이유의 전부입니다.** Bulk 실험은 평균을 보고하지만, 같은 평균이라도 생물학적 상황은 완전히 다를 수 있습니다.
+-   **① 전체 세포의 완만한 반응** — 모두가 암묵적으로 가정하는 경우. 가장 덜 흥미로움
+-   **② 반응하는 드문 하위집단** — 보통 가장 흥미로운 경우. Bulk에서는 반응 없는 다수의 세포에 희석 → 유의성에 못 미치는 경우가 많음
+-   **③ 조성의 변화** — 어떤 세포도 전사체를 바꾸지 않음. 발현이 높은 세포 유형이 단순히 많아진 것(🔗 [W4 §7.2](w4_transcriptomics.qmd#w4-s7-2), 후성유전체판은 🔗 [W3 §5.3②](w3_epigenomics.qmd#w3-s5-3-2))
 
--   **① 전체 세포의 완만한 반응** — 가장 흥미롭지 않은 경우지만 사람들이 암묵적으로 가정하는 경우입니다.
--   **② 반응하는 희귀 하위집단** — 보통 가장 흥미로운 경우입니다. Bulk에서는 아무 반응도 하지 않는 85%의 세포에 의해 희석되어 유의성에 도달하지 못할 때가 많습니다.
--   **③ 조성의 변화** — 어떤 세포도 전사체를 바꾸지 않았습니다(🔗 [W4 §7.2](w4_transcriptomics.qmd#w4-s7-2), 후성유전체학의 같은 문제는 🔗 [W3 §5.3②](w3_epigenomics.qmd#w3-s5-3-2)).
+⚠️ ③은 염증·섬유화·침윤 조직 — 임상에서 주로 연구하는 바로 그 조직 — 에서 흔함. 그런데 논문에는 흔히 ①처럼 기술됨
+
+→ 세 경우는 후속 실험이 완전히 다름. Bulk는 구분 불가, single cell은 구분 가능
 
 ## 2) 단일세포 분석이 실제로 잘하는 것 {#w5-s1-2}
 
-구체적으로 판단해야 합니다. 단일세포 분석은 비싸며 bulk가 더 잘 답할 질문에도 자주 사용됩니다.
+Single cell은 비쌈 → bulk로 충분한 질문에는 굳이 x
 
-**Single-cell이 적합한 경우:**
+**✅ Single cell이 적합한 질문:**
 
--   희귀 집단을 포함한 **세포 집단의 발견 또는 특성화**
--   **조성** — 질병에서 어떤 세포 유형의 비율이 변했는가?
--   **세포 유형 특이적 효과** — 한 세포 유형에서는 증가하고 다른 유형에서는 감소하여 bulk에서 보이지 않는 유전자
--   **연속적인 상태** — 분화, 활성화, 탈진처럼 불연속 범주로 설명하기 어려운 과정
+-   드문 집단을 포함한 **세포 집단의 발견·특성화**
+-   **조성** — 질환에서 어떤 세포 유형의 비율이 변했나?
+-   **세포 유형 특이적 효과** — 한 유형에서는 증가, 다른 유형에서는 감소 → bulk에서는 상쇄되어 안 보이는 유전자
+-   **연속적인 상태** — 분화, 활성화, 탈진처럼 불연속 범주로 나누기 어려운 과정
 
-**Bulk가 여전히 적합한 경우:**
+**✅ Bulk가 여전히 적합한 질문:**
 
--   균질한 system(cell line, sorting된 집단)에서 잘 정의된 비교
--   Isoform, 저발현 유전자, splicing과 같은 깊은 transcript-level 분석
--   대규모 cohort — 환자 n = 200에서 단일세포 run을 200번 수행하는 것은 감당하기 어려움
+-   균질한 system(cell line, sorting한 집단)에서의 명확한 비교
+-   Isoform, splicing, 저발현 유전자 같은 깊은 transcript-level 분석
+-   **대규모 cohort** — 환자 n = 200에 single-cell run 200번은 감당 불가
 
 ::: {.callout-tip collapse="true"}
-## 먼저 sorting하는 방법이 과소평가되어 있습니다
+## 먼저 sorting하는 전략은 과소평가되어 있음
 
-관심 있는 세포 유형을 이미 알고 있나요?
+관심 세포 유형을 이미 안다면?
 
-→ FACS로 분리한 뒤 깊은 bulk RNA-seq을 수행하세요. 전체 조직 단일세포 실험보다 **저렴하고, 깊고, 통계적으로 더 깔끔한** 경우가 많습니다.
+→ FACS로 sorting 후 deep bulk RNA-seq. 전체 조직 single cell보다 흔히 **더 싸고, 더 깊고, 통계적으로 더 깔끔함**. 같은 예산으로 환자를 훨씬 많이 넣을 수 있음 — 실제 검정력은 거기서 나옴(§6.2)
+
+💡 "Single cell을 했다" ≠ 더 강한 설계. 검정력이 부족한 연구를 더 비싸게 한 것일 수도
 :::
 
 ------------------------------------------------------------------------
 
-# 2. 플랫폼과 시료 선택 🧫 {#w5-s2}
+# 2. 장비에 넣기 전에 내리는 결정 🧫 {#w5-s2}
 
-## 1) 근본적인 trade-off {#w5-s2-1}
+> 🔑 **핵심** — 분석으로 되돌릴 수 없는 결정은 전부 시료 수집과 실험 설계 단계에서 내려짐
 
-![모든 플랫폼은 세포 수를 얻는 대신 깊이를 포기하거나, 깊이를 얻는 대신 세포 수를 포기합니다.](/assets/img/w5/platform_tradeoff.png){fig-align="center"}
+## 1) Platform의 trade-off {#w5-s2-1}
 
--   **Droplet 방식(10x Genomics)** — barcode bead와 함께 세포를 기름방울에 포획합니다. 수만 개 세포에서 세포당 수천 개 유전자를 측정하며 3′ 또는 5′ 말단만 읽습니다. **현재의 기본 방법입니다.**
--   **Plate 방식(Smart-seq2/3)** — well마다 세포 하나를 넣고 full-length transcript를 깊게 읽습니다. 수백 개 세포를 측정합니다. Isoform 또는 매우 민감한 검출이 필요할 때 여전히 선택됩니다.
--   **Combinatorial indexing(sci-, SPLiT-seq)** — 물리적으로 분리하지 않고 split-pool을 반복하며 barcode를 붙입니다. 수백만 개 세포를 매우 얕게 읽습니다. 전 개체 atlas를 가능하게 한 방법입니다.
+![모든 platform은 세포 수를 얻는 대신 깊이를 포기하거나, 깊이를 얻는 대신 세포 수를 포기](/assets/img/w5/platform_tradeoff.png){fig-align="center"}
 
-## 2) ⚠️ 세포와 핵 {#w5-s2-2}
+| Platform | 원리 | 세포 수 | 깊이 | 언제 |
+|-------------------|-------------------|-----------|-------------------|-------------------|
+| **Droplet (10x Genomics)** | 세포 하나 + barcode bead 하나를 기름방울에 | 10³–10⁵ | 세포당 유전자 수천 개, 3′ 또는 5′ 말단만 | 현재의 기본 선택 |
+| **Plate (Smart-seq2/3)** | well 하나에 세포 하나 | 10² | full-length, 깊음 | isoform, 매우 민감한 검출 |
+| **Combinatorial indexing (sci-, SPLiT-seq)** | 물리적 분리 없이 split-pool을 반복해 barcode 조합 | 10⁶ | 매우 얕음 | 전 개체 atlas |
 
-**snRNA-seq**은 온전한 세포 대신 핵을 profiling합니다. scRNA-seq보다 못한 방법이 아니라 많은 조직에서 **유일한 선택지**입니다.
+## 2) 3′ vs 5′ {#w5-s2-2}
+
+Transcript 전체가 아니라 **barcode가 붙는 한쪽 끝**만 읽음 → 유전자 세기엔 충분, isoform은 x
+
+![](/assets/img/w5/three_vs_five_prime.svg){fig-align="center"}
+
+-   ✅ **대부분의 single-cell data = 3′** (공개 atlas 대부분 포함)
+-   ✅ **5′** — TCR/BCR clonotype이 필요할 때: T/B cell, 종양면역, 자가면역, 백신 반응
+-   ⚠️ 유전자 count만 보면 둘은 대체로 비슷. 하지만 **한 비교 안에서 섞어 쓰기 x** — 3′/5′ 시료가 섞인 연구 = 설계 단계의 batch effect
+-   💡 고정·FFPE 시료: probe 기반 kit(10x Flex) — poly(A) tail을 잡는 대신 probe를 hybridise
+
+## 3) ⚠️ 세포 vs 핵 {#w5-s2-3}
+
+⚠️ 분석이 아니라 **시료 수집 시점에 결정됨**
+
+-   **scRNA-seq** = **신선한** 조직을 온전한 세포로 해리해야 가능
+-   **snRNA-seq** = 세포 대신 핵을 profiling. 못한 대안이 아니라 많은 조직에서 **유일한 선택지**
+
+![](/assets/img/w5/dissociation_bias.svg){fig-align="center"}
 
 |   | scRNA-seq | snRNA-seq |
-|------------------------|------------------------|------------------------|
+|------------------------|:----------------------:|:----------------------:|
 | 냉동 / 보관 조직 | ❌ 신선한 시료 필요 | ✅ |
 | 크거나 약한 세포(신경세포, 지방세포, 근섬유, 심근세포) | ❌ 해리 과정에서 소실 | ✅ |
-| 해리 스트레스 반응 | ⚠️ 있음 — protocol 자체가 immediate early gene(*FOS*, *JUN*, heat shock)을 유도 | ✅ 최소 |
+| 해리 스트레스 반응 | ⚠️ 있음 — protocol 자체가 *FOS*, *JUN*, heat shock 유전자 유도 | ✅ 최소 |
 | 세포질 transcript | ✅ 포획 | ❌ 놓침 |
-| Intron read 비율 | 낮음 | 높음 — 핵에는 splicing되지 않은 pre-mRNA가 많음 |
+| Intron read 비율 | 낮음 | 높음 — 핵에는 splicing 전 pre-mRNA가 많음 |
 
 ::: {.callout-warning collapse="true"}
-## 해리는 의도하지 않았지만 수행하게 된 실험입니다
+## 해리 = 의도하지 않았지만 수행하게 된 실험
 
 **일어나는 일:**
 
--   37 °C에서 30–60분 동안 효소로 해리합니다.
--   세포는 그 시간 내내 살아서 반응하므로 스트레스 반응 유전자가 유도됩니다.
--   ⚠️ 더 큰 문제는 **해리가 균일하지 않다는 것**입니다. 신경세포, 지방세포, 크거나 약한 세포가 선택적으로 파괴됩니다.
+-   37 °C에서 30–60분 효소 해리. 세포는 그동안 살아서 반응 → 스트레스 반응 유전자 유도
+-   ⚠️ 더 큰 문제: **해리가 균일하지 않음.** 신경세포, 지방세포처럼 크거나 약한 세포가 선택적으로 파괴
 
-→ 측정한 조성은 조직의 원래 조성이 아니라 **살아남은 세포의 조성**입니다.
+→ 측정한 조성 = 조직의 원래 조성이 아니라 **살아남은 세포의 조성**
 
-💡 “질병에서 세포 유형 X가 감소했다”는 결과를 얻었나요? 질병 조직에서 세포 유형 X를 해리하기가 더 어려웠던 것은 아닌지 물어보세요.
+**연구 설계 회의에 가져갈 두 가지:**
+
+-   ⚠️ **Immediate-early gene = 대표적인 위양성.** *FOS*, *JUN*, *EGR1*로 정의된 cluster는 "활성화" 상태가 아니라 해리 artifact인 경우가 많음. 한 조건의 시료가 bench에 더 오래 있었다면 그 조건이 더 "활성화"된 것처럼 보임
+-   ⚠️ **감소 주장은 의심해 볼 것.** "질환에서 세포 유형 X 감소"와 "질환 조직에서 세포 유형 X를 해리하기 더 어려움"은 똑같은 데이터를 만듦
+
+✅ 완화: 저온 활성 protease로 낮은 온도에서 해리, 조건 간 protocol 동일하게, 가능하면 핵 사용
 :::
+
+## 4) 연구 설계: 반복 단위는 기증자 {#w5-s2-4}
+
+⚠️ **반복(replicate)의 단위 = 기증자(donor)**, 세포가 아님. §6의 통계 이야기는 전부 여기서 출발 → 분석보다 먼저 **예산**에 반영해야 함
+
+-   💡 예산이 고정이라면, 조건을 비교하는 거의 모든 질문에서 **기증자 많이 × 기증자당 세포 적게** \> **기증자 적게 × 기증자당 세포 많이**
+-   💡 **여러 기증자를 한 lane에 pooling** → genotype(`demuxlet`, `souporcell`, `vireo`)이나 hashtag antibody로 다시 분리(demultiplexing)
+    -   lane 간 batch effect가 특정 조건과 엮이지 않음
+    -   서로 다른 기증자의 세포로 된 doublet은 직접 식별 가능(§3.3④)
+-   ⚠️ 조건별로 날짜를 나눠 처리(환자 전부 하루, 대조군 전부 다른 날) = 분석으로 복구 불가(§5)
 
 ------------------------------------------------------------------------
 
 # 3. Droplet에서 count matrix까지 🧮 {#w5-s3}
 
+> 🔑 **핵심** — Count matrix는 측정값 그 자체가 아님. 빈 droplet, 떠다니는 RNA, 두 세포가 섞인 droplet, 죽어가는 세포를 걸러낸 **판단의 결과물**
+
+![FASTQ에서 downstream 분석까지. 단계가 많을수록 앞 단계의 오류가 그대로 전파](../../chapters/images/clipboard-949377196.png){fig-align="center"}
+
+💡 이 수업의 초점 = 도구 사용법이 아니라 **각 단계가 무엇을 판단하는지**. 직접 분석은 다음 학기 실습 수업에서
+
 ## 1) Barcode와 UMI {#w5-s3-1}
 
-포획한 모든 transcript에는 두 종류의 barcode가 붙습니다.
+![Droplet 하나에 gel bead 하나(그림은 5′ kit bead, §2.2). Bead의 모든 oligo = 같은 cell barcode + 서로 다른 UMI. 아래: antibody에 붙은 oligo → 같은 barcode로 표면 단백질까지 읽음(CITE-seq)](../../chapters/images/clipboard-150401913.png){fig-align="center"}
 
--   **Cell barcode** — droplet, 따라서 세포를 식별합니다.
--   **UMI**(unique molecular identifier) — 원래 mRNA 분자마다 고유한 무작위 서열입니다.
+-   **Cell barcode** — bead 하나의 모든 oligo에 똑같이 붙음 → 그 droplet에서 잡힌 모든 분자에 "이 세포에서 왔음" 표시
+-   **UMI**(unique molecular identifier) — oligo마다 다른 무작위 서열 → 증폭 **전** 원래 mRNA 분자 하나하나에 표시
 
-**UMI가 중요한 이유** — PCR 후 하나의 원래 분자가 수백 개 read로 나타날 수 있습니다. 같은 UMI를 공유하는 read를 하나로 합치면 read 수가 아니라 **분자 수**를 복원하여 증폭 편향을 제거합니다.
+**UMI가 중요한 이유** — PCR 후 분자 하나가 read 수백 개로 불어남. 같은 UMI의 read를 하나로 합침 → read가 아니라 **분자 수**를 셈 → 증폭 편향 제거
+
+⚠️ UMI로도 못 고치는 것: 애초에 포획되지 않은 분자는 UMI도 없음 → 다음의 0들
 
 ## 2) Matrix의 90% 이상이 0인 이유 {#w5-s3-2}
 
-일반적인 droplet 실험은 약 20,000개 유전자 중 세포당 1,000–5,000개를 검출합니다.
+일반적인 droplet 실험: 약 20,000개 유전자 중 세포당 1,000–5,000개 검출
 
-0은 서로 매우 다른 두 가지 의미를 가집니다.
+0의 두 가지 의미:
 
--   **생물학적 0** — 해당 세포에서 유전자가 실제로 발현되지 않았습니다.
--   **기술적 0(dropout)** — transcript가 있었지만 포획되지 않았습니다. Droplet 포획 효율은 약 10–30%입니다.
+-   **생물학적 0** — 그 세포에서 실제로 발현 x
+-   **기술적 0 (dropout)** — transcript는 있었지만 포획 x. Droplet 포획 효율 약 10–30%
 
-💡 이 분야는 대체로 이를 “zero inflation”이라고 부르지 않게 되었습니다. UMI 자료의 0은 별도의 추가 과정이 아니라 낮은 count에서 단순 표본추출 model이 예측하는 결과인 경우가 대부분입니다.
+💡 요즘은 "zero inflation"이라고 잘 안 부름. UMI 자료의 0은 대부분 별도의 과정이 아니라, 발현이 낮을 때 단순 표본추출 model이 예측하는 결과
 
-⚠️ 실용적인 결론은 같습니다. **한 세포에서 0이 한 번 나왔다고 유전자가 꺼졌다고 결론 내릴 수 없습니다.**
+⚠️ 실용적인 결론은 같음: **한 세포에서 0 하나 → 유전자가 꺼졌다는 결론 x**
 
-## 3) 품질 관리 {#w5-s3-3}
+## 3) 품질 관리 (QC) {#w5-s3-3}
 
-![왼쪽: 세포와 빈 droplet을 구분합니다. 오른쪽: 모든 단일세포 논문이 보여주거나 보여주어야 하는 그림입니다.](/assets/img/w5/knee_qc.png){fig-align="center"}
+걸러낼 것 네 가지: 빈 droplet, ambient RNA, doublet, 죽어가는 세포
 
-| 문제 | 관찰되는 양상 | 대응 방법 |
+### ① 세포인가, 빈 droplet인가 (cell calling)
+
+> 어떤 barcode가 세포이고, 어떤 게 빈 droplet?
+
+-   Droplet 방식은 세포를 일부러 묽게 loading → 대부분의 droplet = bead만 있고 세포는 없음 (그래도 barcode는 붙음)
+-   **Knee plot (barcode rank plot)** — 모든 barcode를 총 UMI 순으로 줄 세워 log–log로 그린 그림
+
+![](/assets/img/w5/knee_plot.svg){fig-align="center"}
+
+-   ① **높고 평평한 plateau** — 진짜 세포
+-   ② **급경사 (knee)** — 전이 구간
+-   ③ **길고 낮은 꼬리** — ambient RNA만 든 빈 droplet
+
+⚠️ Knee에서 단순 cutoff → RNA가 적을 뿐인 진짜 세포까지 삭제 (작거나 휴지기인 세포, neutrophil). 딱 전이 구간에 몰려 있음
+
+✅ **EmptyDrops**: "총량이 많은가?"가 아니라 "이 barcode의 **profile**이 빈 droplet의 profile과 다른가?"를 물음 → 총량이 적어도 profile이 뚜렷한 작은 세포는 살아남음
+
+💡 빈 droplet까지 포함된 **raw matrix는 꼭 보관** — 다음 단계(ambient RNA 보정)에 필요
+
+### ② Ambient RNA
+
+해리·loading 중 터진 세포 → mRNA가 용액으로 흘러나옴. 이 **"soup"**이 모든 droplet에 들어감 → 모든 세포의 profile = 자기 RNA + soup 약간
+
+![](/assets/img/w5/ambient_rna.svg){fig-align="center"}
+
+-   **어떻게 보이나** — 가장 많거나 가장 약한 세포 유형의 marker가 **모든** cluster에서 낮게 검출. 예: 혈액이 많은 시료 → 모든 세포에 hemoglobin 유전자, 간 → 면역세포에 *ALB*
+-   **왜 문제** — 가짜 co-expression, 흐려진 cluster 경계, ⚠️ 한 조건에 soup이 더 많으면 가짜 DE (질환·괴사 조직이 보통 더 많음)
+-   **보정** — 빈 droplet에서 soup profile을 추정해 각 세포에서 뺌: `SoupX`, `CellBender`, `DecontX`
+
+⚠️ 모든 droplet 기반 protocol에 있음. **snRNA-seq이 가장 심함** (핵을 분리하면서 모든 세포가 터지므로)
+
+💡 Well 기반 platform(BD Rhapsody, plate 기반 Smart-seq)은 soup이 훨씬 적어 보통 생략. ⚠️ 적다 ≠ 0
+
+### ③ 죽어가는 세포: 세 가지 숫자
+
+세포마다 세 숫자를 봄:
+
+| 지표 | 너무 낮으면 → | 너무 높으면 → |
 |------------------------|------------------------|------------------------|
-| **빈 droplet** | Knee 아래의 낮은 UMI barcode | 단순 cutoff 대신 `EmptyDrops` 사용 |
-| **Ambient RNA** | 풍부한 세포 유형의 marker 유전자가 모든 곳에서 관찰됨 | `SoupX`, `CellBender` 또는 `DecontX` |
-| **Doublet** | 높은 UMI와 높은 유전자 수, 양립할 수 없는 두 marker 집합 | `Scrublet`, `DoubletFinder`. Droplet system에 주입한 세포 1,000개당 약 1% |
-| **죽어가는 세포** | 높은 미토콘드리아 분율, 낮은 유전자 수 | 조직 특이적으로 mito % threshold 적용 |
+| 총 UMI 수 | 빈 droplet, 잔해, 깨진 세포 | doublet — 또는 크고 전사가 활발한 세포 |
+| 검출 유전자 수 | 위와 같음 | 위와 같음 |
+| 미토콘드리아 비율(mito %) | — | 죽어가는 세포 — 또는 원래 미토콘드리아가 많은 세포 |
 
-::: {.callout-warning collapse="true"}
-## QC threshold는 청소가 아니라 분석상의 결정입니다
+**Mito %가 높으면 왜 죽어가는 세포?** 세포막이 깨지면 세포질 mRNA는 새어 나가지만, 미토콘드리아 안의 transcript는 미토콘드리아 막에 보호되어 남음 → **비율**이 올라감 (더 많이 만든 게 아님)
 
--   Mito cutoff 5%가 흔하지만 미토콘드리아가 실제로 풍부한 **심근세포에는 잘못된 기준**입니다.
--   최소 유전자 수 500개라는 threshold는 잔해를 제거하지만 혈소판과 일부 granulocyte처럼 작고 RNA가 적은 세포도 **함께 제거합니다.**
+-   ⚠️ **함께 볼 것.** Mito 높음 **+** 유전자 수 적음 = 깨진 세포. Mito가 높아도 유전자 수가 정상이면 원래 미토콘드리아가 많은 세포일 수 있음 (심근세포, 간세포, 신세뇨관)
+-   ⚠️ **snRNA-seq**: 핵에는 미토콘드리아 x → mito read ≈ 0이 정상. 여기서 mito read = 세포질·ambient 오염 신호
+-   ✅ **데이터 기반 cutoff, 시료별로** — median에서 몇 MAD(median absolute deviation) 이상 벗어난 세포를 표시. 깊게 sequencing한 시료는 분포 전체가 이동하므로 고정값 x
 
-→ **모든 QC threshold는 하나의 세포 집단을 제거합니다.** 제외하기 전에 무엇을 제외하는지 살펴보고 threshold를 보고하세요.
+![](/assets/img/w5/qc_thresholds.svg){fig-align="center"}
+
+### ④ Doublet
+
+Droplet 하나에 세포 둘 → barcode 공유 → **혼합 profile을 가진 세포 하나**처럼 보임
+
+-   Loading할수록 ↑: 표준 10x에서 회수 세포 1,000개당 약 0.8% → **10,000개 회수 시 약 8%**
+
+|   | **Heterotypic** | **Homotypic** |
+|-------------------|------------------------|------------------------|
+| 구성 | 서로 다른 세포 유형 (T cell + monocyte) | 같은 유형의 세포 둘 |
+| 보이는 모습 | 두 유형의 marker가 동시에; 가짜 "중간" cluster, cluster 사이 다리 | count가 약 2배인 세포 하나 |
+| 발현으로 검출 | ✅ 가능 | ❌ 거의 불가 |
+| 피해 | ⚠️ 없는 세포 유형·전이 상태를 만들어냄 | 경미 |
+
+**핵심 아이디어** — 어떤 barcode가 doublet인지 직접 볼 방법은 없음 → 대신 가짜 doublet을 **만들어 놓고**, 진짜 세포 중 누가 그걸 닮았는지 확인
+
+![](/assets/img/w5/doublet_detection.svg){fig-align="center"}
+
+1.  **만들기** — 진짜 세포 두 개의 profile을 무작위로 섞어 가짜 doublet 수천 개 생성
+2.  **함께 배치** — 진짜 + 가짜 세포를 같은 PC 공간에
+3.  **이웃 세기** — 진짜 세포의 이웃 중 가짜 doublet 비율(pANN)이 높으면 → 아마 doublet
+
+도구: `scDblFinder`(현재 흔한 기본값), `DoubletFinder`
+
+-   ⚠️ **시료(capture)마다 따로.** Doublet은 한 capture 안에서만 생김
+-   ⚠️ **Homotypic doublet은 발현 기반 방법으로 다 못 잡음** → 어느 정도 남는 건 감수
+-   ⚠️ **Cluster 해석 전에.** Doublet cluster는 두 부모 cluster 사이에 놓임 → 전이 상태로 착각하기 쉬움
+-   💡 **설계가 algorithm보다 나음** — 기증자 pooling + demultiplexing(§2.4)이면 기증자 간 doublet은 직접 식별
+
+### ⑤ 정리
+
+| 문제 | 관찰되는 양상 | 대응 |
+|------------------------|------------------------|------------------------|
+| **빈 droplet** | Knee 아래의 낮은 UMI barcode | 단순 cutoff 대신 `EmptyDrops` |
+| **Ambient RNA** | 풍부한 세포 유형의 marker가 모든 곳에서 | `SoupX`, `CellBender`, `DecontX` |
+| **Doublet** | 높은 UMI **와** 높은 유전자 수, 양립 불가한 두 marker 집합 | `scDblFinder`, `DoubletFinder`; 회수 세포 1,000개당 약 0.8% |
+| **죽어가는 세포** | 높은 mito %, 낮은 유전자 수 | 조직에 맞는 mito % threshold |
+
+::: {.callout-important collapse="true"}
+## 모든 QC threshold는 하나의 세포 집단을 지움
+
+-   Mito cutoff 5%는 흔하지만 미토콘드리아가 실제로 많은 **심근세포에는 틀린 기준** → 조직·세포 유형마다 다르게
+-   최소 유전자 수 500개는 잔해뿐 아니라 **혈소판, 일부 granulocyte처럼 작고 RNA가 적은 세포**도 제거
+-   유전자 수 상한은 doublet뿐 아니라 **실제로 크고 전사가 활발한 세포**도 제거
+
+→ QC 자동화는 불가. 분포를 그려 보고, cutoff 밖에 무엇이 있는지 확인한 뒤 결정. 사용한 threshold는 **보고**
 :::
+
+## 4) 정규화와 차원 축소 {#w5-s3-4}
+
+QC 후: **세포 수천 개 × 유전자 약 20,000개**, 대부분 0
+
+| 단계 | 하는 일 | 이유 |
+|-------------------|------------------------|------------------------|
+| **정규화** | 세포의 총 UMI로 나누고 × 10,000 → log(1 + x) | 포획 효율이 순전히 기술적 이유로 세포마다 몇 배씩 다름; log로 소수의 큰 값을 눌러줌 |
+| **HVG 선택** | 평균에 비해 분산이 큰 유전자 약 2,000개만 남김 | 대부분의 유전자는 평평하거나 noise; 세포 유형 신호는 HVG에 |
+| **Scaling** | 유전자마다 평균 빼고 SD로 나눔 | 발현량이 크다는 이유만으로 PCA를 지배하지 않게 |
+| **PCA** | HVG 2,000개 → principal component 10–50개 | 아래 |
+
+**PCA의 핵심** — PC 하나 = 함께 움직이는 유전자들의 가중 조합 → 유전자가 아니라 **program**
+
+-   **Denoising** — 유전자 하나는 noisy, 상관된 program은 안정적. 상위 PC = 생물학, 뒤쪽 PC = 대부분 noise
+-   **속도** — 이후 모든 단계(이웃 graph, clustering, UMAP, batch 보정)가 유전자가 아니라 PC 위에서 진행
+-   ✅ **상위 PC를 움직이는 게 무엇인지 확인.** PC1이 총 UMI나 mito %를 따라가면 → 주된 변이 축이 기술적인 것 → QC로 복귀
+
+⚠️ 이제 같은 matrix의 버전이 여러 개: raw count, log-정규화 값, scaled 값 (+ 나중에 batch 보정값). **어떤 버전을 어디에 쓰는지**가 §5–6의 핵심 → 검정은 raw count로
 
 ------------------------------------------------------------------------
 
 # 4. 세포 유형 찾기 🗺️ {#w5-s4}
 
-## 1) 표준 pipeline {#w5-s4-1}
+> 🔑 **핵심** — Clustering과 UMAP은 유전자를 직접 보지 않음. PC 공간에서 만든 **"누가 누구와 가까운가" graph**를 봄. Cluster도 UMAP도 판단이 들어간 결과물
 
-```         
-정규화  →  highly variable gene 선택  →  PCA
-        →  k-nearest-neighbour graph 생성
-        →  clustering (Leiden)  →  시각화를 위한 UMAP
-        →  cluster annotation
+```
+정규화 → HVG → PCA                    (§3.4)
+   →  k-nearest-neighbour graph        (§4.1)
+   →  clustering (Leiden / Louvain)    (§4.2)
+   →  시각화용 UMAP                     (§4.3)
+   →  cluster annotation               (§4.4)
 ```
 
-⚠️ 순서에 주목하세요. **UMAP은 표시만을 위해 계산합니다.** Clustering은 2차원 embedding이 아니라 PCA/graph에서 수행됩니다.
+⚠️ 순서 주목: **UMAP은 표시용으로만 계산.** Clustering은 2차원 그림이 아니라 PC 공간의 graph에서 수행
 
-## 2) ⚠️ UMAP을 책임 있게 읽는 방법 {#w5-s4-2}
+## 1) 이웃 graph {#w5-s4-1}
 
-UMAP은 수십 차원의 자료를 2차원으로 비선형 투영합니다. 국소 이웃은 비교적 잘 보존하지만 전체 구조는 잘 보존하지 못합니다.
+![](/assets/img/w5/knn_graph.svg){fig-align="center"}
+
+-   **이웃** — 세포마다 PC 공간에서 가장 가까운 *k*개 세포
+-   **kNN graph** — 세포 = 점, 각 세포를 *k*개 이웃과 연결. Seurat은 두 세포가 이웃을 얼마나 **공유**하는지로 연결 강도를 다시 매김(SNN graph) → outlier 영향 감소
+-   **왜 graph?** — 세포 집단은 동그란 덩어리인 경우가 드묾. Graph는 길쭉하거나 갈라지거나 연속적인 모양을 그대로 따라감
+
+⚠️ *k*가 scale을 정함. *k* 작음 → 세밀한 구조, 조각 많음. *k* 큼 → 매끄러운 graph, *k*보다 작은 집단은 자기 이웃을 못 만들고 주변에 흡수됨
+
+## 2) Clustering과 resolution {#w5-s4-2}
+
+![](/assets/img/w5/clustering.svg){fig-align="center"}
+
+-   **Community detection** — 우연히 기대되는 것보다 서로 더 촘촘히 연결된 그룹으로 graph를 자름
+-   **Louvain vs Leiden** — Leiden = Louvain의 결함(내부가 끊긴 cluster)을 고친 개선판. 생물학적 결론은 거의 안 바뀜
+-   결과를 바꾸는 건 **resolution**: 값 ↑ → cluster 수 ↑
+
+![](/assets/img/w5/umap_resolution.svg){fig-align="center"}
+
+⚠️ **정답인 resolution도, 이를 정해 주는 통계 기준도 없음.** Algorithm은 요청하는 만큼 얼마든지 나눔
+
+💡 값 자체를 고민하는 대신 확인할 것:
+
+-   점수가 아니라 **marker 유전자**와 알려진 생물학에 비추어 cluster 확인
+-   **안정성** — 다른 resolution, 다른 seed, subsampling한 dataset에서도 유지되나?
+-   높은 resolution에서 생긴 "새" cluster가 고유한 marker를 가지나, 같은 marker의 정도 차이일 뿐인가?
+-   ✅ **사용한 resolution 보고**
+
+::: {.callout-warning collapse="true"}
+## Cluster ≠ 세포 유형
+
+Cluster에 반영될 수 있는 것:
+
+-   세포 **상태** (활성 vs 휴지)
+-   세포주기 단계
+-   스트레스 반응 (해리, §2.3)
+-   Ambient 오염 (§3.3②)
+-   Doublet (§3.3④)
+-   **기증자 정체성**
+
+→ 가장 높은 marker 이름을 붙이고 세포 유형으로 취급 → 문헌에 **실제로 존재하지 않는 세포 유형**이 쌓임. "Novel cell type" 주장은 특히 신중하게
+:::
+
+## 3) ⚠️ UMAP을 책임 있게 읽는 법 {#w5-s4-3}
+
+> 수십 차원 → 2차원 비선형 투영. 국소 이웃은 비교적 잘 보존, 전체 구조는 잘 보존 x
+
+-   UMAP이 기본이 된 이유: clustering과 **같은 kNN graph를 펼침** → island가 대개 cluster와 일치. 빠름
+-   PCA, t-SNE와의 비교는 아래 접힌 그림
 
 ::: {.callout-warning collapse="true"}
 ## UMAP으로 알 수 *없는* 것
 
--   **Cluster 사이 거리는 의미가 없습니다.** 멀리 떨어진 두 cluster가 가까운 두 cluster보다 반드시 더 다른 것은 아닙니다.
--   **Cluster 크기는 의미가 없습니다.** 면적은 세포 수가 아니라 embedding을 반영합니다.
--   **겉으로 보이는 연결은 trajectory가 아닙니다.** 가느다란 다리는 doublet, ambient RNA 또는 parameter artifact일 수 있습니다.
--   **Parameter와 random seed에 따라 배치가 달라집니다.** `n_neighbors`와 `min_dist`를 바꾸면 눈에 보이는 형태가 달라집니다.
+-   ❌ **Cluster 사이 거리** — 멀리 떨어진 두 cluster가 가까운 두 cluster보다 반드시 더 다른 건 아님
+-   ❌ **Cluster 면적** — 세포 수가 아니라 embedding 방식을 반영
+-   ❌ **가느다란 다리 ≠ trajectory** — doublet, ambient RNA, parameter artifact인 경우가 많음
+-   ⚠️ **Parameter와 random seed에 따라 배치가 바뀜** (`n_neighbors`, `min_dist`)
 
-→ UMAP은 자료의 **그림**이지 **측정값**이 아닙니다. 중요한 주장은 고차원 공간에서 계산한 수치로 뒷받침해야 합니다.
+→ UMAP = 자료의 **그림**이지 **측정값**이 아님. 중요한 주장은 고차원 공간에서 계산한 숫자로
 :::
 
-## 3) Clustering resolution은 임의적입니다 {#w5-s4-3}
+::: {.callout-note collapse="true"}
+## PCA, t-SNE, UMAP 한눈에 보기
 
-![같은 세포와 같은 algorithm에서 parameter 하나만 바꾼 결과입니다.](/assets/img/w5/umap_resolution.png){fig-align="center"}
+![](/assets/img/w5/dimred_compare.svg){fig-align="center"}
 
-Leiden clustering에는 **resolution** parameter가 있습니다.
+-   **PCA** — 선형, 거리에 의미 있음. 이후 모든 단계의 input이지만 cluster를 *보기*엔 너무 거침
+-   **t-SNE** — 국소 이웃 보존, island 배치는 임의. UMAP 이전의 표준
+-   **UMAP** — 국소 이웃 + 전체 구조 일부, 빠름. 현재 기본값
 
--   값을 높이면 cluster가 많아지고 낮추면 적어집니다.
--   ⚠️ **정답인 값도, 이를 결정해 주는 통계 기준도 없습니다.** Algorithm은 요청하는 만큼 어떤 cluster든 기꺼이 나눕니다.
+💡 t-SNE와 UMAP의 차이는 대부분 algorithm이 아니라 **설정**(시작 위치, 이웃끼리 당기는 힘) 차이
 
-💡 값 자체를 고민하는 대신 다음을 확인하세요.
-
--   점수가 아니라 **marker gene**과 알려진 생물학에 비추어 cluster를 확인합니다.
--   **안정성**을 확인합니다. 다른 resolution, 다른 seed, subsampling한 dataset에서도 cluster가 유지되나요?
--   높은 resolution에서 생긴 “새” cluster가 실제로 고유한 marker를 가지는지, 같은 marker의 정도 차이만 있는지 질문합니다.
--   ✅ **사용한 resolution을 보고하세요.**
-
-::: {.callout-warning collapse="true"}
-## Cluster는 세포 유형이 아닙니다
-
-Cluster는 다음을 반영할 수도 있습니다.
-
--   세포 **상태**(활성 상태 대 휴지 상태)
--   세포주기 단계
--   스트레스 반응
--   Ambient contamination
--   기증자 정체성
-
-→ 가장 높은 marker gene의 이름을 cluster에 붙이고 세포 유형으로 취급하면 문헌에는 **실제로 존재하지 않는 세포 유형**이 쌓이게 됩니다.
+⚠️ 결국 전부 2D 그림. 2D 거리를 측정값으로 만들어 주는 방법은 없음
 :::
 
 ## 4) Annotation {#w5-s4-4}
 
--   **Marker 기반** — cluster별로 알려진 marker를 확인합니다. ✅ 투명합니다. ⚠️ 순환적입니다. 찾으려고 한 세포 유형을 발견하게 됩니다.
--   **참조 기반** — annotation된 atlas에 mapping합니다(Azimuth, SingleR, scANVI). ✅ 빠르고 일관됩니다. ⚠️ 참조의 용어를 그대로 물려받으며 참조에 없는 것은 이름 붙일 수 없습니다.
+-   **Marker 기반** — cluster별로 알려진 marker 확인
+    -   ✅ 투명함
+    -   ⚠️ 순환적 — 찾으려던 세포 유형만 찾게 됨
+-   **참조 기반** — annotation된 atlas에 mapping (Azimuth, SingleR, scANVI)
+    -   ✅ 빠르고 일관됨
+    -   ⚠️ 참조의 용어를 그대로 물려받고, 참조에 없는 것은 이름 붙일 수 없음
 
-💡 두 방법을 함께 사용하세요. 서로 일치하지 않는 결과가 유용한 정보를 줍니다.
+💡 두 방법을 함께. **둘이 불일치하는 지점** = 새로운 집단이거나 artifact → 가장 정보가 많은 곳
 
-🗺️ 참조 기반 annotation은 단일세포 분석에서 나타나는 **참조 편향**입니다(🔗 [W1 §2.3③](w1_intro.qmd#w1-s2-3-3)). Atlas에 없는 세포 유형은 보이지 않거나 가장 가까운 이웃으로 잘못 분류됩니다.
+🗺️ 참조 기반 annotation = 단일세포판 **참조 편향**(🔗 [W1 §2.3③](w1_intro.qmd#w1-s2-3-3)). Atlas에 없는 세포 유형은 안 보이거나 가장 가까운 이웃으로 잘못 분류됨
 
 ------------------------------------------------------------------------
 
 # 5. Batch effect와 integration 🔗 {#w5-s5}
 
-![항상 두 가지 색칠을 모두 확인하세요. 가운데 열이 목표이고 오른쪽 열은 아무도 보여주지 않는 실패 사례입니다.](/assets/img/w5/batch_integration.png){fig-align="center"}
+> 🔑 **핵심** — Integration은 "batch 간 차이는 전부 기술적"이라고 가정함. 생물학이 흥미로운 바로 그 순간 이 가정이 깨짐
 
-단일세포 자료에서는 보통 **기증자**가 가장 큰 변이 원인입니다. 세포는 세포 유형보다 먼저 환자에 따라 군집화됩니다.
+![](/assets/img/w5/integration_overcorrection.svg){fig-align="center"}
 
-**Integration 방법**(Harmony, scVI, Seurat CCA/RPCA, scANVI)은 서로 다른 기증자의 같은 세포 유형이 함께 놓이는 공유 표현 공간을 찾습니다.
+-   단일세포 자료에서 가장 큰 변이 원인 = 보통 **기증자** → 세포가 세포 유형보다 환자별로 먼저 뭉침
+-   **Integration 방법**(Harmony, scVI, Seurat CCA/RPCA, scANVI) = 서로 다른 기증자의 같은 세포 유형이 한곳에 모이는 공유 표현 공간 찾기
+-   보정은 count가 아니라 **embedding(PC 등)**에서 → 이웃 graph, clustering, UMAP에 사용
+-   ✅ **필요한지부터 확인** — 보정 전 UMAP을 시료별로 색칠. 이미 세포 유형이 시료 간에 섞여 있으면 생략
+-   ⚠️ **보정된 값은 세포를 묶는 용도, 유전자 검정용 x.** DE는 raw count로 돌아가서(§6.2)
 
 ::: {.callout-warning collapse="true"}
-## 과보정
+## 과보정 (over-correction)
 
-Integration에는 **숨겨진 가정**이 있습니다. 모든 batch에 같은 세포 유형이 존재하며 batch와 연관된 변이는 모두 기술적이라는 가정입니다.
+숨은 가정: **모든 batch에 같은 세포 유형이 있고, batch와 연관된 변이는 전부 기술적**
 
-바로 생물학적으로 흥미로운 상황에서 이 가정이 실패합니다.
+⚠️ 이 가정이 깨지는 경우 = 생물학적으로 흥미로운 경우:
 
--   질병 특이적 세포 상태
--   한 조건에만 존재하는 집단
+-   질환 특이적 세포 상태
+-   한 조건에만 있는 집단
+-   치료로 유도된 program
 
-→ 공격적인 integration은 그 집단을 합쳐 없애 버리고, 결과 UMAP은 **아름답게 섞여 보입니다.**
+→ 공격적인 integration이 이 집단을 합쳐 없애버림. 그런데 결과 UMAP은 **아름답게 섞여 보임**
 
-**진단 방법:**
+**진단:**
 
--   ✅ Batch와 세포 유형으로 **각각** 색칠합니다.
--   ✅ 알려진 세포 유형 marker가 integration 후에도 서로 구분되는지 확인합니다.
--   ✅ 한 조건에만 있는 집단이 살아남았는지 확인합니다.
--   ✅ **scIB**와 같은 benchmark는 바로 이 batch 제거와 생물학 보존 사이의 trade-off를 평가합니다.
+-   ✅ Batch와 세포 유형으로 **각각** 색칠. 둘 다 논문에 실을 것
+-   ✅ Integration 후에도 알려진 marker가 서로 구분되는지 확인
+-   ✅ 한 조건에만 있는 집단이 **살아남았는지** 확인
+-   ✅ **scIB** 같은 benchmark = batch 제거 vs 생물학 보존의 trade-off를 점수화
+
+⚠️ 대부분의 논문은 batch 색칠만 보여줌 — 방법이 작동했음을 보여주는 그림이자, 실패는 절대 드러낼 수 없는 그림
+
+💡 "환자·대조군이 완벽하게 섞인 UMAP"과 "질환 특이적 fibroblast state 발견"이 한 논문에 함께 있다면 → 서로 긴장 관계. 불가능은 아니지만 세포 유형 색칠을 반드시 확인
 :::
 
-⚠️ 질병 상태와 batch가 완전히 교락되어 모든 환자군은 하루에, 모든 대조군은 다른 날에 처리했다면 **어떤 integration 방법도 해결할 수 없습니다.** 다시 🔗 [W1 §4.3](w1_intro.qmd#w1-s4-3)의 문제이며 복구할 수 없습니다.
+⚠️ 질환 상태와 batch가 완전히 교락(환자는 전부 하루, 대조군은 전부 다른 날) → **어떤 integration 방법으로도 분리 불가.** 🔗 [W1 §4.3](w1_intro.qmd#w1-s4-3)과 같은 문제, 복구 불가
 
 ------------------------------------------------------------------------
 
 # 6. 통계 검정 📊 {#w5-s6}
 
+> 🔑 **핵심** — n = 세포 수가 아니라 **기증자 수**. 세포를 많이 읽으면 해상도가 늘 뿐, 검정력은 늘지 않음
+
 ## 1) ⚠️ 세포별 검정이 잘못된 이유 {#w5-s6-1}
 
-![단일세포 문헌에서 결과에 가장 큰 영향을 미치는 통계 오류입니다.](/assets/img/w5/pseudobulk.png){fig-align="center"}
+![](/assets/img/w5/pseudobulk.svg){fig-align="center"}
 
 ::: {.callout-important collapse="true"}
-## 한 기증자에서 나온 세포는 독립적인 시료가 아닙니다
+## 한 기증자에서 나온 세포 ≠ 독립적인 시료
 
-6명의 기증자에서 얻은 5,400개 세포에 Wilcoxon test 또는 t-test를 적용하면 세포를 5,400개의 독립적인 관측값으로 취급합니다.
+-   기증자 6명의 세포 5,400개에 Wilcoxon test·t-test → 세포를 5,400개의 독립 관측값으로 취급
+-   **실제로는 독립 x** — 같은 사람의 세포는 유전적 배경, 환경, 약물, batch, 처리 과정을 공유
 
-**그러나 독립적이지 않습니다.** 같은 사람의 세포는 그 사람의 유전적 배경, 환경, 약물, batch와 처리 과정을 공유합니다.
+**결과:**
 
-**그 결과:**
+-   p-value가 여러 자릿수만큼 과도하게 작아짐
+-   세포를 추가할수록 p-value가 끝없이 작아짐
+-   → 연구한 사람 수가 아니라 **loading한 세포 수**를 측정하게 됨
 
--   p-value가 여러 자릿수만큼 과도하게 작아집니다.
--   세포를 추가하면 p-value가 끝없이 작아집니다.
--   → 연구한 사람의 수가 아니라 **주입한 세포 수**를 측정하게 됩니다.
+⚠️ Seurat의 기본 `FindMarkers`가 이 방식
 
-⚠️ Seurat의 기본 `FindMarkers`가 이런 방식으로 작동합니다.
-
--   ✅ 한 dataset 안에서 *cluster marker를 식별*하는 기술적 목적에는 적합합니다.
--   ❌ **조건 간 비교**에는 적합하지 않습니다.
+-   ✅ 한 dataset 안에서 *cluster marker 찾기* — 기술적 목적으로는 OK
+-   ❌ **조건 간 비교** — 무효
 :::
 
 ## 2) Pseudobulk {#w5-s6-2}
 
-**해결책**은 각 **기증자 × 세포 유형**에 대해 세포 전체의 count를 합하는 것입니다.
+> 각 **기증자 × 세포 유형**별로 세포들의 raw count를 합침
 
-→ 작은 pseudo-sample matrix를 만들고 🔗 [W4 §5](w4_transcriptomics.qmd#w4-s5)와 똑같이 DESeq2 또는 edgeR로 분석합니다.
+→ 작은 pseudo-sample matrix → 🔗 [W4 §5](w4_transcriptomics.qmd#w4-s5)의 bulk RNA-seq과 똑같이 DESeq2·edgeR로 분석
 
--   반복된 benchmark에서 pseudobulk는 세포별 검정보다 위양성을 훨씬 잘 통제합니다.
--   기증자를 random effect로 둔 **mixed model**도 합리적인 대안입니다. 더 많은 검정력을 유지하지만 계산량이 많습니다.
+-   반복된 benchmark: pseudobulk가 세포별 검정보다 위양성을 훨씬 잘 통제
+-   기증자를 random effect로 둔 **mixed model**도 합리적 대안 — 검정력은 더 유지, 계산량은 많음
 
 ::: {.callout-tip collapse="true"}
 ## 연구 설계에 미치는 영향
 
-반복의 단위가 기증자라면 **기증자 수가 n입니다.**
+반복 단위 = 기증자 → **기증자 수가 n** (§2.4)
 
-환자 3명 대 대조군 3명이면 세포를 3,000개 읽든 300,000개 읽든 **n = 3**입니다.
+환자 3명 vs 대조군 3명 = 세포를 3,000개 읽든 300,000개 읽든 **n = 3**
 
-→ 이는 단일세포 실험의 비용 배분을 바꿉니다. 많은 출판 연구가 두세 명에게서 엄청난 수의 세포를 profiling합니다.
+→ 단일세포 실험의 비용 배분을 바꿈. 많은 출판 연구가 두세 명에게서 엄청난 수의 세포를 profiling:
 
--   ✅ 어떤 세포 유형이 존재하는지 기술하는 데는 매우 좋습니다.
--   ❌ 조건 사이의 차이를 주장하는 데는 정보가 부족합니다.
+-   ✅ 어떤 세포 유형이 존재하는지 **기술**하는 데는 매우 좋음
+-   ❌ 조건 간 **차이를 주장**하기엔 정보 부족
 :::
 
 ## 3) Differential abundance {#w5-s6-3}
 
-흔히 흥미로운 결과는 한 세포 유형의 발현이 변한 것이 아니라 그 유형의 **양이 늘거나 줄었다는 것**입니다.
+흔히 흥미로운 결과 = 세포 유형의 발현 변화가 아니라 **양이 늘거나 줄었다는 것**
 
-⚠️ 비율은 **조성 자료**입니다. 한 세포 유형이 늘면 산술적으로 다른 모든 유형의 비율이 줄어듭니다. 🔗 [W4 §4.2](w4_transcriptomics.qmd#w4-s4-2)와 같은 문제이며, 다른 형태로는 🔗 [W7 §6](w7_metagenomics.qmd#w7-s6)에서도 나타납니다.
+⚠️ 비율 = **조성 자료(compositional data)**. 한 세포 유형이 늘면 생물학적 변화가 없어도 산술적으로 나머지 비율이 모두 줄어듦. 🔗 [W4 §4.2](w4_transcriptomics.qmd#w4-s4-2)와 같은 문제, 다른 형태로 🔗 [W7 §6](w7_metagenomics.qmd#w7-s6)에서도 등장
 
--   ✅ 이를 처리하는 방법: `scCODA`, `miloR`, `propeller`, Dirichlet-multinomial model
--   ❌ 세포 count에 대한 χ² test는 **타당하지 않습니다.**
+-   ✅ 이를 다루는 방법: `scCODA`, `miloR`, `propeller`, Dirichlet-multinomial model
+-   ❌ 세포 수에 대한 χ² test — **무효**
+-   ⚠️ Abundance 결과를 믿기 전에 §2.3 다시 보기 — 실제 조성 변화인가, 해리 효율 차이인가?
+-   n은 여기서도 기증자 수
 
 ------------------------------------------------------------------------
 
-# 7. 동역학, 공간과 atlas 🌈 {#w5-s7}
+# 7. 동역학, 기전 추론, 공간과 atlas 🌈 {#w5-s7}
 
-## 1) Trajectory inference {#w5-s7-1}
+> 🔑 **핵심** — 해리한 세포의 **snapshot 한 장**에서 시간·조절·상호작용을 추론하는 방법들. 출력은 그럴듯하지만 전부 **가설**
 
-분화 중간에 포착된 세포는 전사적 유사성에 따라 **pseudotime** 축에 배열할 수 있습니다.
+## 1) Trajectory와 pseudotime {#w5-s7-1}
 
+Biology는 동적인데 single-cell 실험은 snapshot. 진행 중인 과정의 여러 지점에서 세포가 잡혔다면 → 전사적 유사성 축을 따라 **순서 매기기** 가능 = **pseudotime**
+
+-   예: stem cell → progenitor → 분화 세포 / naive T → activated → effector → exhausted
 -   도구: Monocle3, Slingshot, PAGA
--   **RNA velocity**(scVelo)는 splicing 전후의 read를 비교해 방향 정보를 추가합니다.
 
-⚠️ 세 가지 주의점을 명확히 알아야 합니다.
+![](/assets/img/w5/trajectory_caveats.svg){fig-align="center"}
 
--   실제 과정이 전혀 없는 dataset에서도 trajectory algorithm은 **항상** trajectory를 반환합니다.
--   **Pseudotime은 시간이 아닙니다.** 속도도 기간도 측정하지 않습니다.
--   RNA velocity가 가정하는 splicing kinetics는 **논쟁 중**이며 일부 유전자와 system에서 실패한다는 사실이 알려져 있습니다.
+::: {.callout-warning collapse="true"}
+## 분명히 짚고 갈 세 가지
 
-→ 가설 생성 도구로 취급하세요. 가설을 검정하려면 lineage tracing 또는 time-course sampling이 필요합니다.
+-   ⚠️ **Trajectory algorithm은 항상 trajectory를 반환** — 실제 과정이 전혀 없는 dataset에서도. "Trajectory 없음"이라는 출력은 없음
+-   ⚠️ **Pseudotime ≠ 시간.** 속도도 기간도 측정 x. Pseudotime상 멀리 떨어진 두 세포가 실제로는 몇 분 차이일 수도, 몇 달 차이일 수도
+-   ⚠️ **시작점(root)은 내가 고름.** Root를 뒤집으면 순서도 뒤집힘 → 결과처럼 보이지만 사전지식이 들어간 것
+:::
 
-## 2) 세포–세포 communication {#w5-s7-2}
+**RNA velocity** (scVelo) — 유전자별로 unspliced(새로 만든) vs spliced(성숙) read를 비교해 **방향** 추가
 
-CellPhoneDB, CellChat, NicheNet은 cluster 쌍 사이에서 함께 발현되는 ligand–receptor 쌍에 점수를 매깁니다.
+![](/assets/img/w5/rna_velocity.svg){fig-align="center"}
 
-⚠️ 두 세포 유형에서 ligand와 receptor가 함께 발현된다는 사실은 **두 세포가 상호작용한다는 증거가 아닙니다.**
+-   ⚠️ Splicing·분해 속도에 대한 가정은 **논쟁 중**, 일부 유전자·system에서는 안 맞음
+-   ⚠️ 화살표가 UMAP 위에 그려짐 → §4.3의 왜곡을 전부 물려받음
 
--   두 세포가 서로 인접하지 않을 수 있습니다.
--   Ligand가 분비되지 않을 수 있습니다.
--   단백질이 아예 만들어지지 않을 수도 있습니다(🔗 W6).
+→ 가설 생성 도구. 검정하려면 **time course** 또는 **lineage tracing**
 
-→ 이런 예측에는 공간적 또는 기능적 검증이 필요합니다.
+## 2) Co-expression으로 기전 추론하기 {#w5-s7-2}
+
+재료는 모두 같음 = 같은 snapshot 안의 **co-expression**. 어디를 보느냐만 다름:
+
+|   | 세포 안 (within cell) | 세포 사이 (between cells) |
+|-------------------|------------------------|------------------------|
+| 짝 | 유전자 ↔ 유전자 | ligand ↔ receptor |
+| 결과 | **Regulon**(TF 중심) / **gene program**(함께 움직이는 유전자 묶음) | **세포–세포 소통** |
+| 대표 도구 | SCENIC, decoupleR / cNMF | CellPhoneDB, CellChat, NicheNet |
+| 한계 | co-expression ≠ 조절 | co-expression ≠ 상호작용 |
+
+### ① 세포 안: regulon과 gene program
+
+-   **Regulon** — "어떤 TF가 이 상태를 켜고 있나?" TF와 함께 발현되는 유전자 중 promoter에 그 TF의 motif가 있는 것만 남긴 묶음 (SCENIC)
+-   **Gene program** — TF 목록 없이, 함께 움직이는 유전자 묶음을 데이터에서 찾음 (NMF 계열). 세포 하나 = 여러 program의 혼합 (세포 유형 정체성 + 세포주기, IFN 반응, hypoxia 등)
+
+⚠️ 해석 시 주의:
+
+-   **TF mRNA ≠ TF 활성** — 인산화, 핵 이동, ligand 결합 같은 번역 후 조절은 RNA에 안 보임 (🔗 W6)
+-   **Motif가 있다 ≠ 실제로 결합** — chromatin이 닫혀 있으면 못 붙음 (🔗 [W3](w3_epigenomics.qmd))
+-   **Program에 붙인 pathway 이름은 해석일 뿐.** 조건 비교는 기증자 단위로 (§6)
+
+✅ 검증: 결합은 ChIP-seq·CUT&RUN, 기능은 TF knockout·CRISPR·Perturb-seq
+
+### ② 세포 사이: 세포–세포 소통
+
+CellPhoneDB, CellChat, NicheNet = cluster 쌍 사이에서 함께 발현되는 ligand–receptor 쌍에 점수. Cluster A에서 ligand mRNA가 높고 cluster B에서 receptor mRNA가 높은가? → 그게 전부
+
+![](/assets/img/w5/ccc_fallacy.svg){fig-align="center"}
+
+⚠️ Ligand와 receptor가 함께 발현 ≠ **두 세포가 상호작용한다는 증거**
+
+-   두 세포가 서로 인접하지 않았을 수 있음 (해리로 공간 정보 소실, §7.3)
+-   단백질이 아예 만들어지지 않았을 수 있음 (🔗 W6)
+-   Database는 이미 잘 연구된 쌍 쪽으로 편향 → 결과가 이미 아는 문헌을 재발견
+
+### ③ 적절한 사용법 (둘 다)
+
+-   ✅ **가설 생성기로** — "어떤 TF / program / 신호 축을 검정해 볼 만한가?"
+-   ✅ **공간적 검증** — 두 세포 유형이 실제로 붙어 있다면 예측이 그럴듯해짐 (§7.3)
+-   ✅ **기능적 검증** — blocking antibody, receptor knockout, ligand 자극 / TF knockout, Perturb-seq
+-   ❌ **단독 결과로 x** — "Macrophage가 TNF로 T cell에 신호를 보낸다", "TF X가 섬유화 program을 구동한다" 둘 다 co-expression만으로는 입증 불가
 
 ## 3) 공간전사체학 — 다음 단계 {#w5-s7-3}
 
-해리하면 세포가 *어디에* 있었는지에 관한 정보가 모두 사라집니다. 공간 방법은 이 정보를 보존합니다.
+해리하면 세포가 *어디에* 있었는지 정보가 모두 사라짐 → 공간 방법은 이를 보존
 
--   **Spot 기반**(Visium) — 격자 위에서 transcript를 포획합니다. ✅ 전체 전사체를 봅니다. ⚠️ 각 spot에 여러 세포가 들어갈 수 있습니다.
--   **Imaging 기반**(MERFISH, Xenium, CosMx) — 세포 이하 해상도에서 단일 분자를 imaging합니다. ⚠️ 전체 전사체가 아니라 표적 유전자 panel입니다.
+-   **Spot 기반 (Visium)** — 격자 위에서 transcript 포획
+    -   ✅ 전체 전사체
+    -   ⚠️ spot 하나에 여러 세포
+-   **Imaging 기반 (MERFISH, Xenium, CosMx)** — 세포 이하 해상도에서 단일 분자 imaging
+    -   ⚠️ 전체 전사체가 아니라 표적 유전자 panel
 
-→ 이 장의 다른 모든 방법과 같은 trade-off입니다. **해상도 대 범위**입니다.
+→ 이 장의 다른 모든 방법과 같은 trade-off: **해상도 vs 범위**
 
 ## 4) 참조 atlas {#w5-s7-4}
 
@@ -356,27 +605,70 @@ CellPhoneDB, CellChat, NicheNet은 cluster 쌍 사이에서 함께 발현되는 
 
 | 자료원 | 제공하는 것 |
 |------------------------------------|------------------------------------|
-| [**Human Cell Atlas**](https://www.humancellatlas.org/) | 사람 조직 전반에 걸쳐 구축된 단일세포 참조 |
+| [**Human Cell Atlas**](https://www.humancellatlas.org/) | 사람 조직 전반의 단일세포 참조 |
 | [**CELLxGENE**](https://cellxgene.cziscience.com/) | 출판된 수백 개 dataset을 대화형으로 탐색, subset 선택, 다운로드 |
 | [**Tabula Sapiens**](https://tabula-sapiens.sf.czbiohub.org/) | 같은 기증자에게서 얻은 다장기 atlas |
 | [**Azimuth**](https://azimuth.hubmapconsortium.org/) | 브라우저에서 수행하는 참조 기반 annotation |
 
-💡 **단일세포 자료를 만들기 전에 atlas가 이미 질문에 답하는지 확인하세요.** “어떤 세포 유형이 내 유전자를 발현하는가?”라는 질문에는 보통 이미 답이 있습니다.
+💡 **자료를 만들기 전에 atlas가 이미 답하는지 확인.** "어떤 세포 유형이 내 유전자를 발현하나?"에는 보통 이미 답이 있음
+
+::: {.callout-tip collapse="true"}
+## ✅ 해보기: 코딩 없이 CELLxGENE에서 내 유전자 찾기
+
+[**CELLxGENE**](https://cellxgene.cziscience.com) → 관심 유전자 검색
+
+-   ① 어떤 조직의 어떤 세포 유형에서 발현?
+-   ② 발현이 넓게 퍼져 있나, 한 집단에 국한되나?
+-   ③ 관심 질환의 dataset 찾기 → 세포 수가 아니라 **기증자가 몇 명**인지 확인
+-   ④ 💡 Atlas가 이미 답한다면 → 연구비를 아낀 것
+:::
+
+## 5) 결과별 근거의 강도 {#w5-s7-5}
+
+이 장의 방법들은 데이터가 다 받쳐주지 못하는, 자신만만한 모양의 출력을 냄. 쓰지 말라는 게 아니라 → 결과가 정확히 무엇인지 정확하게 표현하라는 것
+
+| 결과 | 근거의 강도 | 들어갈 위치 |
+|------------------------------------|------------------------|------------------------|
+| 검증된 marker가 있는 cluster | ✅ 기술적(descriptive), 견고 | Results |
+| 기증자 단위 pseudobulk DE | ✅ 추론적(inferential), 견고 | Results |
+| 조성 자료 방법을 쓴 differential abundance | ⚠️ n이 기증자라면 견고 | Results, 단서 포함 |
+| Pseudotime 순서 | ⚠️ 가설 | Results, "consistent with"로 |
+| RNA velocity 방향 | ⚠️ 가설, 논쟁 중인 방법 | Supplementary 또는 가설 |
+| Regulon / TF 활성 / gene program | ⚠️ 가설 | Results, "consistent with"로 |
+| Ligand–receptor 예측 | ❌ 가설일 뿐 | Discussion 또는 연구계획서 aim |
+
+::: {.callout-tip collapse="true"}
+## 논문을 곤란하게 만드는 문장
+
+*"Trajectory analysis revealed that fibroblasts differentiate into myofibroblasts, and cell–cell communication analysis showed that macrophage-derived TGF-β drives this transition."*
+
+→ 이 문장은 아무것도 revealed하거나 showed하지 않음. 해리된 세포 snapshot 하나에서 algorithm 두 개가 순서 두 개를 만든 것뿐
+
+✅ 정직한 버전: *"Pseudotime ordering은 fibroblast-to-myofibroblast transition과 일치하며, ligand–receptor 분석은 macrophage TGF-β를 후보 driver로 제시한다. 이를 \[spatial validation / receptor blockade\]로 검정 중이다."*
+
+→ 두 번째 버전이 연구비 받을 만한 다음 단계로 읽히기도 함
+:::
 
 ------------------------------------------------------------------------
 
 # 📝 요약
 
--   하나의 bulk fold change는 전체 세포의 균일한 변화, 반응하는 희귀 하위집단, 순수한 조성 변화 모두와 일치합니다. Single-cell은 이들을 구분합니다.
--   Droplet, plate, combinatorial 방식은 같은 예산 안에서 세포 수와 깊이를 서로 맞바꿉니다.
--   ⚠️ 냉동 조직과 약한 세포 유형에는 핵이 필요합니다. **해리 자체가 스트레스 유전자를 유도하고 세포를 선택적으로 파괴합니다.**
--   UMI는 read가 아니라 분자를 셉니다. Matrix의 90% 이상이 0이며 0 하나만으로는 거의 아무것도 알 수 없습니다.
--   QC는 빈 droplet, ambient RNA, doublet, 죽어가는 세포를 제거합니다. ⚠️ 모든 threshold는 실제 세포 집단도 함께 제거합니다.
--   ⚠️ UMAP의 거리, cluster 면적과 cluster 사이의 다리는 **해석할 수 없습니다.** Clustering resolution은 임의적이므로 marker와 안정성을 확인해야 합니다.
--   ⚠️ Integration은 찾으려던 생물학적 차이를 지울 수 있습니다. 항상 batch와 세포 유형으로 **각각** 색칠하세요.
--   ⚠️ **조건 간 세포별 차등 발현 검정은 타당하지 않습니다.** Pseudobulk를 사용하세요. n은 **기증자 수**입니다.
--   Trajectory와 세포–세포 communication 예측은 결과가 아니라 가설입니다.
--   자료를 만들기 전에 atlas를 확인하세요.
+-   하나의 bulk fold change = 전체 세포의 균일한 변화, 반응하는 드문 하위집단, **순수한 조성 변화** 모두 가능 → single cell이 구분
+-   ✅ 관심 세포를 안다면 sorting + deep bulk로 환자를 많이 넣는 쪽이 나은 경우가 많음
+-   Droplet, plate, combinatorial = 같은 예산 안에서 세포 수 vs 깊이의 맞교환. 3′ = 기본, 5′ = TCR/BCR
+-   ⚠️ **신선 vs 냉동은 시료 수집 때 결정** → scRNA-seq vs snRNA-seq 선택도 그때 고정
+-   ⚠️ **해리는 스트레스 유전자를 유도하고 특정 세포를 선택적으로 파괴.** *FOS*/*JUN* cluster는 대개 artifact, 감소 주장은 의심
+-   ⚠️ 반복 단위 = **기증자** → 예산은 기증자 수에
+-   UMI는 read가 아니라 분자를 셈. Matrix의 90% 이상이 0, 0 하나로는 거의 아무것도 알 수 없음
+-   QC = 빈 droplet, ambient RNA, doublet, 죽어가는 세포 제거. ⚠️ **모든 threshold는 실제 세포 집단도 함께 지움**
+-   Doublet 검출 = 가짜 doublet을 만들어 닮은 세포를 찾는 방식. Homotypic doublet은 못 잡음
+-   PC 공간의 이웃 graph가 clustering과 UMAP을 둘 다 결정. Leiden vs Louvain보다 resolution이 훨씬 중요
+-   ⚠️ UMAP의 거리, cluster 면적, 다리는 **해석 불가.** Resolution은 임의적 → marker와 안정성 확인, 값 보고
+-   ⚠️ Integration은 찾으려던 생물학적 차이를 지울 수 있음 → batch와 세포 유형으로 **각각** 색칠. 보정값은 묶는 용도, 검정은 raw count로
+-   ⚠️ **조건 간 세포별 차등 발현 검정은 무효.** Pseudobulk 사용, n = **기증자 수**
+-   ⚠️ 세포 유형 비율은 조성 자료 → 세포 수에 χ² test는 무효
+-   Trajectory, RNA velocity, regulon, 세포 간 소통 = 결과가 아니라 **가설**. "consistent with"로 쓰고, 검정할 실험을 명시
+-   자료를 만들기 전에 atlas 확인
 
 ------------------------------------------------------------------------
 
@@ -384,23 +676,35 @@ CellPhoneDB, CellChat, NicheNet은 cluster 쌍 사이에서 함께 발현되는 
 
 | 용어 | 한 줄 설명 |
 |-------------------------|------------------------------------------------|
-| Cell barcode | Read가 어느 droplet에서 왔는지 식별하는 서열 |
+| Cell barcode | Read가 어느 droplet(세포)에서 왔는지 식별하는 서열 |
 | UMI | 원래 mRNA 분자 하나를 표시하는 tag |
 | Dropout | 발현되었지만 포획되지 않은 transcript, 즉 기술적 0 |
-| Knee plot | UMI count의 순위 그림으로 세포와 빈 droplet을 구분하는 데 사용 |
-| Ambient RNA | 모든 droplet을 오염시키는 유리 RNA |
-| Doublet | 하나의 droplet에 포획된 두 세포 |
+| 3′ / 5′ kit | Transcript의 어느 쪽 끝을 읽는지; 5′는 TCR/BCR 서열까지 |
 | snRNA-seq | 온전한 세포 대신 핵을 profiling하는 방법 |
+| Dissociation artifact | 생물학이 아니라 조직 해리 과정이 유도한 유전자 발현 |
+| Knee plot | UMI count의 순위 그림, 세포와 빈 droplet 구분에 사용 |
+| Cell calling | 어떤 barcode가 세포인지 판정하는 과정 (예: EmptyDrops) |
+| Ambient RNA | 모든 droplet을 오염시키는 떠다니는 RNA("soup") |
+| Doublet | 하나의 droplet에 포획된 두 세포 |
+| Homotypic / heterotypic doublet | 같은 유형끼리(거의 검출 불가) / 다른 유형끼리(혼합 profile) |
+| MAD | 중앙값 절대 편차 — 시료별 데이터 기반 QC cutoff의 기준 |
 | HVG | PCA 전에 선택하는 highly variable gene |
-| UMAP / t-SNE | 시각화만을 위한 비선형 2차원 embedding |
-| Leiden clustering | kNN graph에서 수행하는 graph 기반 community detection |
+| PCA | 함께 움직이는 유전자 묶음(program)으로 차원을 줄이는 선형 방법 |
+| kNN / SNN graph | PC 공간에서 각 세포를 가장 가까운(또는 이웃을 공유하는) 세포와 연결한 graph |
+| Leiden / Louvain | kNN graph에서 수행하는 community detection; Leiden은 연결된 cluster 보장 |
 | Resolution | 얻는 cluster 수를 조절하는 parameter |
-| Integration | 공유 세포 유형이 함께 군집화되도록 dataset을 정렬하는 과정 |
-| Over-correction | 실제 생물학적 차이를 제거해 버린 integration |
+| UMAP / t-SNE | 시각화만을 위한 비선형 2차원 embedding |
+| Integration | 공유 세포 유형이 함께 모이도록 dataset을 정렬하는 과정 |
+| Over-correction | 실제 생물학적 차이까지 제거해 버린 integration |
 | Pseudobulk | 검정 전에 기증자 × 세포 유형별로 count를 합하는 방법 |
 | Differential abundance | 세포 유형 비율의 변화를 검정하는 분석 |
-| Pseudotime | 추론한 과정에 따라 세포를 배열한 순서 |
-| RNA velocity | Splicing 전후 read로 추론한 방향 |
+| Compositional data | 합이 1이라 각 비율이 독립적으로 변할 수 없는 자료 |
+| Pseudotime | 추론한 과정에 따라 세포를 배열한 순서 — 시간 아님 |
+| Root cell | Pseudotime의 시작점으로 사용자가 고른 세포 |
+| RNA velocity | Splicing 전후 read로 추론한 변화 방향 |
+| Regulon | TF와, 그 TF의 motif로 뒷받침되는 표적 유전자 묶음 |
+| Gene program | 함께 움직이는 유전자 묶음 — 세포마다 사용 정도가 다름 |
+| Ligand–receptor 분석 | Ligand·receptor co-expression으로 세포 간 소통을 추정하는 방법 |
 
 ------------------------------------------------------------------------
 
@@ -408,31 +712,46 @@ CellPhoneDB, CellChat, NicheNet은 cluster 쌍 사이에서 함께 발현되는 
 
 ### 종설과 모범 사례
 
-Luecken MD, Theis FJ. [*Current best practices in single-cell RNA-seq analysis: a tutorial.*](https://pubmed.ncbi.nlm.nih.gov/?term=Current+best+practices+in+single-cell+RNA-seq+analysis%3A+a+tutorial) Mol Syst Biol. 2019.\
 Heumos L, et al. [*Best practices for single-cell analysis across modalities.*](https://doi.org/10.1038/s41576-023-00586-w) Nat Rev Genet. 2023.\
-[Single-cell best practices (online book)](https://www.sc-best-practices.org/)
+[Single-cell best practices (online book)](https://www.sc-best-practices.org/) — 무료, 계속 갱신됨\
+Luecken MD, Theis FJ. [*Current best practices in single-cell RNA-seq analysis: a tutorial.*](https://doi.org/10.15252/msb.20188746) Mol Syst Biol. 2019.
 
-### 기술과 QC
+### 기술, QC, artifact
 
 Svensson V, Vento-Tormo R, Teichmann SA. [*Exponential scaling of single-cell RNA-seq in the past decade.*](https://pubmed.ncbi.nlm.nih.gov/?term=Exponential+scaling+of+single-cell+RNA-seq+in+the+past+decade) Nat Protoc. 2018.\
-Lun ATL, et al. [*EmptyDrops: distinguishing cells from empty droplets in droplet-based single-cell RNA sequencing data.*](https://pubmed.ncbi.nlm.nih.gov/?term=EmptyDrops%3A+distinguishing+cells+from+empty+droplets+in+droplet-based+single-cell+RNA+sequencing+data) Genome Biol. 2019.\
+van den Brink SC, et al. [*Single-cell sequencing reveals dissociation-induced gene expression in tissue subpopulations.*](https://doi.org/10.1038/nmeth.4437) Nat Methods. 2017. **← 해리 protocol을 설계하기 전에 읽을 논문**\
+Denisenko E, et al. [*Systematic assessment of tissue dissociation and storage biases in single-cell and single-nucleus RNA-seq workflows.*](https://doi.org/10.1186/s13059-020-02048-6) Genome Biol. 2020.\
+Lun ATL, et al. [*EmptyDrops: distinguishing cells from empty droplets in droplet-based single-cell RNA sequencing data.*](https://doi.org/10.1186/s13059-019-1662-y) Genome Biol. 2019.\
 Young MD, Behjati S. [*SoupX removes ambient RNA contamination.*](https://doi.org/10.1093/gigascience/giaa151) GigaScience. 2020.\
-van den Brink SC, et al. [*Single-cell sequencing reveals dissociation-induced gene expression in tissue subpopulations.*](https://pubmed.ncbi.nlm.nih.gov/?term=Single-cell+sequencing+reveals+dissociation-induced+gene+expression+in+tissue+subpopulations) Nat Methods. 2017.
+Fleming SJ, et al. [*Unsupervised removal of systematic background noise from droplet-based single-cell experiments using CellBender.*](https://doi.org/10.1038/s41592-023-01943-7) Nat Methods. 2023.\
+McGinnis CS, Murrow LM, Gartner ZJ. [*DoubletFinder: doublet detection in single-cell RNA sequencing data using artificial nearest neighbors.*](https://doi.org/10.1016/j.cels.2019.03.003) Cell Syst. 2019.\
+Germain PL, et al. [*Doublet identification in single-cell sequencing data using scDblFinder.*](https://doi.org/10.12688/f1000research.73600.2) F1000Research. 2021.
 
-### Clustering, embedding, integration
+### Embedding, clustering, integration
 
-Becht E, et al. [*Dimensionality reduction for visualizing single-cell data using UMAP.*](https://pubmed.ncbi.nlm.nih.gov/?term=Dimensionality+reduction+for+visualizing+single-cell+data+using+UMAP) Nat Biotechnol. 2019.\
-Chari T, Pachter L. [*The specious art of single-cell genomics.*](https://pubmed.ncbi.nlm.nih.gov/?term=The+specious+art+of+single-cell+genomics) PLoS Comput Biol. 2023. (2D embedding에 대한 날카로운 비판)\
+Becht E, et al. [*Dimensionality reduction for visualizing single-cell data using UMAP.*](https://doi.org/10.1038/nbt.4314) Nat Biotechnol. 2019.\
+Chari T, Pachter L. [*The specious art of single-cell genomics.*](https://doi.org/10.1371/journal.pcbi.1011288) PLoS Comput Biol. 2023. **← 2D embedding에 대한 날카로운 비판**\
+Kobak D, Linderman GC. [*Initialization is critical for preserving global data structure in both t-SNE and UMAP.*](https://doi.org/10.1038/s41587-020-00809-z) Nat Biotechnol. 2021.\
+Traag VA, Waltman L, van Eck NJ. [*From Louvain to Leiden: guaranteeing well-connected communities.*](https://doi.org/10.1038/s41598-019-41695-z) Sci Rep. 2019.\
+Korsunsky I, et al. [*Fast, sensitive and accurate integration of single-cell data with Harmony.*](https://doi.org/10.1038/s41592-019-0619-0) Nat Methods. 2019.\
 Luecken MD, et al. [*Benchmarking atlas-level data integration in single-cell genomics.*](https://doi.org/10.1038/s41592-021-01336-8) Nat Methods. 2022. (scIB)
 
 ### 통계
 
 Squair JW, et al. [*Confronting false discoveries in single-cell differential expression.*](https://doi.org/10.1038/s41467-021-25960-2) Nat Commun. 2021.\
-Zimmerman KD, Espeland MA, Langefeld CD. [*A practical solution to pseudoreplication bias in single-cell studies.*](https://pubmed.ncbi.nlm.nih.gov/?term=A+practical+solution+to+pseudoreplication+bias+in+single-cell+studies) Nat Commun. 2021.\
-Murphy AE, Skene NG. [*A balanced measure shows superior performance of pseudobulk methods.*](https://pubmed.ncbi.nlm.nih.gov/?term=A+balanced+measure+shows+superior+performance+of+pseudobulk+methods) Nat Commun. 2022.\
+Zimmerman KD, Espeland MA, Langefeld CD. [*A practical solution to pseudoreplication bias in single-cell studies.*](https://doi.org/10.1038/s41467-021-21038-1) Nat Commun. 2021.\
+Murphy AE, Skene NG. [*A balanced measure shows superior performance of pseudobulk methods.*](https://doi.org/10.1038/s41467-022-35519-4) Nat Commun. 2022.\
 Büttner M, et al. [*scCODA is a Bayesian model for compositional single-cell data analysis.*](https://doi.org/10.1038/s41467-021-27150-6) Nat Commun. 2021.
+
+### Trajectory, 조절, 세포 간 소통
+
+Saelens W, et al. [*A comparison of single-cell trajectory inference methods.*](https://doi.org/10.1038/s41587-019-0071-9) Nat Biotechnol. 2019.\
+Bergen V, Soldatov RA, Kharchenko PV, Theis FJ. [*RNA velocity — current challenges and future perspectives.*](https://doi.org/10.15252/msb.202110282) Mol Syst Biol. 2021. **← Figure에 velocity를 넣기 전에 읽을 논문**\
+Aibar S, et al. [*SCENIC: single-cell regulatory network inference and clustering.*](https://doi.org/10.1038/nmeth.4463) Nat Methods. 2017.\
+Kotliar D, et al. [*Identifying gene expression programs of cell-type identity and cellular activity with single-cell RNA-Seq.*](https://doi.org/10.7554/eLife.43803) eLife. 2019. (cNMF)\
+Dimitrov D, et al. [*Comparison of methods and resources for cell-cell communication inference from single-cell RNA-Seq data.*](https://doi.org/10.1038/s41467-022-30755-0) Nat Commun. 2022. **← 도구와 database에 따라 답이 얼마나 달라지는지**
 
 ### Atlas와 공간 분석
 
-[Human Cell Atlas](https://www.humancellatlas.org/) · [CELLxGENE](https://cellxgene.cziscience.com/) · [Azimuth](https://azimuth.hubmapconsortium.org/)\
+[Human Cell Atlas](https://www.humancellatlas.org/) · [CELLxGENE](https://cellxgene.cziscience.com/) · [Azimuth](https://azimuth.hubmapconsortium.org/) · [Tabula Sapiens](https://tabula-sapiens.sf.czbiohub.org/)\
 Moses L, Pachter L. [*Museum of spatial transcriptomics.*](https://pubmed.ncbi.nlm.nih.gov/?term=Museum+of+spatial+transcriptomics) Nat Methods. 2022.

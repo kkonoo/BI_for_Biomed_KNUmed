@@ -115,12 +115,12 @@ editor: visual
 > **모든 세포가 조금씩 변한 것일까요, 아니면 세포의 5%가 크게 변한 것일까요?**
 
 1.  왜 단일세포인가 🔬 — 평균이 지워버리는 것과 bulk가 여전히 더 나은 경우
-2.  플랫폼과 시료 선택 🧫 — droplet·plate·combinatorial, cell과 nucleus
-3.  액적에서 count matrix까지 🧮 — barcode, UMI, zero, 품질관리
-4.  세포 유형 찾기 🗺️ — HVG, PCA, UMAP, clustering resolution, annotation
+2.  장비에 넣기 전에 내리는 결정 🧫 — droplet·plate·combinatorial, 3′/5′, cell과 nucleus, 해리 편향, 기증자 단위 설계
+3.  액적에서 count matrix까지 🧮 — barcode, UMI, zero, cell calling, ambient RNA, doublet, 품질관리, PCA
+4.  세포 유형 찾기 🗺️ — 이웃 graph, clustering resolution, UMAP, annotation
 5.  배치 효과와 통합 🔗 — Harmony/scVI와 과도한 보정
 6.  통계 검정 📊 — 세포 단위 검정이 잘못된 이유, pseudobulk, differential abundance
-7.  동역학·공간·아틀라스 🌈 — trajectory, 세포 간 소통, spatial, HCA
+7.  동역학·기전 추론·공간·아틀라스 🌈 — trajectory, regulon, 세포 간 소통, spatial, HCA, 결과별 근거의 강도
 
 ⚠️ **함정** — 조건 간 세포 단위 검정은 잘못된 방법입니다. n은 세포 수가 아니라 공여자 수입니다.
 

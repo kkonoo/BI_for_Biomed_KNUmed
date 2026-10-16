@@ -115,12 +115,12 @@ Each week opens with a question a wet-lab scientist might actually be asked, and
 > **Every cell changing a little, or 5% of cells changing a lot?**
 
 1.  Why Single Cell 🔬 — what averaging destroys, and when bulk is still better
-2.  Platforms and Sample Choices 🧫 — droplet vs plate vs combinatorial; cells vs nuclei
-3.  From Droplets to a Count Matrix 🧮 — barcodes, UMIs, zeros, and QC
-4.  Finding Cell Types 🗺️ — HVGs, PCA, UMAP, clustering resolution, annotation
+2.  Decisions Made Before the Machine 🧫 — droplet vs plate vs combinatorial; 3′ vs 5′; cells vs nuclei; dissociation bias; donor-level design
+3.  From Droplets to a Count Matrix 🧮 — barcodes, UMIs, zeros, cell calling, ambient RNA, doublets, QC, PCA
+4.  Finding Cell Types 🗺️ — the neighbour graph, clustering resolution, UMAP, annotation
 5.  Batch Effects and Integration 🔗 — Harmony/scVI, and over-correction
 6.  Statistical Testing 📊 — why per-cell tests are invalid; pseudobulk; differential abundance
-7.  Dynamics, Space, and Atlases 🌈 — trajectories, cell–cell communication, spatial, HCA
+7.  Dynamics, Mechanism, Space, and Atlases 🌈 — trajectories, regulons, cell–cell communication, spatial, HCA, strength of evidence
 
 ⚠️ **The trap** — per-cell tests are invalid across conditions; your n is the number of donors.
 

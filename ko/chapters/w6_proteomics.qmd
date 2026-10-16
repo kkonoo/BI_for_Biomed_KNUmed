@@ -22,10 +22,8 @@ execute:
 -   Mass spectrometry와 affinity platform을 각각 언제 쓰는지
 :::
 
-> 🤔 **출발 질문**
->
-> Transcript와 단백질 양의 상관 = 대략 r ≈ 0.4
->
+> 🤔 **출발 질문**\
+> Transcript와 단백질 양의 상관 = 대략 r ≈ 0.4\
 > → 그렇다면 RNA-seq이 정확히 알려준 것은 무엇인가?
 
 ![](../../chapters/images/clipboard-4216984541.png)

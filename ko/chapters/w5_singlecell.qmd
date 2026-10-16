@@ -21,10 +21,8 @@ execute:
 -   Trajectory·세포 간 소통 결과를 가설로 읽기
 :::
 
-> 🤔 **출발 질문**
->
-> Bulk RNA-seq에서 뚜렷한 2배 증가, *p* = 0.001
->
+> 🤔 **출발 질문**\
+> Bulk RNA-seq에서 뚜렷한 2배 증가, *p* = 0.001\
 > → 모든 세포가 조금씩 변했나? 세포의 5%만 크게 변했나? 아니면 어떤 세포도 변하지 않았나?
 
 ![](../../chapters/images/clipboard-2113067316.png){fig-align="center"}

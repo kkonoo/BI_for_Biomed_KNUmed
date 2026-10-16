@@ -22,10 +22,8 @@ By the end of this chapter you should be able to:
 -   Explain why epigenomics is the bridge from a non-coding GWAS hit to a mechanism
 :::
 
-> 🤔 **Motivating question**
->
-> Every cell in your body carries the same genome
->
+> 🤔 **Motivating question**\
+> Every cell in your body carries the same genome\
 > → So why is a neuron not a hepatocyte? And why does that matter for interpreting the 90% of GWAS hits that fall outside genes?
 
 ![](images/clipboard-2383268863.png)

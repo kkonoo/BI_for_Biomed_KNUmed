@@ -22,10 +22,8 @@ By the end of this chapter you should be able to:
 -   ⚠️ Recognise when a "differential expression" result is really a change in cell composition
 :::
 
-> 🤔 **Motivating question**
->
-> Your knockout has a phenotype. RNA-seq returns 847 differentially expressed genes
->
+> 🤔 **Motivating question**\
+> Your knockout has a phenotype. RNA-seq returns 847 differentially expressed genes\
 > → Which of them mean anything?
 
 ![](images/clipboard-3691346398.png)

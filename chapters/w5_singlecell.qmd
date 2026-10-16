@@ -21,10 +21,8 @@ By the end of this chapter you should be able to:
 -   Read trajectories and cell–cell communication as hypotheses
 :::
 
-> 🤔 **Motivating question**
->
-> Your bulk RNA-seq shows a clean two-fold increase, *p* = 0.001
->
+> 🤔 **Motivating question**\
+> Your bulk RNA-seq shows a clean two-fold increase, *p* = 0.001\
 > → Is that every cell changing a little, 5% of cells changing a lot, or no cell changing at all?
 
 ![](images/clipboard-2113067316.png){fig-align="center"}

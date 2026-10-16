@@ -22,10 +22,8 @@ By the end of this chapter you should be able to:
 -   Say when to use mass spectrometry and when to use an affinity platform
 :::
 
-> 🤔 **Motivating question**
->
-> Transcript and protein levels correlate at roughly r ≈ 0.4
->
+> 🤔 **Motivating question**\
+> Transcript and protein levels correlate at roughly r ≈ 0.4\
 > → So what, exactly, did your RNA-seq tell you?
 
 ![](images/clipboard-4216984541.png)

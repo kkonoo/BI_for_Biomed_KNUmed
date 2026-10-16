@@ -22,10 +22,8 @@ By the end of this chapter you should be able to:
 -   Have the design conversation *before* you send samples for sequencing
 :::
 
-> 🤔 **Motivating question**
->
-> Your samples came back. There is a link to 200 GB of data on a server you have never logged into
->
+> 🤔 **Motivating question**\
+> Your samples came back. There is a link to 200 GB of data on a server you have never logged into\
 > → What happens now?
 
 💡 The main text of each section = the basics you need. **🔍 Going further** boxes = deeper material to open when you are curious

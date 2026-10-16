@@ -21,10 +21,8 @@ By the end of this chapter you should be able to:
 -   Recognise when a genetic result is being oversold
 :::
 
-> 🤔 **Motivating question**
->
-> Any two people differ at roughly 4–5 million positions in their genome
->
+> 🤔 **Motivating question**\
+> Any two people differ at roughly 4–5 million positions in their genome\
 > → Which of those differences cause disease?
 
 ![](images/clipboard-2115945549.png)

@@ -22,10 +22,8 @@ By the end of this chapter you should be able to:
 -   Read any omics paper critically — the closing skill of the course
 :::
 
-> 🤔 **Motivating question**
->
-> Patients have less *Faecalibacterium* than controls
->
+> 🤔 **Motivating question**\
+> Patients have less *Faecalibacterium* than controls\
 > → Is that a cause, a consequence, or an artifact?
 
 ![](images/clipboard-2901442990.png)

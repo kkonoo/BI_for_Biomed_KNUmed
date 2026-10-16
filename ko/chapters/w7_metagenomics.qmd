@@ -22,10 +22,8 @@ execute:
 -   어떤 omics 논문이든 비판적으로 읽기 — 이 수업을 마무리하는 기술
 :::
 
-> 🤔 **출발 질문**
->
-> 환자군에서 대조군보다 *Faecalibacterium*이 적음
->
+> 🤔 **출발 질문**\
+> 환자군에서 대조군보다 *Faecalibacterium*이 적음\
 > → 원인? 결과? 아니면 artifact?
 
 ![](../../chapters/images/clipboard-2901442990.png)

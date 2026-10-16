@@ -198,6 +198,8 @@ Every chapter follows the same shape:
 -   **🎯 Learning objectives** — what you should be able to do afterwards
 -   **🤔 Motivating question** — the problem the chapter exists to solve
 -   **Numbered sections** — `1.` → `1)` → `①`, mirroring the lecture
+-   **🔑 Core idea** — the one-line takeaway at the top of each section
+-   **🔍 Going further** — deeper material to open when you are curious (the main text = the basics you need)
 -   **⚠️ Pitfall boxes** — the mistakes that show up in real manuscripts
 -   **💡 Tips** — practical guidance for your own project
 -   **📝 Summary · 🔑 Key terms · ➕ References**

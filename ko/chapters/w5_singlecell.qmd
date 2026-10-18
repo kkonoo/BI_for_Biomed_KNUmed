@@ -326,6 +326,15 @@ QC로 걸러내는 네 가지:
 
 ------------------------------------------------------------------------
 
+**직접 해 보기** — [PCA·SVD: 저랭크 근사 ↗](https://kkonoo.github.io/edu_sims/sims/pca-svd/?lang=ko){target="_blank"}
+
+::: {.column-page}
+```{=html}
+<iframe src="https://kkonoo.github.io/edu_sims/sims/pca-svd/?embed=1&lang=ko" title="PCA·SVD: 저랭크 근사" loading="lazy"
+        style="width: 100%; height: 1300px; border: 0;"></iframe>
+```
+:::
+
 # 4. 세포 유형 찾기 🗺️ {#w5-s4}
 
 > 🔑 **핵심** — 발현이 비슷한 세포끼리 묶고(clustering), 2D 그림으로 보여주고(UMAP), 이름을 붙임(annotation). 셋 다 판단이 들어간 결과물

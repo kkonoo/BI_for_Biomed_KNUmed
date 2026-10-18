@@ -326,6 +326,15 @@ Cells that burst during dissociation and loading release their mRNA into the sus
 
 ------------------------------------------------------------------------
 
+**Try it** — [PCA and SVD: low-rank approximation ↗](https://kkonoo.github.io/edu_sims/sims/pca-svd/?lang=en){target="_blank"}
+
+::: {.column-page}
+```{=html}
+<iframe src="https://kkonoo.github.io/edu_sims/sims/pca-svd/?embed=1&lang=en" title="PCA and SVD: low-rank approximation" loading="lazy"
+        style="width: 100%; height: 1300px; border: 0;"></iframe>
+```
+:::
+
 # 4. Finding Cell Types 🗺️ {#w5-s4}
 
 > 🔑 **Core idea** — group cells with similar expression (clustering), show them as a 2D picture (UMAP), and name them (annotation). All three are products of choices

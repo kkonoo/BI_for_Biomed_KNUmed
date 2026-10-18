@@ -504,6 +504,15 @@ $P$ = base call이 틀릴 확률
 → 오믹스에서 FDR이 기본인 이유: 목적 = 개별적으로 확실한 주장이 아니라 후속 연구를 위한 *순위화된 후보 목록*
 :::
 
+**직접 해 보기** — [다중검정과 FDR ↗](https://kkonoo.github.io/edu_sims/sims/multiple-testing/?lang=ko){target="_blank"}
+
+::: {.column-page}
+```{=html}
+<iframe src="https://kkonoo.github.io/edu_sims/sims/multiple-testing/?embed=1&lang=ko" title="다중검정과 FDR" loading="lazy"
+        style="width: 100%; height: 1300px; border: 0;"></iframe>
+```
+:::
+
 ## 3) 배치 효과와 교란 ⚠️ {#w1-s4-3}
 
 -   **배치 효과** — 함께 처리된 시료군 사이의 체계적 기술 변이: 서로 다른 날, reagent lot, flow cell, 작업자, extraction kit
@@ -539,6 +548,15 @@ $P$ = base call이 틀릴 확률
 
 -   배치 효과를 제거하는 모든 방법 → 신호도 제거
 -   신호를 보존하는 모든 방법 → 인공물도 보존
+:::
+
+**직접 해 보기** — [교란변수와 배치효과 ↗](https://kkonoo.github.io/edu_sims/sims/confounding/?lang=ko){target="_blank"}
+
+::: {.column-page}
+```{=html}
+<iframe src="https://kkonoo.github.io/edu_sims/sims/confounding/?embed=1&lang=ko" title="교란변수와 배치효과" loading="lazy"
+        style="width: 100%; height: 1300px; border: 0;"></iframe>
+```
 :::
 
 ## 4) 검정력, 효과 크기, n {#w1-s4-4}

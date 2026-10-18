@@ -505,6 +505,15 @@ Not all deposited data is usable. Check before committing a semester to a GEO ac
 → FDR is the omics default: the goal is usually a *ranked candidate list* for follow-up, not individually certain claims
 :::
 
+**Try it** — [Multiple testing and FDR ↗](https://kkonoo.github.io/edu_sims/sims/multiple-testing/?lang=en){target="_blank"}
+
+::: {.column-page}
+```{=html}
+<iframe src="https://kkonoo.github.io/edu_sims/sims/multiple-testing/?embed=1&lang=en" title="Multiple testing and FDR" loading="lazy"
+        style="width: 100%; height: 1300px; border: 0;"></iframe>
+```
+:::
+
 ## 3) Batch effects and confounding ⚠️ {#w1-s4-3}
 
 -   **Batch effect** — systematic technical variation between groups of samples processed together: different days, reagent lots, flow cells, technicians, extraction kits
@@ -540,6 +549,15 @@ In the unrecoverable case:
 
 -   every method that removes the batch effect also removes your signal
 -   every method that preserves the signal preserves the artifact
+:::
+
+**Try it** — [Confounding and batch effects ↗](https://kkonoo.github.io/edu_sims/sims/confounding/?lang=en){target="_blank"}
+
+::: {.column-page}
+```{=html}
+<iframe src="https://kkonoo.github.io/edu_sims/sims/confounding/?embed=1&lang=en" title="Confounding and batch effects" loading="lazy"
+        style="width: 100%; height: 1300px; border: 0;"></iframe>
+```
 :::
 
 ## 4) Power, effect size, and n {#w1-s4-4}

@@ -129,6 +129,7 @@ format:
     include-after-body:
       - assets/ai-chat-init.html
       - assets/language-switch.html
+      - assets/edu-sims-resize.html
 
 execute:
   freeze: auto          # 코드 실행 결과 캐시 (빠른 빌드)

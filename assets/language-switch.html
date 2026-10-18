@@ -19,18 +19,18 @@
       return url.href;
     }
 
-    var switcher = document.createElement('div');
+    // One button that links to the *other* language of this page
+    // (like the theme button, it shows what you get when you click it).
+    var switcher = document.createElement('nav');
     switcher.className = 'course-language-switch';
-    switcher.setAttribute('role', 'group');
     switcher.setAttribute('aria-label', isKorean ? '언어 선택' : 'Choose language');
-    switcher.innerHTML =
-      '<a href="' + pageUrl(englishPath) + '" lang="en">EN</a>' +
-      '<a href="' + pageUrl(koreanPath) + '" lang="ko">KO</a>';
-
-    var links = switcher.querySelectorAll('a');
-    var active = links[isKorean ? 1 : 0];
-    active.classList.add('active');
-    active.setAttribute('aria-current', 'page');
+    var link = document.createElement('a');
+    link.href = pageUrl(isKorean ? englishPath : koreanPath);
+    link.lang = isKorean ? 'en' : 'ko';
+    link.hreflang = link.lang;
+    link.textContent = isKorean ? 'EN' : 'KO';
+    link.setAttribute('aria-label', isKorean ? 'View this page in English' : '이 페이지를 한국어로 보기');
+    switcher.appendChild(link);
 
     var tools = document.querySelector('.quarto-navbar-tools');
     if (tools) tools.insertBefore(switcher, tools.firstChild);

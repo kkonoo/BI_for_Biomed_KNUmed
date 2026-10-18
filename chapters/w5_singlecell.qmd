@@ -474,6 +474,15 @@ Clusters can equally reflect:
 
 ------------------------------------------------------------------------
 
+**Try it** — [Confounding and batch effects ↗](https://kkonoo.github.io/edu_sims/sims/confounding/?lang=en){target="_blank"}
+
+::: {.column-page}
+```{=html}
+<iframe src="https://kkonoo.github.io/edu_sims/sims/confounding/?embed=1&lang=en" title="Confounding and batch effects" loading="lazy"
+        style="width: 100%; height: 1300px; border: 0;"></iframe>
+```
+:::
+
 # 6. Statistical Testing 📊 {#w5-s6}
 
 > 🔑 **Core idea** — n = the number of **donors**, not cells. Sequencing more cells buys resolution, never power

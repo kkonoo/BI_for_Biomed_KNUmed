@@ -119,6 +119,15 @@ By the end of this chapter you should be able to:
 Age · sex · BMI · bowel movement frequency and stool consistency (Bristol scale — a surprisingly strong covariate) · transit time · geography
 :::
 
+**Try it** — [Confounding and batch effects ↗](https://kkonoo.github.io/edu_sims/sims/confounding/?lang=en){target="_blank"}
+
+::: {.column-page}
+```{=html}
+<iframe src="https://kkonoo.github.io/edu_sims/sims/confounding/?embed=1&lang=en" title="Confounding and batch effects" loading="lazy"
+        style="width: 100%; height: 1300px; border: 0;"></iframe>
+```
+:::
+
 ## 3) ⚠️ The kit-ome {#w7-s2-3}
 
 ![Contaminant fraction is a function of how much real biomass you started with.](/assets/img/w7/contamination.png){fig-align="center"}

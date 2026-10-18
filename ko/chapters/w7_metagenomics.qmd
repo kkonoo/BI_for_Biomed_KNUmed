@@ -119,6 +119,15 @@ execute:
 나이 · 성별 · BMI · 배변 빈도와 대변 굳기(Bristol scale — 의외로 강한 공변량) · 장 통과 시간 · 지역
 :::
 
+**직접 해 보기** — [교란변수와 배치효과 ↗](https://kkonoo.github.io/edu_sims/sims/confounding/?lang=ko){target="_blank"}
+
+::: {.column-page}
+```{=html}
+<iframe src="https://kkonoo.github.io/edu_sims/sims/confounding/?embed=1&lang=ko" title="교란변수와 배치효과" loading="lazy"
+        style="width: 100%; height: 1300px; border: 0;"></iframe>
+```
+:::
+
 ## 3) ⚠️ Kit-ome {#w7-s2-3}
 
 ![오염물의 비율 = 처음에 실제 biomass가 얼마나 있었는지에 따라 달라짐](/assets/img/w7/contamination.png){fig-align="center"}

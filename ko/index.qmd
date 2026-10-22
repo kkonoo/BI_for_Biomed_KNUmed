@@ -49,7 +49,7 @@ editor: visual
 
 > **시퀀싱 데이터 200 GB 도착. 이제 무엇을 해야 하나?**
 
-1.  생물정보학이란 무엇인가 👩‍💻 — 인접한 세 분야, wet lab ➡️ dry lab, 강의 전체를 관통하는 5단계 오믹스 워크플로
+1.  생물정보학이란 무엇인가 👩‍💻 — wet lab ➡️ dry lab, 강의 전체를 관통하는 5단계 오믹스 워크플로
 2.  시퀀싱과 데이터 🧪 — Sanger, short-read, long-read, FASTQ/BAM/VCF/count matrix, 참조 유전체와 reference bias
 3.  데이터가 있는 곳 🗄️ — GEO, SRA, dbGaP, UK Biobank, GTEx, ENCODE, TCGA, HCA
 4.  피할 수 없는 통계 📊 — p-value, 다중검정, 배치 효과, 검정력

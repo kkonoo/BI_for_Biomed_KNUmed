@@ -48,7 +48,7 @@ A compound word — both halves matter:
 Not how to run programs → a sound study design + understanding the analysis (that AI is doing for you)
 :::
 
-## 3) Wet lab ➡️ dry lab {#w1-s1-3}
+## 2) Wet lab ➡️ dry lab {#w1-s1-3}
 
 The logic is not so different. Look at a beautiful Western blot\
 → what was the loading control? how many biological replicates? was the exposure saturated?
@@ -67,7 +67,7 @@ Similar reflexes:
 -   Failed PCR → an empty gel. Obvious
 -   Failed RNA-seq analysis → a tidy table of 847 genes, sorted by p-value. **Nothing about its appearance tells you it is wrong**
 
-## 4) The generic omics workflow 🗺️ {#w1-s1-4}
+## 3) The generic omics workflow 🗺️ {#w1-s1-4}
 
 The omics hierarchy of the next six weeks = organized by the central dogma. Each layer has its own question:
 

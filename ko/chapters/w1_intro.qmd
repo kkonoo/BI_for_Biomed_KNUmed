@@ -48,7 +48,7 @@ execute:
 프로그램 실행법 x → 적절한 study design + (AI가 해주고있는) 분석 이해하기
 :::
 
-## 3) Wet lab ➡️ dry lab {#w1-s1-3}
+## 2) Wet lab ➡️ dry lab {#w1-s1-3}
 
 논리적 사고는 크게 다르지 않음. 멋진 Western blot을 보면\
 → loading control은? 생물학적 반복은 몇 개? 노출이 포화되지는 않았나?
@@ -67,7 +67,7 @@ execute:
 - 실패한 PCR → 빈 gel. 실패가 명확
 - 실패한 RNA-seq 분석 → p-value 순으로 잘 정리된 유전자 847개. **겉모습만으로는 틀렸다는 사실을 알 수 없음**
 
-## 4) 일반적인 Omics workflow🗺️ {#w1-s1-4}
+## 3) 일반적인 Omics workflow🗺️ {#w1-s1-4}
 
 다음 6주에 배울 Omics hierarchy= 중심원리에 따라 정리. 층위마다 특징적인 질문:
 

@@ -49,7 +49,7 @@ editor: visual
 
 > **200 GB of sequencing data just arrived. What now?**
 
-1.  What Bioinformatics Is 👩‍💻 — the three neighbouring fields; wet lab ➡️ dry lab; the five-stage omics workflow that maps the whole course
+1.  What Bioinformatics Is 👩‍💻 — wet lab ➡️ dry lab; the five-stage omics workflow that maps the whole course
 2.  Sequencing and Data 🧪 — Sanger, short-read, long-read; FASTQ / BAM / VCF / count matrix; the reference genome and reference bias
 3.  Where the Data Lives 🗄️ — GEO, SRA, dbGaP, UK Biobank, GTEx, ENCODE, TCGA, HCA
 4.  Statistics You Cannot Avoid 📊 — p-values, multiple testing, batch effects, power

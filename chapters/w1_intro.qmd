@@ -16,10 +16,9 @@ By the end of this chapter you should be able to:
 -   Say what a bioinformatician does, and what they need from you
 -   Tell the three sequencing technologies apart, and what each is good for
 -   Say what a FASTQ, BAM, VCF and count matrix each contain — without opening one
--   Explain why the reference genome and annotation change results
 -   Name the major public omics repositories and what lives in each
 -   ⚠️ Recognize the three statistical traps that ruin most omics analyses
--   Have the design conversation *before* you send samples for sequencing
+-   Think through the study design *before* you send samples for sequencing
 :::
 
 > 🤔 **Motivating question**\
@@ -41,73 +40,47 @@ A compound word — both halves matter:
 -   **Bio** ➡️ human samples, cells, tissues — with phenotypes attached
 -   **Information** ➡️ data, usually omics data, usually a very large table
 
-![Bioinformatics sits at the intersection of biology, computer science, and statistics — and spans the whole path from sample to interpretation.](/assets/img/w1/bioinformatics.png){fig-align="center"}
-
-## 2) Three neighbouring fields {#w1-s1-2}
-
-Often used interchangeably — but different jobs:
-
--   **Bioinformatics** — raw data → an interpretable measurement
--   **Computational biology** — a model that explains or predicts biology
--   **Biostatistics** — what this design lets you legitimately conclude
--   💡 In practice one person does all three. The distinction matters when deciding **who to ask**
+![](/assets/img/w1/bioinformatics.png){fig-align="center"}
 
 ::: {.callout-tip collapse="true"}
 ## The most useful thing you will learn this semester
 
-Not how to run anything
-
-→ Recognizing **which of those three questions you are actually asking**. Asking the wrong specialist wastes months
-:::
-
-::: {.callout-note collapse="true" icon=false}
-## 🔍 Going further — the three fields side by side
-
-| Field | Central question | Typical output |
-|--------------------|------------------------|----------------------------|
-| **Bioinformatics** | How do I get from raw data to an interpretable measurement? | Processed matrices, variant calls, annotated gene lists |
-| **Computational biology** | Can I build a model that explains or predicts biology? | Simulations, predictive models, mechanistic theory |
-| **Biostatistics** | Given this design, what can I legitimately conclude? | Estimates, confidence intervals, p-values, study designs |
-
-Who to ask:
-
--   "My aligner is throwing away 40% of reads" → bioinformatics
--   "Is n = 3 enough?" → biostatistics — and it should have been asked months earlier
+Not how to run programs → a sound study design + understanding the analysis (that AI is doing for you)
 :::
 
 ## 3) Wet lab ➡️ dry lab {#w1-s1-3}
 
-You already have the right reflexes. A beautiful Western blot → what was the loading control? how many biological replicates? was the exposure saturated?
+The logic is not so different. Look at a beautiful Western blot\
+→ what was the loading control? how many biological replicates? was the exposure saturated?
 
-Same reflexes, different artifacts:
+Similar reflexes:
 
 | Wet lab habit | Dry lab equivalent |
 |-----------------------------|-------------------------------------------|
 | Loading control | Normalization (W4) |
-| Antibody validation | Reference database / annotation choice (W1, W6) |
+| Antibody validation | Reference and annotation choice (W1, W6) |
 | Blinding and randomization | Batch design and randomized sample layout (W1) |
-| Technical vs. biological replicate | The same distinction, more consequential (W4) |
-| "It worked once" | A finding that does not replicate in a second cohort |
+| Technical vs. biological replicate | The same concept, more consequential (W4) |
 
-⚠️ **The failure unique to computation** — the analysis always produces an answer
+⚠️ **A failure mode unique to the dry lab** — run an analysis and something always comes out!!
 
 -   Failed PCR → an empty gel. Obvious
 -   Failed RNA-seq analysis → a tidy table of 847 genes, sorted by p-value. **Nothing about its appearance tells you it is wrong**
 
 ## 4) The generic omics workflow 🗺️ {#w1-s1-4}
 
-The omics layers of the next six weeks, organized by the central dogma — each with its own question:
+The omics hierarchy of the next six weeks = organized by the central dogma. Each layer has its own question:
 
 ![W2 works on the genome, W3 on its regulatory state, W4–W5 on the transcriptome, W6 on the proteome. W7 asks the same questions of a second genome — the microbiome.](/assets/img/w1/central_dogma.png){fig-align="center"}
 
 Every analysis in this course — genomics, epigenomics, transcriptomics, proteomics, metagenomics — follows the **same five stages**:
 
 ```
-① Quality control     → is this data usable at all?
+① Quality control     → is this data usable at all? (most important)
 ② Alignment /          → where did each measurement come from,
    quantification         and how much of it is there?
 ③ Normalization       → make samples comparable to each other
-④ Statistical testing → which differences are larger than noise?
+④ Statistical testing → is the biological difference larger than random noise?
 ⑤ Interpretation      → what does that mean biologically?
 ```
 
@@ -116,12 +89,11 @@ Every analysis in this course — genomics, epigenomics, transcriptomics, proteo
 ::: {.callout-important collapse="true"}
 ## This is the map for the whole course
 
-Every week from W2 onward: ask **where in these five stages you are**
-
+Every week from W2 onward: ask **where in these five stages you are**\
 The errors live in the stages too — and they are **not equally dangerous**:
 
--   Stage ① ② errors → **loud**. The pipeline crashes, or the numbers are absurd
--   Stage ③ ④ errors → **quiet**. These are the ones that reach publication
+-   Stage ① ② errors → **obvious right away**. The pipeline crashes, or the numbers are absurd
+-   Stage ③ ④ errors → **invisible from the outside**. Wrong results all the way into a paper..?
 :::
 
 ------------------------------------------------------------------------
@@ -216,9 +188,9 @@ Reading the fragment from one end, or from both
     -   Raw accuracy below Illumina, though modern chemistries have narrowed the gap considerably
 :::
 
-### ④ The trade-off triangle {#w1-s2-1-4}
+### ④ Pros and cons of each platform {#w1-s2-1-4}
 
-Read length, per-base accuracy, cost per base → you cannot maximize all three. Every platform picks a corner
+Read length, per-base accuracy, cost per base → no platform is best at everything. Choose the one that fits your research!!
 
 |   | Read length | Accuracy | Cost / Gb | Best for |
 |--------------|--------------|--------------|--------------|-----------------|
@@ -242,14 +214,14 @@ Not "which platform?" but **"is the read long enough to answer my question?"**
 
 -   You will probably never open these files by hand — but you will read methods sections that mention them, and reviewers will ask
 -   What matters: **what each format holds, and what it has already thrown away**
--   FASTQ ➡️ BAM ➡️ VCF / count matrix = increasing summarization
+-   FASTQ ➡️ BAM ➡️ VCF / count matrix = increasingly summarized info
 
-### ① FASTQ — the raw read {#w1-s2-2-1}
+### ① FASTQ — raw reads {#w1-s2-2-1}
 
 -   Four lines per read, tens of millions of reads per sample
 -   **Knows** — the sequence, and the machine's confidence in each base
 -   **Does not know** — where in the genome the read came from. That information does not exist yet
--   Confidence = the **Phred quality score**. Q30 (99.9% accuracy) = the conventional benchmark
+-   Confidence = the **Phred quality score**. Q30 (99.9% accuracy) or Q20 (99% accuracy) = the conventional benchmarks
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — what one read looks like
@@ -279,7 +251,7 @@ where $P$ = probability that the base call is wrong
 → "\>80% of bases above Q30" is the sort of line you will see in a facility report
 :::
 
-### ② BAM — reads placed on a genome {#w1-s2-2-2}
+### ② BAM — reads aligned to the genome {#w1-s2-2-2}
 
 -   Every read + the coordinate the aligner assigned + a **mapping quality** for that assignment
 -   ⚠️ **Alignment is inference, not observation** — a read from a repetitive region could plausibly come from several places; the aligner picks one
@@ -289,22 +261,22 @@ where $P$ = probability that the base call is wrong
 ## 🔍 Going further — why mapping quality matters
 
 -   For an ambiguous read, the aligner picks one place and lowers the mapping quality to say so
--   ⚠️ Analyses that ignore mapping quality silently accept a lot of wrong placements
+-   ⚠️ Analyses that ignore mapping quality end up including misplaced reads..
 -   BAM = where read-level information ends for most projects
 :::
 
-### ③ VCF — differences from a reference {#w1-s2-2-3}
+### ③ VCF — differences from the reference genome {#w1-s2-2-3}
 
 -   Only the positions where your sample **differs** from the reference, with genotype and quality
--   Everything shared with the reference is implicit — absent from the file
+-   Everything shared with the reference is not shown — absent from the file
 -   ⚠️ **A VCF is a diff, not a genome** — a region that could not be aligned produces no variants → looks identical to a region with no variants
 -   → **Absence of a call ≠ a call of absence**
 
-### ④ Count matrix — where most analyses actually begin {#w1-s2-2-4}
+### ④ Count matrix — where most (statistical) analysis starts {#w1-s2-2-4}
 
 -   Features (genes, peaks, proteins, taxa) in rows × samples in columns, one number per cell
 -   What public repositories distribute, and what statistical methods consume
--   ⚠️ Also the point of **maximum information loss** — every read, alignment, and quality score compressed into one integer per gene per sample
+-   ⚠️ Also the point of **maximum information loss** — QC has already been done upstream
 
 ::: {.callout-warning collapse="true"}
 ## What the count matrix has already decided for you
@@ -317,19 +289,19 @@ By the time it reaches you, someone has already chosen:
 -   Quantification method
 -   Rules for multi-mapping reads
 
-All invisible in the matrix. All capable of changing your results substantially
+All invisible in the count matrix. But all of them can change your results substantially!
 
 → Download a matrix from GEO, and **the original paper's methods section is part of your methods section**
 :::
 
-## 3) The reference genome {#w1-s2-3}
+## 3) Reference genome {#w1-s2-3}
 
-💡 The reference genome and its annotation are **choices, not facts** — and they bias results systematically
+💡 The reference genome and annotation = **a choice you have to make** — systemic bias
 
 ### ① GRCh38 and T2T-CHM13 {#w1-s2-3-1}
 
 -   Not a person's genome — a mosaic from several donors → an idealized **coordinate system** everyone agrees to use
--   **GRCh38** (2013) — the workhorse. Still the default for most clinical and population resources
+-   **GRCh38** (2013) — the default for most clinical and population resources today
 -   ⚠️ **Coordinates are not interchangeable between builds** — a position in GRCh37 (hg19) is a different position in GRCh38. "Liftover" is routine but lossy
 -   ⚠️ Mixing builds = one of the commonest sources of nonsense results in student projects
 
@@ -343,7 +315,7 @@ All invisible in the matrix. All capable of changing your results substantially
 
 ### ② Annotation: where the genes are {#w1-s2-3-2}
 
--   **Reference sequence** — what the bases are
+-   Reference sequence — what the bases are
 -   **Annotation** — which stretches are genes, exons, transcripts, regulatory elements
 -   Separate files, separately versioned, and they disagree with each other → ⚠️ **report the build *and* the annotation version**
 
@@ -374,7 +346,7 @@ Usually modest differences. Occasionally not
 
 -   Everything is measured relative to one sequence → anything poorly represented in that sequence is **systematically under-detected**
 -   Sequence absent from the reference → undetectable by definition
--   🗺️ First appearance of a thread running through the whole course: **reference bias** — same problem, different name
+-   🗺️ First appearance of a thread running through the whole course: reference bias — same problem, different name
     -   W3 → chromatin atlases / W4 → annotation versions / W6 → the protein search database / W7 → the 16S taxonomy database
 
 ::: {.callout-note collapse="true" icon=false}
@@ -451,14 +423,14 @@ Usually modest differences. Occasionally not
 Not all deposited data is usable. Check before committing a semester to a GEO accession:
 
 -   ✅ **Sample size** — n \> 30 per group for most bulk questions. Small studies are underpowered no matter how clean
--   ✅ **Rich metadata** — age, sex, batch, tissue, treatment. A matrix without covariates cannot be corrected for confounding
--   ⚠️ **Batch structure recoverable** — all cases in one batch and all controls in another → unsalvageable. This is common. Check first
+-   ✅ **Metadata** — age, sex, batch, tissue, treatment. A matrix without covariates cannot be corrected for confounding
+-   ⚠️ **Batch design** — all cases in one batch and all controls in another → cannot be analysed
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — two more checks: design and raw data
 
 -   ✅ **Clear design** — unambiguous case vs. control, or a paired design (stronger: within-patient variation is controlled statistically)
--   ✅ **Raw data available** — reprocessing with your own annotation needs the FASTQs, not just the matrix
+-   ✅ **Raw sequence available** — reprocessing with your own annotation needs the FASTQs, not just the matrix
 :::
 
 ------------------------------------------------------------------------
@@ -485,14 +457,7 @@ Not all deposited data is usable. Check before committing a semester to a GEO ac
 -   One gene at α = 0.05 → 5% chance of a false positive
 -   20,000 genes, no real signal at all → **\~1,000 false positives expected**
 -   Omics default = **FDR** (Benjamini–Hochberg): "FDR \< 0.05" = about 5% of the genes on this list are expected to be false
--   ✅ Acceptable bargain when the next step is **validation**. ❌ Unacceptable when the next step is a **clinical decision**
-
-::: {.callout-warning collapse="true"}
-## The correction cannot be applied after the fact
-
--   Tested 20,000 genes, found one interesting result, reported only that one with an uncorrected p-value? → you have not avoided the multiple testing problem, you have **hidden** it
--   Tried six normalization methods and reported the one with the nicest volcano plot? → also multiple testing, and **no correction exists for it**
-:::
+-   ✅ OK when the next step is **validation**. ❌ Never when the next step is a **clinical decision**...
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — Bonferroni vs. FDR
@@ -521,17 +486,17 @@ Not all deposited data is usable. Check before committing a semester to a GEO ac
 -   Batch effects are annoying but survivable. **Confounding is fatal:**
 
 ```
-Recoverable:   Batch 1 = 5 cases + 5 controls
-               Batch 2 = 5 cases + 5 controls
-               → batch can be modelled and removed
+Correctable:     Batch 1 = 5 cases + 5 controls
+                 Batch 2 = 5 cases + 5 controls
+                 → batch can be modelled and removed
 
-Unrecoverable: Batch 1 = 10 cases
-               Batch 2 = 10 controls
-               → batch and disease are the same variable
-                 no statistical method can separate them
+Not analysable:  Batch 1 = 10 cases
+                 Batch 2 = 10 controls
+                 → batch and disease are the same variable
+                   no statistical method can separate them
 ```
 
-⚠️ In the second case the experiment cannot be rescued by analysis → it has to be redesigned
+⚠️ The second case → cannot be analysed. It has to be redesigned
 
 ::: {.callout-important collapse="true"}
 ## Randomize your sample layout
@@ -539,13 +504,13 @@ Unrecoverable: Batch 1 = 10 cases
 Costs nothing. Prevents the single most common unrecoverable error in omics studies
 
 -   When laying samples on a plate or submitting for sequencing → **distribute conditions evenly across every technical grouping** — plate, row, run, day, operator
--   💡 If you take one practical thing from this chapter, take this one
+-   💡 The most important point in this chapter. Please remember at least this one...
 :::
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — why no method can rescue confounding
 
-In the unrecoverable case:
+In the case that cannot be analysed:
 
 -   every method that removes the batch effect also removes your signal
 -   every method that preserves the signal preserves the artifact
@@ -582,7 +547,7 @@ They do not simply fail to find things. What they *do* find is:
 
 Rough orientation, not rules:
 
--   **Bulk RNA-seq** — n = 3 detects only large, consistent changes. n = 6–10 is a working minimum for human tissue. n \> 20 for clinically heterogeneous phenotypes
+-   **Bulk RNA-seq** — n = 3 detects only large, consistent changes. [n = 6–10 is a working minimum for human tissue]{.underline}. n \> 20 for clinically heterogeneous phenotypes
 -   **GWAS** — thousands to hundreds of thousands; individual variant effects are tiny (🔗 W2)
 -   **Single-cell** — the relevant n is the number of *donors*, not cells. Three donors is three, whether you sequenced 300 cells or 300,000 (🔗 W5)
 :::
@@ -633,7 +598,7 @@ You will write these, and you will review them:
 -   ✅ Multiple testing correction method and threshold; accession numbers for data, and a link to analysis code
 -   ❌ "Data were analyzed using standard pipelines" is not a methods section — you will see it in print constantly
 
-## 3) 🗣️ The conversation to have before you sequence {#w1-s5-3}
+## 3) 🗣️ What to think through before you send samples for sequencing {#w1-s5-3}
 
 The highest-value section of this chapter. Agree on these before samples leave your bench:
 

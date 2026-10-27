@@ -580,6 +580,10 @@ Not analysable:  Batch 1 = 10 cases
 
 ⚠️ The second case → cannot be analysed. It has to be redesigned
 
+In RNA-seq this is usually checked with **PCA** — a 2D map summarizing the expression of tens of thousands of genes. One point = one sample; closer = more similar expression (🔗 W5)
+
+![Two simulated experiments with the same batch and disease effects — only the design differs. Left: PC1 (the largest source of variation) = batch → the batch difference is bigger than the disease difference. But both batches contain cases and controls, so the disease separates on PC2 → correctable by including batch in the model. Right: two clean groups, but colour (disease) and shape (batch) coincide perfectly → no way to tell a disease difference from a batch difference](/assets/img/w1/batch_pca.png){fig-align="center"}
+
 ::: {.callout-important collapse="true"}
 ## Randomize your sample layout
 

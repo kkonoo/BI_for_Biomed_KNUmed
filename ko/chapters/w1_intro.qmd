@@ -579,6 +579,10 @@ count matrix에서는 모두 안 보임. 하지만 모두 결과를 크게 바�
 
 ⚠️ 두 번째 경우 → 분석 불가. 다시 설계해야 함
 
+RNA-seq에서는 보통 **PCA**로 확인 — 수만 개 유전자의 발현을 2차원으로 요약한 지도. 점 하나 = 시료, 가까울수록 발현 패턴이 비슷 (🔗 W5)
+
+![같은 batch 효과·질병 효과, 설계만 다른 두 실험(시뮬레이션). 왼쪽: PC1(가장 큰 변이) = batch → 질병보다 batch 차이가 더 큼. 하지만 두 batch 모두에 case와 control이 있어 PC2에서 질병 차이가 보임 → batch를 모형에 넣어 보정 가능. 오른쪽: 깔끔하게 두 무리로 갈라지지만 색(질병)과 모양(batch)이 완전히 겹침 → 질병 차이인지 batch 차이인지 구분 불가](/assets/img/w1/batch_pca.png){fig-align="center"}
+
 ::: {.callout-important collapse="true"}
 ## 시료 배치 무작위화
 

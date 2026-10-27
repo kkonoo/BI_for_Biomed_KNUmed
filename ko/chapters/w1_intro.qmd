@@ -222,8 +222,7 @@ Read length, base당 정확도, base당 비용 → 모든 면에서 좋은 건 �
 - **모르는 것** — read가 유전체 어디에서 왔는지. 그 정보는 아직 존재하지 않음
 - 신뢰도 = **Phred 품질 점수**. Q30(정확도 99.9%) 혹은 Q20 (정확도 99%) = 관례적 기준
 
-::: {.callout-note collapse="true" icon="false"}
-## 🔍 더 알아보기 — 리드 하나의 실제 모습
+리드 하나의 실제 모습:
 
 ```         
 @SRR21484222.626.1 626 length=51           ← read ID
@@ -231,7 +230,6 @@ GCCTTGGTGGTGAAATGGTAGACTGGAATTCTCGGGTGCC   ← sequence
 +SRR21484222.626.1 626 length=51           ← description
 F:FFFFFFFFFFFFFFFFFFFFFFFFFFF:FFFFFFFFFF   ← base quality (Phred)
 ```
-:::
 
 ::: {.callout-note collapse="true" icon="false"}
 ## 🔍 더 알아보기 — Phred 품질 점수
@@ -250,11 +248,46 @@ $P$ = base call이 틀릴 확률
 → 분석 기관 보고서에서 "base의 80% 이상이 Q30 이상" 같은 문장을 보게 됨
 :::
 
+::: {.callout-note collapse="true" icon="false"}
+## 🔍 더 알아보기 — read trimming: 리드 길이가 제각각이 되는 이유
+
+- 시퀀서는 정해진 cycle 수만큼 읽음 → 막 나온 FASTQ = 모든 리드 길이가 같음 (예: 100 또는 150)
+- 하지만 [library 분자](#w1-s2-1-2) = adapter + **insert** + adapter. Insert 길이는 분자마다 다름
+- **Insert < read 길이** → insert를 다 읽고 반대편 adapter까지 읽음 (*adapter read-through*)
+
+![Insert가 read 길이보다 짧으면 Read 1·Read 2 모두 insert를 지나 반대편 adapter까지 읽음(빨간 점선) → 시료의 서열이 아닌 부분](/assets/img/w1/adapter_readthrough.png){fig-align="center"}
+
+- **Read trimming** = 이 adapter 서열 + 3′ 끝의 낮은 품질 base를 잘라냄 (cutadapt, Trimmomatic, fastp 등)
+- 잘리는 위치 = 분자마다 다름 → trimming 후 리드 길이는 **제각각**
+
+![Adapter가 리드의 어디에서 시작하느냐에 따라 남는 길이(초록)가 달라짐. A·B = 첫 base부터 adapter(insert 없음) → 리드 전체 제거, C = 중간에서 시작 → 앞부분만 남음, D = 끝에서 시작 → 대부분 남음. 출처: Bolger et al., Bioinformatics 2014 (Trimmomatic)](/assets/img/w1/adapter_trimming.png){fig-align="center"}
+
+- 💡 위 예시 리드도 같은 경우: 뒷부분 `TGGAATTCTCGGGTGCC` = small RNA library의 3′ adapter → 잘라내면 앞의 23 nt만 남음
+- ⚠️ 너무 짧아진 리드는 버림 — 유전체 여러 곳에 정렬될 수 있음
+:::
+
 ### ② BAM — 유전체에 aligned reads {#w1-s2-2-2}
 
 - 모든 리드 + aligner가 지정한 좌표 + 그 지정에 대한 **mapping quality**
 - ⚠️ **Alignment는 관찰이 아니라 추론** — 반복 영역의 read는 여러 위치에서 왔을 수 있음. Aligner가 그중 하나를 고름
 - WGS 시료당 수십 GB로 큼 — 이후의 모든 결과는 이를 요약한 것
+
+앞의 FASTQ 리드를 adapter trimming 후 정렬한 모습 (`samtools view`로 연 것. 실제로는 탭으로 구분된 한 줄, 위치는 설명용 예시):
+
+```
+SRR21484222.626.1          ← read ID (FASTQ와 같음)
+0                          ← FLAG: 정렬 상태 (0 = + 가닥에 정렬)
+chr8                       ← 염색체
+24816530                   ← 시작 위치
+60                         ← mapping quality (MAPQ)
+23M                        ← CIGAR: 23 base가 이 위치에 정렬 (M = 정렬됨)
+*   0   0                  ← paired-end 짝의 위치 (single-end라 비어 있음)
+GCCTTGGTGGTGAAATGGTAGAC    ← sequence (adapter를 잘라낸 23 nt)
+F:FFFFFFFFFFFFFFFFFFFFF    ← base quality (FASTQ와 같음)
+```
+
+- FASTQ의 서열·품질은 그대로, **위치 + MAPQ + CIGAR**가 새로 붙음
+- **MAPQ** = 이 위치가 맞다는 aligner의 확신. 높을수록 확실, 0 = 여러 곳에 똑같이 잘 맞음
 
 ::: {.callout-note collapse="true" icon="false"}
 ## 🔍 더 알아보기 — mapping quality가 중요한 이유
@@ -271,11 +304,39 @@ $P$ = base call이 틀릴 확률
 - ⚠️ **VCF는 유전체가 아니라 차이(diff)** — 정렬할 수 없는 영역에서는 변이가 호출되지 않음 → 변이가 없는 영역과 똑같아 보임
 - → **Call이 없음 ≠ 없다고 call함**
 
+VCF 한 조각 (header 일부 + 변이 두 개):
+
+```
+##fileformat=VCFv4.2
+##reference=GRCh38                     ← 어느 build 기준인지
+#CHROM  POS       ID         REF  ALT  QUAL  FILTER  INFO   FORMAT  환자1
+chr1    11796321  rs1801133  G    A    1530  PASS    DP=41  GT      1/1
+chr19   44908684  rs429358   T    C    812   PASS    DP=34  GT      0/1
+```
+
+- CHROM·POS = 위치, REF → ALT = 바뀐 염기, QUAL·FILTER = 신뢰도
+- 마지막 열 = genotype: 0/1 = 이형접합(한쪽 allele만 ALT), 1/1 = 동형접합(양쪽 모두 ALT)
+- 예시 변이: rs1801133 = *MTHFR* C677T, rs429358 = *APOE* ε4 판정에 쓰이는 변이
+- 두 줄 사이 = 기록 없음 → reference와 같거나, **정렬이 안 돼서 모르는 곳**
+
 ### ④ Count matrix — 대부분의 (통계)분석 시작점 {#w1-s2-2-4}
 
 - 행 = feature(유전자, peak, 단백질, taxon), 열 = 시료, 셀마다 측정값 하나
 - 공개 저장소가 배포하고 통계 분석법이 입력으로 받는 형식
 - ⚠️ 동시에 **정보 손실이 가장 큰 지점** — 이미 앞에서 QC를 했기 때문
+
+RNA-seq count matrix의 한 부분:
+
+```
+gene_id           환자1   환자2   대조1   대조2
+ENSG00000111640   15234   14876   16102   15530    ← GAPDH
+ENSG00000141510     812     790    1022     955    ← TP53
+ENSG00000136244     145     210       3       0    ← IL6
+...                                                (수만 행)
+```
+
+- 행 이름 = annotation이 정한 유전자 ID (여기서는 Ensembl)
+- 값 = 그 유전자에 배정된 read 수. 정수, normalization 전 → 시료끼리 바로 비교 x (🔗 W4)
 
 ::: {.callout-warning collapse="true"}
 ## Count matrix에 도착하기 전에 이미 결정된 것
@@ -309,6 +370,13 @@ count matrix에서는 모두 안 보임. 하지만 모두 결과를 크게 바�
 
 - 20년 넘게 다듬어 온 참조서열. GRCh38이 기본값으로 남은 주된 이유 = 이미 거대한 데이터가 여기에 정렬되어 있음
 - **T2T-CHM13**(2022) — centromere, acrocentric short arm 등 GRCh38의 빈틈을 채운 최초의 완전한 assembly. 이전에 정렬되지 않던 약 200 Mb 추가
+
+![T2T-CHM13이 채운 GRCh38의 빈틈. (A) 염색체별 지도 — **검은 칸 = GRCh38에서 비어 있거나 틀렸던 구간 → CHM13이 채움**, 빨강 = CHM13에만 있는 유전자. 위쪽 노랑 = centromere satellite, 파랑 = segmental duplication. (B) 염색체별로 추가된 서열 — 진한 막대 = acrocentric 염색체(13, 14, 15, 21, 22). (C) 추가된 서열의 대부분 = centromere satellite(CenSat)와 segmental duplication(SD). (D) Release별 총 서열 길이(gap 제외) — 20년간 조금씩 늘다 CHM13에서 크게 증가. 출처: Nurk et al., Science 2022](/assets/img/w1/t2t_gaps_filled.webp){fig-align="center"}
+
+- 왜 그렇게 오래 비어 있었나 → 이 구간 = 거의 같은 서열이 수없이 반복. 150 bp read로는 어디에 놓을지 결정 불가 → 수십 kb–Mb [long read](#w1-s2-1-3)로 비로소 해결
+
+![CHM13 assembly graph. 한 줄로 이어지는 부분 = 순서가 하나로 정해지는 서열, 엉킨 덩어리 = 반복 서열이라 경로가 여러 갈래인 곳 (centromere, rDNA가 있는 acrocentric short arm 등). HiFi read로 만든 graph의 엉킨 부분을 ultra-long nanopore read로 풀어냄. 출처: Nurk et al., Science 2022](/assets/img/w1/t2t_assembly_graph.webp){fig-align="center"}
+
 - **Pangenome reference** — 하나의 선형 서열 대신 여러 haplotype으로 만든 graph. 분야가 향하는 방향이지만 아직 기본값은 아님
 :::
 
@@ -438,7 +506,21 @@ count matrix에서는 모두 안 보임. 하지만 모두 결과를 크게 바�
 
 > 🔑 **핵심** — 오믹스 데이터 = **큰 *p*(feature 수), 작은 *n*(시료 수)**: 유전자 20,000개, 환자 12명. 반대 비율에서 만들어진 직관은 여기서 전부 흔들림
 
-## 1) p-value가 말하는 것과 말하지 않는 것 {#w1-s4-1}
+## 1) 가설검정과 p-value {#w1-s4-1}
+
+### ① 가설검정: H₀, H₁, 그리고 p-value {#w1-s4-1-1}
+
+가설검정 = "차이가 없다"고 가정했을 때 내 데이터가 얼마나 드문지 따져 보는 절차. 예: 이 유전자의 발현이 환자와 대조군에서 다른가?
+
+- **H₀ (귀무가설)** — 차이 없음. 환자와 대조군의 발현이 같음
+- **H₁ (대립가설)** — 차이 있음. 발현이 다름
+- **검정통계량** — 데이터를 숫자 하나로 요약 (예: z, t). H₀가 참이면 대개 0 근처, 차이가 클수록 0에서 멀어짐
+- **p-value** — H₀ 아래의 분포에서 관찰값만큼 또는 더 극단적인 쪽의 면적 (아래 그림의 빨간 부분)
+- **판정** — p \< α(보통 0.05) → H₀ 기각. p ≥ α → 기각 못 함 (≠ H₀가 참)
+
+![H₀가 참일 때 검정통계량의 분포(정규분포). 관찰값 z = 2.2보다 극단적인 양쪽 꼬리의 면적 = p-value ≈ 0.028 \< 0.05 → H₀ 기각](/assets/img/w1/pvalue_normal.png){fig-align="center"}
+
+### ② p-value가 말하는 것과 말하지 않는 것 {#w1-s4-1-2}
 
 - **말하는 것** — *귀무가설이 참일 때* 현재와 같거나 더 극단적인 데이터를 관찰할 확률. 그 이상은 아님
 - **말하지 않는 것** — 귀무가설이 참일 확률, 발견이 재현될 확률, 효과 크기, 생물학적 중요성
@@ -648,6 +730,7 @@ count matrix에서는 모두 안 보임. 하지만 모두 결과를 크게 바�
 | Annotation | 그 좌표계에서 유전자, exon, element의 위치를 정의한 정보 |
 | Reference bias | 참조서열과 다른 것을 체계적으로 덜 검출하는 현상 |
 | Count matrix | Feature × sample 측정값 표 |
+| H₀ / H₁ | 귀무가설(차이 없음) / 대립가설(차이 있음) |
 | p-value | 귀무가설이 참일 때 이만큼 극단적인 데이터를 볼 확률 — 귀무가설이 참일 확률 아님 |
 | FDR | 유의한 결과 중 위양성이 차지하는 기대 비율 |
 | Batch effect | 처리 집단 사이의 체계적 기술 변이 |

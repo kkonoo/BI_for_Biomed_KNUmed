@@ -223,8 +223,7 @@ Not "which platform?" but **"is the read long enough to answer my question?"**
 -   **Does not know** — where in the genome the read came from. That information does not exist yet
 -   Confidence = the **Phred quality score**. Q30 (99.9% accuracy) or Q20 (99% accuracy) = the conventional benchmarks
 
-::: {.callout-note collapse="true" icon=false}
-## 🔍 Going further — what one read looks like
+What one read looks like:
 
 ```
 @SRR21484222.626.1 626 length=51           ← read ID
@@ -232,7 +231,6 @@ GCCTTGGTGGTGAAATGGTAGACTGGAATTCTCGGGTGCC   ← sequence
 +SRR21484222.626.1 626 length=51           ← description
 F:FFFFFFFFFFFFFFFFFFFFFFFFFFF:FFFFFFFFFF   ← base quality (Phred)
 ```
-:::
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — the Phred quality score
@@ -251,11 +249,46 @@ where $P$ = probability that the base call is wrong
 → "\>80% of bases above Q30" is the sort of line you will see in a facility report
 :::
 
+::: {.callout-note collapse="true" icon=false}
+## 🔍 Going further — read trimming: why read lengths end up uneven
+
+-   The sequencer reads a fixed number of cycles → a fresh FASTQ = every read the same length (e.g. 100 or 150)
+-   But the [library molecule](#w1-s2-1-2) = adapter + **insert** + adapter, and insert length varies from molecule to molecule
+-   **Insert < read length** → the read runs through the insert and into the adapter on the other side (*adapter read-through*)
+
+![When the insert is shorter than the read length, Read 1 and Read 2 both run past the insert into the opposite adapter (red dotted) → sequence that is not from your sample](/assets/img/w1/adapter_readthrough.png){fig-align="center"}
+
+-   **Read trimming** = cutting off that adapter sequence + low-quality bases at the 3′ end (cutadapt, Trimmomatic, fastp, …)
+-   Where the cut falls differs per molecule → after trimming, read lengths are **all over the place**
+
+![How much is left (green) depends on where in the read the adapter starts. A, B = adapter from the first base (no insert) → whole read removed; C = starts mid-read → only the front survives; D = starts near the end → most of the read survives. Source: Bolger et al., Bioinformatics 2014 (Trimmomatic)](/assets/img/w1/adapter_trimming.png){fig-align="center"}
+
+-   💡 The example read above is one of these: its tail `TGGAATTCTCGGGTGCC` is the small RNA library's 3′ adapter → trimmed, only the first 23 nt remain
+-   ⚠️ Reads that become too short are discarded — they could align to many places in the genome
+:::
+
 ### ② BAM — reads aligned to the genome {#w1-s2-2-2}
 
 -   Every read + the coordinate the aligner assigned + a **mapping quality** for that assignment
 -   ⚠️ **Alignment is inference, not observation** — a read from a repetitive region could plausibly come from several places; the aligner picks one
 -   Large (tens of GB per WGS sample) — everything downstream is a summary of it
+
+The FASTQ read above after adapter trimming and alignment (as shown by `samtools view`; really one tab-separated line, and the position is an illustrative example):
+
+```
+SRR21484222.626.1          ← read ID (same as FASTQ)
+0                          ← FLAG: status (0 = + strand)
+chr8                       ← chromosome
+24816530                   ← start position
+60                         ← mapping quality (MAPQ)
+23M                        ← CIGAR: 23 bases aligned (M)
+*   0   0                  ← mate position (single-end: none)
+GCCTTGGTGGTGAAATGGTAGAC    ← sequence (23 nt after trimming)
+F:FFFFFFFFFFFFFFFFFFFFF    ← base quality (same as FASTQ)
+```
+
+-   Sequence and quality carried over from the FASTQ; **position + MAPQ + CIGAR** are new
+-   **MAPQ** = the aligner's confidence that this is the right place. Higher = more certain, 0 = fits several places equally well
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — why mapping quality matters
@@ -272,11 +305,39 @@ where $P$ = probability that the base call is wrong
 -   ⚠️ **A VCF is a diff, not a genome** — a region that could not be aligned produces no variants → looks identical to a region with no variants
 -   → **Absence of a call ≠ a call of absence**
 
+A slice of a VCF (part of the header + two variants):
+
+```
+##fileformat=VCFv4.2
+##reference=GRCh38                     ← which build it refers to
+#CHROM  POS       ID         REF  ALT  QUAL  FILTER  INFO   FORMAT  case1
+chr1    11796321  rs1801133  G    A    1530  PASS    DP=41  GT      1/1
+chr19   44908684  rs429358   T    C    812   PASS    DP=34  GT      0/1
+```
+
+-   CHROM·POS = where, REF → ALT = what changed, QUAL·FILTER = how confident
+-   Last column = genotype: 0/1 = heterozygous (one allele is ALT), 1/1 = homozygous (both alleles ALT)
+-   Example variants: rs1801133 = *MTHFR* C677T, rs429358 = one of the two variants that define *APOE* ε4
+-   Between the two lines = nothing recorded → same as the reference, or **unknown because nothing aligned there**
+
 ### ④ Count matrix — where most (statistical) analysis starts {#w1-s2-2-4}
 
 -   Features (genes, peaks, proteins, taxa) in rows × samples in columns, one number per cell
 -   What public repositories distribute, and what statistical methods consume
 -   ⚠️ Also the point of **maximum information loss** — QC has already been done upstream
+
+Part of an RNA-seq count matrix:
+
+```
+gene_id           patient1  patient2  control1  control2
+ENSG00000111640      15234     14876     16102     15530    ← GAPDH
+ENSG00000141510        812       790      1022       955    ← TP53
+ENSG00000136244        145       210         3         0    ← IL6
+...               (tens of thousands of rows)
+```
+
+-   Row names = gene IDs defined by the annotation (here Ensembl)
+-   Values = number of reads assigned to that gene. Integers, before normalization → not directly comparable between samples (🔗 W4)
 
 ::: {.callout-warning collapse="true"}
 ## What the count matrix has already decided for you
@@ -310,6 +371,13 @@ All invisible in the count matrix. But all of them can change your results subst
 
 -   Curated over two decades. GRCh38 stays the default largely because enormous datasets are already mapped to it
 -   **T2T-CHM13** (2022) — the first genuinely complete assembly: centromeres, acrocentric short arms, and other GRCh38 gaps. Adds \~200 Mb of previously unmapped sequence
+
+![The GRCh38 gaps that T2T-CHM13 filled. (A) Per-chromosome map — **black blocks = stretches that were missing or wrong in GRCh38 → filled by CHM13**; red = genes found only in CHM13. Above: yellow = centromeric satellites, blue = segmental duplications. (B) Sequence added per chromosome — dark bars = the acrocentric chromosomes (13, 14, 15, 21, 22). (C) Most of the added sequence = centromeric satellites (CenSat) and segmental duplications (SD). (D) Total sequence per release (excluding gaps) — creeping up for twenty years, then a jump with CHM13. Source: Nurk et al., Science 2022](/assets/img/w1/t2t_gaps_filled.webp){fig-align="center"}
+
+-   Why were they empty for so long → these regions = nearly identical sequence repeated over and over. A 150 bp read cannot tell where it belongs → solved only with [long reads](#w1-s2-1-3) of tens of kb to Mb
+
+![The CHM13 assembly graph. Single strands = sequence with only one possible order; tangles = repeats where the path branches many ways (centromeres, the rDNA-bearing acrocentric short arms, …). The tangles in the HiFi-read graph were resolved with ultra-long nanopore reads. Source: Nurk et al., Science 2022](/assets/img/w1/t2t_assembly_graph.webp){fig-align="center"}
+
 -   **Pangenome references** — a graph of many haplotypes rather than one linear sequence. Where the field is heading; not yet the default
 :::
 
@@ -439,7 +507,21 @@ Not all deposited data is usable. Check before committing a semester to a GEO ac
 
 > 🔑 **Core idea** — omics data = **large *p* (features), small *n* (samples)**: twenty thousand genes, twelve patients. Every intuition built on the opposite ratio breaks here
 
-## 1) What a p-value does and does not say {#w1-s4-1}
+## 1) Hypothesis testing and the p-value {#w1-s4-1}
+
+### ① Hypothesis testing: H₀, H₁, and the p-value {#w1-s4-1-1}
+
+Hypothesis testing = asking how unusual your data would be if there were no difference. Example: is this gene expressed differently in patients and controls?
+
+-   **H₀ (null hypothesis)** — no difference. Expression is the same in patients and controls
+-   **H₁ (alternative hypothesis)** — there is a difference. Expression differs
+-   **Test statistic** — the data summarized as one number (e.g. z, t). Usually near 0 if H₀ is true; the bigger the difference, the further from 0
+-   **p-value** — the area of the H₀ distribution at least as extreme as the observed value (red in the figure below)
+-   **Decision** — p \< α (usually 0.05) → reject H₀. p ≥ α → fail to reject (≠ H₀ is true)
+
+![The distribution of the test statistic if H₀ is true (a normal distribution). The area of both tails beyond the observed z = 2.2 = p-value ≈ 0.028 \< 0.05 → reject H₀](/assets/img/w1/pvalue_normal.png){fig-align="center"}
+
+### ② What a p-value does and does not say {#w1-s4-1-2}
 
 -   **Is** — the probability of data at least this extreme *if the null hypothesis were true*. That is all
 -   **Is not** — the probability that the null is true, the probability of replication, the effect size, or biological importance
@@ -649,6 +731,7 @@ If the honest answer is "not much" → you have just saved yourself a year, befo
 | Annotation | Where genes, exons, and elements sit on that system |
 | Reference bias | Systematic under-detection of anything unlike the reference |
 | Count matrix | Features × samples table of measurements |
+| H₀ / H₁ | Null hypothesis (no difference) / alternative hypothesis (a difference) |
 | p-value | Probability of data this extreme *if* the null were true — not the probability that the null is true |
 | FDR | Expected proportion of false positives among significant results |
 | Batch effect | Systematic technical variation between processing groups |

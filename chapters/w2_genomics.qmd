@@ -37,19 +37,23 @@ By the end of this chapter you should be able to:
 
 ## 1) Types of variation {#w2-s1-1}
 
-A typical human genome, compared to the reference (🔗 [W1 §2.3](w1_intro.qmd#w1-s2-3)):
+**One person's** genome, compared to the reference (🔗 [W1 §2.3](w1_intro.qmd#w1-s2-3)):
 
 -   **\~4–5 million** single nucleotide variants (SNVs) and short indels
 -   **\~20,000–25,000** structural variants (SVs)
 -   ⚠️ SVs are far fewer — but together they affect **more base pairs** than all SNVs combined → count and impact point in opposite directions, and this decides which technology you need
 
-![Classes of variation, drawn against the same reference sequence. The boundary between "indel" and "structural variant" is a convention — conventionally 50 bp — not a biological distinction.](/assets/img/w2/variant_types.png){fig-align="center"}
+💡 4–5 million is **per person**. Each person carries a different set (most of them rare, [§1.2](#w2-s1-2)) → the list grows as you add people: gnomAD (\~810,000 people) holds \~900 million SNVs and indels. This is also why a GWAS tests more than ten million variants — a **population-level** list built by imputation from a reference panel, minus the variants that are too rare or too poorly imputed (🔗 [§2.4](#w2-s2-4))
+
+![The classes of variation at a glance. Small variants and SVs are split by size (50 bp — a convention, not a biological boundary); tandem repeats are defined by sequence pattern, so their length change can be a few bp or many kb.](/assets/img/w2/variant_tree.png){fig-align="center"}
 
 ### ① SNVs and short indels {#w2-s1-1-1}
 
 -   **SNV** — one base changed
 -   **Indel** — a short insertion or deletion
 -   What most people mean by "a variant" → arrays, exomes and standard short-read pipelines detect them well
+
+![An SNV, an insertion and a deletion against the same reference sequence.](/assets/img/w2/small_variants.png){fig-align="center"}
 
 💡 **SNP** (*polymorphism*) = common variants; **SNV** = any single-base change, including somatic and rare ones. Usage is not consistent across the literature
 
@@ -58,6 +62,8 @@ A typical human genome, compared to the reference (🔗 [W1 §2.3](w1_intro.qmd#
 -   **SV** = anything larger than \~50 bp — deletions, duplications, insertions, inversions, translocations
 -   **CNV** (copy number variant) = the subset that changes dosage
 -   ⚠️ **Short reads detect SVs poorly** → the single strongest argument for long reads (🔗 [W1 §2.1③](w1_intro.qmd#w1-s2-1-3))
+
+![Five shapes of structural variant. Deletions and duplications change copy number (CNV); inversions and translocations leave it unchanged (balanced), so read depth alone cannot see them.](/assets/img/w2/sv_types.png){fig-align="center"}
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — why short reads miss SVs
@@ -70,8 +76,36 @@ A typical human genome, compared to the reference (🔗 [W1 §2.3](w1_intro.qmd#
 ### ③ Tandem repeats {#w2-s1-1-3}
 
 -   Short sequences repeated head-to-tail; the number of copies varies between individuals
+-   Classed by unit length: **STR** (short tandem repeat, microsatellite) = 1–6 bp / **VNTR** (minisatellite) = 7 bp or more
 -   Expansions cause Huntington disease, fragile X, and a growing list of neurological disorders
 -   ⚠️ Almost invisible to standard short-read pipelines → their contribution to common disease is only now being assessed systematically
+
+![Top: when the repeat is longer than a read, the read is trapped inside it — neither its origin nor the number of units can be told. Bottom: repeat lengths of real disease alleles against the length of one short read. Dedicated tools (e.g. ExpansionHunter) estimate the length from these read patterns; long reads measure it directly.](/assets/img/w2/tandem_repeat.png){fig-align="center"}
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 Going further — kinds of repeat: how do STRs, LINEs, SINEs and transposons differ?
+
+About half of the human genome is repetitive. The first thing to ask = **how the copies are arranged**
+
+-   **Tandem repeats** — copies **side by side** at one place. Polymerase slips during replication, so the number of copies changes easily → lengths differ between people (③ above)
+-   **Interspersed repeats** — copies of a similar sequence **scattered across** the genome → mostly the trace of **transposons** (transposable elements) copying themselves
+
+| Arrangement | Kind | Features | Share of genome |
+|----------------|----------------|--------------------------------|----------------|
+| Tandem | STR · VNTR | 1–6 bp / ≥7 bp units. The repeat expansions that cause disease | \~3% |
+| Tandem | Satellite DNA | Mb-scale arrays at centromeres and elsewhere (e.g. α-satellite, 171 bp unit). Fully resolved only by T2T (🔗 [W1 §2.3①](w1_intro.qmd#w1-s2-3-1)) | \~6% |
+| Interspersed | **LINE** (mostly L1) | Retrotransposon. \~6 kb; makes its own reverse transcriptase | \~20% |
+| Interspersed | **SINE** (mostly Alu) | Retrotransposon. \~300 bp; cannot move alone, borrows L1's enzymes | \~13% |
+| Interspersed | **LTR / ERV** | Retrotransposon. Traces of ancient retroviruses that entered the germline | \~8% |
+| Interspersed | DNA transposon | Cut and paste. All inactive in humans | \~3% |
+
+-   **Transposons are classed by how they move**: **retrotransposons** = transcribed to RNA → reverse-transcribed → inserted at a new site (copy and paste: the original stays, so copies keep accumulating) / **DNA transposons** = cut out and moved (cut and paste)
+-   **LINEs and SINEs** are kinds of retrotransposon. The names say it — *Long/Short INterspersed Nuclear Element* = "scattered" repeats → arranged differently from STRs in the first place
+-   Most are fossils, too mutated to move. **Still active** = L1 (\~80–100 copies per person), Alu, SVA (a SINE–VNTR–Alu composite)
+    -   A new copy = a **mobile element insertion (MEI)** → one kind of structural variant (②). A person carries \~900 Alu, \~130 L1 and \~50 SVA insertions that are not in the reference
+    -   Still happening: a new Alu insertion in about 1 in 40 births, L1 and SVA in about 1 in 63
+-   ⚠️ Why it matters for analysis: hundreds of thousands of near-identical copies → a short read cannot be assigned to one of them → MAPQ ≈ 0 (🔗 [W1 §2.2②](w1_intro.qmd#w1-s2-2-2)) → the "where accuracy falls sharply" of [§2.3](#w2-s2-3)
+:::
 
 ::: {.callout-warning collapse="true"}
 ## Every technology has a blind spot
@@ -93,7 +127,7 @@ A negative exome result says nothing about:
 
 ![Allelic architecture. The three labelled regions require completely different study designs; a study designed for one is nearly blind to the others.](/assets/img/w2/allelic_architecture.png){fig-align="center"}
 
-💡 **Reference resource** — [gnomAD](https://gnomad.broadinstitute.org/): allele frequencies from hundreds of thousands of exomes and tens of thousands of genomes, by ancestry → "is this variant rare?" always needs *in which population*
+💡 **Reference resource** — the standard is [gnomAD](https://gnomad.broadinstitute.org/): allele frequencies from \~810,000 people (730,000 exomes + 76,000 genomes), by ancestry → "is this variant rare?" always needs *in which population*. For Korean frequencies: KRGDB, Korea4K and others (Going further below)
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — why the inverse relation is no accident, and a history of the field
@@ -103,6 +137,29 @@ A negative exome result says nothing about:
     -   **1980s–90s** family linkage studies → the top-left corner (Mendelian disease)
     -   **2007 onwards** GWAS → the bottom-right (common variants, tiny effects)
     -   **The middle** → needed dense imputation *and* biobank-scale samples; still being filled in
+:::
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 Going further — frequency databases vs. imputation reference panels
+
+Both start from sequenced genomes. The difference = **what is released**
+
+-   **Frequency database** — only a **summary** per variant ("what % carry it") → judging rarity, interpreting clinical variants
+-   **Imputation reference panel** — every person's **phased haplotypes** (which alleles sit together on one chromosome) → only then can the pattern at the sites an array measured be used to fill in the rest (🔗 [§2.4](#w2-s2-4))
+-   → gnomAD itself releases only summary frequencies → it cannot serve as an imputation panel. Some resources, such as 1000 Genomes and TOPMed, provide both
+
+| Resource | Size | Main use | Note |
+|----------------|--------------------------|----------------|--------------------------|
+| [gnomAD](https://gnomad.broadinstitute.org/) v4 | \~810,000 people, \~900 million SNVs and indels | Frequencies | Largest; by ancestry |
+| [dbSNP](https://www.ncbi.nlm.nih.gov/snp/) | Over a billion variants | Variant IDs (rsIDs) | Less a frequency database than a registry of variants |
+| [1000 Genomes](https://www.internationalgenome.org/) | 2,504 people, 26 populations (3,202 resequenced at high coverage) | Frequencies + reference panel | The first global map of diversity |
+| HRC | \~32,000 people | Reference panel | Mostly European |
+| TOPMed | \~97,000 genomes, \~300 million variants | Reference panel (+ BRAVO frequency browser) | ⚠️ only \~1,200 East Asians |
+| KRGDB | 1,722 Korean genomes | Frequencies | Korea National Institute of Health |
+| Korea4K | 4,157 Korean genomes | Frequencies | With health check-up phenotypes |
+| NARD | 1,779 Northeast Asians (850 Korean) | Reference panel | Used together with 1000 Genomes |
+
+⚠️ Imputing Korean samples → whether the panel's **ancestry matches** matters more than its size (🔗 "Imputation quality is not uniform" in [§2.4](#w2-s2-4))
 :::
 
 ## 3) Germline vs. somatic {#w2-s1-3}
@@ -127,37 +184,132 @@ A negative exome result says nothing about:
 -   → hence the depth and the matched normal
 :::
 
+::: {.callout-note collapse="true" icon=false}
+## 🔍 Going further — "half the genome is viral"? Is every cell's genome the same?
+
+**"Half viral" is an overstatement**
+
+-   \~45% of the genome derives from transposons (table in [§1.1③ Going further](#w2-s1-1-3)). Of that, retrovirus-derived sequence (ERVs) = **\~8%**. LINEs and SINEs also spread by reverse transcription, but they are not viruses
+-   All of them entered an ancestor's **germ cells** millions to tens of millions of years ago and have been inherited ever since → **germline**: present at the same place in every cell, and in the reference sequence too → not something that differs between cells
+
+**So is every cell's genome identical? → Almost. Strictly, each cell differs a little (somatic mosaicism)**
+
+-   Cell division and DNA damage → each cell gains somatic mutations every year (stem cells of colon, small intestine and liver: \~40 per year)
+-   Some L1s also move in somatic cells → common in some cancers
+-   B and T cells rearrange their antibody and T-cell receptor genes **on purpose** (V(D)J recombination) → each clone has a different genome
+-   Scale: two people differ at 4–5 million sites; two cells of one person differ at hundreds to thousands → "every cell has the same genome" is a very good approximation
+
+**Then why don't they show up when blood DNA is sequenced?**
+
+-   A somatic variant sits in one cell (or a small clone) → mix DNA from millions of cells and its allele fraction ≈ 0 → only germline variants appear, at 0.5 or 1.0
+-   Only a clone that has expanded a lot becomes visible: **tumours**, **clonal hematopoiesis** (blood-cell clones expanding with age; \~10% of people over 70) → can be mistaken for germline variants in biobank WGS from blood
+:::
+
 ------------------------------------------------------------------------
 
-# 2. From Reads to Variants 🔬 {#w2-s2}
+# 2. From Raw Data to Variants 🔬 {#w2-s2}
 
-> 🔑 **Core idea** — a variant list (VCF) is not a list of facts but a list of **inferences** from reads, each with its own confidence. Which variants you can see at all depends on the platform
+> 🔑 **Core idea** — a variant list (VCF) is not a list of facts but a list of **inferences** from reads or fluorescence signals, each with its own confidence. Which variants you can see at all depends on the platform
 
-## 1) The conceptual pipeline {#w2-s2-1}
+## 1) Choosing a platform {#w2-s2-1}
 
-```
-FASTQ  →  align to reference  →  BAM
-       →  call variants per sample
-       →  joint genotyping across the cohort
-       →  quality filtering
-       →  VCF
-```
+There are two routes to variant data — **sequencing** (WGS, WES → reads) vs. **genotyping arrays** (→ fluorescence signals, no reads)
 
+-   **WGS** (whole genome sequencing) — sequences the whole genome
+-   **WES** (whole exome sequencing) — capture probes pull out the exons, which are then sequenced
+-   **SNP array** — DNA is hybridized to a chip carrying probes for pre-selected sites, and genotypes are read from fluorescence
+
+|   | WGS | WES | Array |
+|------------------|------------------|------------------|------------------|
+| Raw data | FASTQ (reads) | FASTQ (reads) | IDAT (fluorescence intensities) |
+| Genome covered | \~100% | \~1–2% (coding) | \~0.02% (selected sites) |
+| Detects novel variants | ✅ | ✅ (coding only) | ❌ |
+| Rare variants | ✅ | ✅ (coding only) | ⚠️ unreliable when very rare ([§2.2②](#w2-s2-2-2)) |
+| Structural variants | Partially (well with long reads) | Poorly | Large CNVs only |
+| Non-coding regulatory variants | ✅ | ❌ | Via imputation only |
+| Relative cost per sample | High | Medium | Very low |
+| Typical use | Deep characterization, rare disease, SVs | Rare disease, clinical panels | GWAS, biobanks |
+
+![The same locus, three technologies. Coverage patterns are schematic but the qualitative differences are real.](/assets/img/w2/platform_comparison.png){fig-align="center"}
+
+::: {.callout-tip collapse="true"}
+## Why arrays still dominate GWAS
+
+An array measures only pre-selected sites → cannot discover anything new. Still the workhorse of population genetics:
+
+-   GWAS needs **hundreds of thousands of samples** far more than it needs complete genomes
+-   The sites an array misses can be recovered statistically
+
+→ which is the imputation of [§2.4](#w2-s2-4)
+:::
+
+## 2) Pipelines: from raw data to a VCF {#w2-s2-2}
+
+-   The platforms start from different raw data → different pipelines: sequencing starts from **reads** (FASTQ), arrays from **fluorescence intensities** (IDAT)
+-   They end in the same place = a table of genotypes for every sample at every site (VCF) → downstream analysis (GWAS etc.) no longer cares which one produced it
+
+![The two pipelines. Left = sequencing (GATK Best Practices), right = array. Pills on the right = the file format a step produces (🔗 [W1 §2.2](w1_intro.qmd#w1-s2-2)).](/assets/img/w2/pipelines.png){fig-align="center"}
+
+### ① WGS/WES — GATK Best Practices {#w2-s2-2-1}
+
+-   The standard order set out by the Broad Institute's **GATK**: align → clean up the reads → call per sample → joint genotyping across the cohort → filter
 -   **Joint calling** — analyses all samples together rather than one at a time
 -   **Filtering** — callers produce far more candidates than are real → this is where most of the judgement lives
 -   ⚠️ Different filter settings → meaningfully different variant sets from identical data
+-   WES = the same pipeline, restricted to the capture regions (a BED file)
 
 ::: {.callout-note collapse="true" icon=false}
-## 🔍 Going further — what joint calling and filtering decide
+## 🔍 Going further — the GATK pipeline step by step
 
--   **Joint calling** distinguishes "homozygous reference here" from "no coverage here" → a distinction invisible in a single-sample VCF (🔗 [W1 §2.2③](w1_intro.qmd#w1-s2-2-3))
--   **Filtering criteria** — coverage, strand balance, mapping quality, position within the read
+| Step | Tool | What it does | Why it is needed |
+|----------------|----------------|--------------------------|--------------------------|
+| Alignment | BWA-MEM → sort | Places each read at its position on the reference | The coordinates for everything after |
+| Mark duplicates | MarkDuplicates | Flags reads that are PCR copies of the same DNA fragment | Counting copies as independent evidence inflates confidence |
+| Base quality recalibration | BaseRecalibrator → ApplyBQSR | Corrects systematic errors in the machine's quality scores (learned away from known variant sites) | The caller uses quality scores directly as error probabilities |
+| Per-sample calling | HaplotypeCaller (GVCF mode) | Reassembles haplotypes where a variant is suspected and computes genotype probabilities. Also records variant-free stretches as "reference here, with confidence X" → gVCF | Fewer false indels from misalignment |
+| Joint genotyping | GenomicsDBImport → GenotypeGVCFs | Pools every sample's gVCF and decides genotypes in one pass | A weak signal in one sample is judged together with evidence from the others; separates "homozygous reference" from "no coverage" (🔗 [W1 §2.2③](w1_intro.qmd#w1-s2-2-3)) |
+| Filtering | VQSR or hard filters | **VQSR** = scores calls with a model trained on validated variant sets (many samples) / **Hard filters** = a fixed cut-off per metric (few samples) | Removes the false candidates |
+
+-   **Filtering metrics** — coverage, strand balance, mapping quality, position within the read. E.g. SNP hard filters remove calls with QD < 2, FS > 60 or MQ < 40
+-   **Other callers** — DeepVariant (reads the read pileup as an image and calls with deep learning), DRAGEN (hardware-accelerated, common in clinical labs) → results differ slightly even from the same BAM
+-   **Sample QC** is needed too — contamination, mismatch with recorded sex, relatives and duplicate samples
+-   **Tumours** — a separate pipeline from germline calling: Mutect2 compares tumour–normal pairs (🔗 [§1.3](#w2-s1-3))
 :::
 
-## 2) ⚠️ Variant calls are probabilities {#w2-s2-2}
+### ② SNP arrays {#w2-s2-2-2}
+
+-   **No reads** → no alignment and no read-based variant calling. Each probe on the chip reports the fluorescence of the two alleles, and the genotype is read from that pattern
+-   **Genotype calling** — pool the same SNP across thousands of people and it falls into three clusters, AA · AB · BB → each person is called by the cluster they fall in
+-   Then **QC** (removing samples and variants) → match the reference panel → **phasing** → fill in unmeasured sites by **imputation** ([§2.4](#w2-s2-4))
+-   ⚠️ Without enough carriers to form a cluster, the call itself is unstable → array results for **very rare variants** cannot be taken at face value
+
+![Array genotype calling. Left: a common SNP forms three clear clusters. Right: with one carrier in 1,000 there is no cluster to compare with → a real carrier and noise are hard to tell apart. In UK Biobank, only 16% of array heterozygous calls for variants rarer than 0.001% were confirmed by sequencing (Weedon et al. 2021).](/assets/img/w2/array_clusters.png){fig-align="center"}
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 Going further — array QC and preparing for imputation
+
+| Applies to | Check | Common threshold | What it removes |
+|----------------|----------------|----------------|--------------------------|
+| Samples | Call rate | Remove below 97–98% | Poor-quality DNA |
+| Samples | Sex check | X-chromosome heterozygosity vs. recorded sex | Sample swaps |
+| Samples | Heterozygosity | Remove beyond mean ± 3 SD | Contamination (too high), inbreeding (too low) |
+| Samples | Relatedness, duplicates | Kinship estimates (KING, PLINK) | Duplicate samples, relatives |
+| Samples | Ancestry | Genotype PCA ([§3.2](#w2-s3-2)) | Outliers |
+| Variants | Call rate | Remove below 95–98% | Probes that hybridize poorly |
+| Variants | HWE | Commonly remove p < 10⁻⁶ in controls | Genotype-calling errors |
+| Variants | MAF | Commonly remove below 1% | Unstable rare-variant calls |
+
+-   **Matching the reference panel** — strand (+/−), genome build (GRCh37 vs. GRCh38) and allele order are made consistent with the panel. A/T and C/G SNPs cannot be strand-resolved and are often dropped
+-   **Phasing** — separates each person's two chromosomes (which alleles sit together on one chromosome) → the input to imputation
+-   **Tools** — PLINK for QC, SHAPEIT or Eagle for phasing, Minimac or Beagle for imputation; often run on the Michigan or TOPMed imputation servers
+-   The intensities themselves (B allele frequency, Log R ratio) also reveal **large CNVs** → the "large CNVs only" in the table above
+:::
+
+## 3) ⚠️ Variant calls are probabilities {#w2-s2-3}
 
 -   A VCF looks like a list of facts → it is a list of **inferences**, each with a confidence
 -   The confidence varies enormously across the genome: ✅ high in unique, well-covered sequence / ⚠️ falls sharply in repetitive and hard-to-read regions
+-   Arrays too: every genotype has a calling score, and imputed genotypes are probabilities (dosages)
 -   → "Accuracy" is not one number. **It is a map**
 
 ::: {.callout-warning collapse="true"}
@@ -169,38 +321,6 @@ FASTQ  →  align to reference  →  BAM
 -   Highly polymorphic loci such as HLA — reads from divergent haplotypes align badly
 
 → Benchmarking resources such as [Genome in a Bottle](https://www.nist.gov/programs-projects/genome-bottle) exist precisely because "accuracy" is not one number
-:::
-
-## 3) Choosing a platform {#w2-s2-3}
-
--   **WGS** (whole genome) — \~100% of the genome; finds new variants anywhere, including non-coding; highest cost
--   **WES** (whole exome) — the coding part only (\~1–2%); medium cost → rare disease, clinical panels
--   **Array** — pre-selected sites only (\~0.02%); cannot find new variants; very cheap → GWAS, biobanks
-
-![The same locus, three technologies. Coverage patterns are schematic but the qualitative differences are real.](/assets/img/w2/platform_comparison.png){fig-align="center"}
-
-::: {.callout-note collapse="true" icon=false}
-## 🔍 Going further — WGS vs. WES vs. array in detail
-
-|   | WGS | WES | Array |
-|------------------|------------------|------------------|------------------|
-| Genome covered | \~100% | \~1–2% (coding) | \~0.02% (selected sites) |
-| Detects novel variants | ✅ | ✅ (coding only) | ❌ |
-| Structural variants | Partially (well with long reads) | Poorly | Large CNVs only |
-| Non-coding regulatory variants | ✅ | ❌ | Via imputation only |
-| Relative cost per sample | High | Medium | Very low |
-| Typical use | Deep characterization, rare disease, SVs | Rare disease, clinical panels | GWAS, biobanks |
-:::
-
-::: {.callout-tip collapse="true"}
-## Why arrays still dominate GWAS
-
-An array measures only pre-selected sites → cannot discover anything new. Still the workhorse of population genetics:
-
--   GWAS needs **hundreds of thousands of samples** far more than it needs complete genomes
--   The sites an array misses can be recovered statistically
-
-→ which brings us to imputation
 :::
 
 ## 4) Imputation {#w2-s2-4}
@@ -665,9 +785,14 @@ Cancer is a **somatic** genetic disease → different questions:
 
 ### Variation and variant calling
 
-[gnomAD browser](https://gnomad.broadinstitute.org/) · [Genome in a Bottle](https://www.nist.gov/programs-projects/genome-bottle)\
+[gnomAD browser](https://gnomad.broadinstitute.org/) · [Genome in a Bottle](https://www.nist.gov/programs-projects/genome-bottle) · [GATK](https://gatk.broadinstitute.org/)\
 1000 Genomes Project Consortium. [*A global reference for human genetic variation.*](https://doi.org/10.1038/nature15393) Nature. 2015.\
-Collins RL, et al. [*A structural variation reference for medical and population genetics.*](https://pubmed.ncbi.nlm.nih.gov/?term=A+structural+variation+reference+for+medical+and+population+genetics) Nature. 2020.
+Collins RL, et al. [*A structural variation reference for medical and population genetics.*](https://pubmed.ncbi.nlm.nih.gov/?term=A+structural+variation+reference+for+medical+and+population+genetics) Nature. 2020.\
+Taliun D, et al. [*Sequencing of 53,831 diverse genomes from the NHLBI TOPMed Program.*](https://pubmed.ncbi.nlm.nih.gov/?term=Sequencing+of+53%2C831+diverse+genomes+from+the+NHLBI+TOPMed+Program) Nature. 2021.\
+Feusier J, et al. [*Pedigree-based estimation of human mobile element retrotransposition rates.*](https://pubmed.ncbi.nlm.nih.gov/?term=Pedigree-based+estimation+of+human+mobile+element+retrotransposition+rates) Genome Res. 2019.\
+Blokzijl F, et al. [*Tissue-specific mutation accumulation in human adult stem cells during life.*](https://doi.org/10.1038/nature19768) Nature. 2016.\
+Anderson CA, et al. [*Data quality control in genetic case-control association studies.*](https://pubmed.ncbi.nlm.nih.gov/?term=Data+quality+control+in+genetic+case-control+association+studies) Nat Protoc. 2010.\
+Weedon MN, et al. [*Use of SNP chips to detect rare pathogenic variants: retrospective, population based diagnostic evaluation.*](https://pubmed.ncbi.nlm.nih.gov/?term=Use+of+SNP+chips+to+detect+rare+pathogenic+variants) BMJ. 2021.
 
 ### GWAS
 

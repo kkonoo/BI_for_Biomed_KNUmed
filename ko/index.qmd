@@ -66,7 +66,7 @@ editor: visual
 > **두 사람은 약 400만–500만 위치에서 다름. 어떤 차이가 질병을 일으키나?**
 
 1.  인간 유전 변이 🧬 — SNV, SV, 반복서열, 대립유전자 빈도와 allelic architecture
-2.  리드에서 변이까지 🔬 — 추론으로서의 variant calling, WGS·WES·array, imputation
+2.  원시 데이터에서 변이까지 🔬 — WGS·WES·array 비교, GATK·array 파이프라인, 추론으로서의 variant calling, imputation
 3.  전장유전체연관분석(GWAS) 📈 — 집단 구조, 연관성 검정, Manhattan·QQ plot, 5×10⁻⁸, 연관불평형
 4.  연관성에서 기능으로 🔎 — fine-mapping, credible set, eQTL, colocalization, TWAS
 5.  유전력과 예측 🧮 — SNP heritability, polygenicity, polygenic risk score

@@ -37,19 +37,23 @@ execute:
 
 ## 1) 변이의 종류 {#w2-s1-1}
 
-일반적인 인간 유전체를 참조서열과 비교하면(🔗 [W1 §2.3](w1_intro.qmd#w1-s2-3)):
+**한 사람**의 유전체를 참조서열과 비교하면(🔗 [W1 §2.3](w1_intro.qmd#w1-s2-3)):
 
 -   **약 400만–500만 개**의 단일염기변이(SNV)와 짧은 indel
 -   **약 20,000–25,000개**의 구조 변이(structural variant, SV)
 -   ⚠️ 구조 변이는 개수가 훨씬 적지만, 영향을 주는 **전체 염기 수**는 모든 SNV의 합보다 많음 → 개수와 영향이 반대 방향, 이 차이가 필요한 기술을 결정
 
-![같은 참조서열 위에 여러 변이 유형을 표시. Indel과 구조 변이의 경계(50 bp) = 생물학적 구분이 아니라 관례](/assets/img/w2/variant_types.png){fig-align="center"}
+💡 400만–500만 = **한 사람** 기준. 사람마다 가진 변이가 서로 다름(대부분 희귀, [§1.2](#w2-s1-2)) → 사람을 모을수록 목록이 커짐: gnomAD(약 81만 명)에 모인 SNV·indel = 약 9억 개. GWAS가 천만 개 넘는 변이를 검정하는 것도 이 때문 — 참조 패널로 imputation한 **집단 수준** 목록에서 너무 희귀하거나 품질이 낮은 변이를 거른 결과(🔗 [§2.4](#w2-s2-4))
+
+![변이 종류 한눈에 보기. Small variant와 구조 변이는 크기(50 bp — 생물학적 구분이 아니라 관례)로 나누고, tandem repeat은 서열 모양으로 정의 → 길이 변화가 몇 bp일 수도 수 kb일 수도 있음](/assets/img/w2/variant_tree.png){fig-align="center"}
 
 ### ① SNV와 짧은 indel {#w2-s1-1-1}
 
 -   **SNV** — 염기 하나가 바뀐 변이
 -   **Indel** — 짧은 삽입 또는 결실
 -   보통 "변이"라고 하면 이것 → array·exome·표준 short-read 파이프라인이 잘 검출
+
+![같은 참조서열 위의 SNV·삽입·결실](/assets/img/w2/small_variants.png){fig-align="center"}
 
 💡 용어: **SNP**(*polymorphism*) = 주로 흔한 변이, **SNV** = 체세포·희귀 변이를 포함한 모든 단일염기 변화. 문헌에서 일관되게 구분하지는 않음
 
@@ -58,6 +62,8 @@ execute:
 -   **구조 변이(SV)** = 약 50 bp보다 큰 변이 — 결실, 중복, 삽입, 역위, 전좌
 -   **CNV**(copy number variant) = 그중 copy number, 즉 용량을 바꾸는 변이
 -   ⚠️ **Short read는 구조 변이를 잘 검출 x** → long read가 필요한 가장 강력한 이유(🔗 [W1 §2.1③](w1_intro.qmd#w1-s2-1-3))
+
+![구조 변이의 다섯 가지 형태. 결실·중복 = copy number가 변함(CNV). 역위·전좌 = copy number는 그대로(balanced) → read depth만으로는 안 보임](/assets/img/w2/sv_types.png){fig-align="center"}
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 더 알아보기 — short read가 구조 변이를 놓치는 이유
@@ -70,8 +76,36 @@ execute:
 ### ③ Tandem repeat {#w2-s1-1-3}
 
 -   짧은 서열이 머리에서 꼬리 방향으로 반복, 사람마다 copy number가 다름
+-   반복 단위 길이로 구분: **STR**(short tandem repeat, microsatellite) = 1–6 bp / **VNTR**(minisatellite) = 7 bp 이상
 -   반복서열 확장 → Huntington disease, fragile X, 점점 늘어나는 신경계 질환의 원인
 -   ⚠️ 표준 short-read 파이프라인에서는 거의 안 보임 → 흔한 질병에 대한 기여도 이제야 체계적으로 평가되는 중
+
+![(위) 반복 구간이 리드보다 길면 리드가 반복 안에 갇힘 → 어디서 왔는지도, 반복이 몇 번인지도 알 수 없음. (아래) 실제 질환 allele의 반복 길이 vs. short read 하나의 길이. 전용 도구(ExpansionHunter 등)는 이런 리드 패턴으로 길이를 추정, long read는 직접 측정](/assets/img/w2/tandem_repeat.png){fig-align="center"}
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 더 알아보기 — 반복서열의 종류: STR, LINE, SINE, transposon은 어떻게 다른가
+
+인간 유전체의 약 절반 = 반복서열. 가장 먼저 볼 것 = **어떻게 놓여 있나**
+
+-   **Tandem repeat** — 한 자리에 **나란히** 반복. 복제 중 polymerase가 미끄러지며(slippage) 반복 수가 쉽게 변함 → 사람마다 길이가 다름(위의 ③)
+-   **Interspersed repeat** — 비슷한 서열의 복사본이 유전체 **곳곳에 흩어져** 있음 → 대부분 **transposon**(전이인자)이 스스로를 복사해 퍼뜨린 흔적
+
+| 배치 | 종류 | 특징 | 유전체 비율 |
+|----------------|----------------|--------------------------------|----------------|
+| Tandem | STR·VNTR | 단위 1–6 bp / 7 bp 이상. 질환을 일으키는 반복 확장 | 약 3% |
+| Tandem | Satellite DNA | Centromere 등에 Mb 단위로 배열(예: α-satellite, 171 bp 단위). T2T에서야 완전히 해독(🔗 [W1 §2.3①](w1_intro.qmd#w1-s2-3-1)) | 약 6% |
+| Interspersed | **LINE** (대부분 L1) | Retrotransposon. 약 6 kb, 역전사효소를 스스로 만듦 | 약 20% |
+| Interspersed | **SINE** (대부분 Alu) | Retrotransposon. 약 300 bp, 스스로는 못 움직이고 L1의 효소를 빌려 씀 | 약 13% |
+| Interspersed | **LTR / ERV** | Retrotransposon. 고대 레트로바이러스가 생식세포에 끼어든 흔적 | 약 8% |
+| Interspersed | DNA transposon | Cut & paste 방식. 사람에서는 모두 멈춤 | 약 3% |
+
+-   **Transposon은 이동 방식으로 나뉨**: **retrotransposon** = RNA로 전사 → 역전사 → 새 위치에 삽입(copy & paste: 원본이 남으니 복사본이 계속 늘어남) / **DNA transposon** = 잘라서 옮김(cut & paste)
+-   **LINE·SINE** = retrotransposon의 하위 종류. 이름 자체가 *Long/Short INterspersed Nuclear Element* = "흩어진" 반복 → STR과는 배치부터 다름
+-   대부분은 돌연변이가 쌓여 더는 못 움직이는 화석. **아직 움직이는 것** = L1(한 사람당 약 80–100개), Alu, SVA(SINE–VNTR–Alu 복합체)
+    -   새로 끼어든 복사본 = **mobile element insertion(MEI)** → 구조 변이(②)의 한 종류. 한 사람이 참조서열에 없는 Alu 약 900개, L1 약 130개, SVA 약 50개를 가짐
+    -   지금도 생기는 중: 새 Alu 삽입 약 40명 출생당 1회, L1·SVA 약 63명당 1회
+-   ⚠️ 분석에서 중요한 이유: 거의 같은 복사본이 수십만 개 → short read가 어느 복사본에서 왔는지 결정 x → MAPQ ≈ 0(🔗 [W1 §2.2②](w1_intro.qmd#w1-s2-2-2)) → [§2.3](#w2-s2-3)의 "정확도가 급격히 떨어지는 곳"
+:::
 
 ::: {.callout-warning collapse="true"}
 ## 모든 기술에는 사각지대가 있음
@@ -93,7 +127,7 @@ Exome 결과가 음성이어도 다음 변이에 대해서는 아무것도 말�
 
 ![Allelic architecture. 표시된 세 영역 = 완전히 다른 연구 설계 필요. 한 영역용으로 만든 연구는 다른 영역을 거의 못 봄](/assets/img/w2/allelic_architecture.png){fig-align="center"}
 
-💡 **참조 자료** — [gnomAD](https://gnomad.broadinstitute.org/): 수십만 exome과 수만 genome의 대립유전자 빈도를 ancestry별로 제공 → "이 변이가 희귀한가?"에는 반드시 *어느 집단에서*인지가 따라야 함
+💡 **참조 자료** — 대표는 [gnomAD](https://gnomad.broadinstitute.org/): 약 81만 명(exome 73만 + genome 7.6만)의 대립유전자 빈도를 ancestry별로 제공 → "이 변이가 희귀한가?"에는 반드시 *어느 집단에서*인지가 따라야 함. 한국인 빈도는 KRGDB, Korea4K 등(아래 더 알아보기)
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 더 알아보기 — 역관계가 우연이 아닌 이유, 그리고 분야의 역사
@@ -103,6 +137,29 @@ Exome 결과가 음성이어도 다음 변이에 대해서는 아무것도 말�
     -   **1980–1990년대** 가족 linkage 연구 → 왼쪽 위(Mendelian disease)
     -   **2007년 이후** GWAS → 오른쪽 아래(흔한 변이, 매우 작은 효과)
     -   **가운데 영역** → 촘촘한 imputation과 biobank 규모 표본이 모두 필요했음, 아직 채워지는 중
+:::
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 더 알아보기 — 빈도 데이터베이스 vs. imputation 참조 패널
+
+둘 다 시퀀싱한 유전체에서 출발. 차이 = **무엇을 공개하나**
+
+-   **빈도 DB** — 변이마다 "몇 %가 가졌나"라는 **요약값**만 → 희귀성 판정, 임상 변이 해석
+-   **Imputation 참조 패널** — 사람별 **phased haplotype**(한 염색체 위에 어떤 allele들이 함께 놓여 있나) 전체 → 그래야 array가 측정한 위치의 패턴을 보고 나머지를 채울 수 있음(🔗 [§2.4](#w2-s2-4))
+-   → gnomAD 본체는 요약 빈도만 공개 → imputation 패널로는 못 씀. 1000 Genomes·TOPMed처럼 둘 다 제공하는 자원도 있음
+
+| 자원 | 규모 | 주 용도 | 비고 |
+|----------------|--------------------------|----------------|--------------------------|
+| [gnomAD](https://gnomad.broadinstitute.org/) v4 | 약 81만 명, SNV·indel 약 9억 개 | 빈도 | 가장 큼, ancestry별 |
+| [dbSNP](https://www.ncbi.nlm.nih.gov/snp/) | 변이 10억 개 이상 | 변이 ID(rsID) 목록 | 빈도 DB라기보다 변이의 "주민등록부" |
+| [1000 Genomes](https://www.internationalgenome.org/) | 2,504명, 26개 집단(고심도 재시퀀싱 3,202명) | 빈도 + 참조 패널 | 첫 전 세계 다양성 지도 |
+| HRC | 약 3.2만 명 | 참조 패널 | 대부분 유럽계 |
+| TOPMed | 약 9.7만 명 genome, 변이 약 3억 개 | 참조 패널(+ BRAVO 빈도 browser) | ⚠️ 동아시아인은 약 1,200명뿐 |
+| KRGDB | 한국인 1,722명 WGS | 빈도 | 국립보건연구원 |
+| Korea4K | 한국인 4,157명 WGS | 빈도 | 건강검진 표현형 동반 |
+| NARD | 동북아시아인 1,779명(한국인 850명) | 참조 패널 | 1000 Genomes와 합쳐 사용 |
+
+⚠️ 한국인 시료를 imputation할 때 → 패널 크기보다 **ancestry가 맞는지**가 중요(🔗 [§2.4](#w2-s2-4)의 "Imputation 품질은 균일하지 않음")
 :::
 
 ## 3) Germline과 somatic {#w2-s1-3}
@@ -127,37 +184,132 @@ Exome 결과가 음성이어도 다음 변이에 대해서는 아무것도 말�
 -   → 그래서 높은 depth와 matched normal이 필요
 :::
 
+::: {.callout-note collapse="true" icon=false}
+## 🔍 더 알아보기 — "유전체의 절반이 바이러스"? 모든 세포의 유전체는 같은가
+
+**"절반이 바이러스"는 과장**
+
+-   유전체의 약 45% = transposon 유래([§1.1③ 더 알아보기](#w2-s1-1-3)의 표). 그중 레트로바이러스 유래(ERV) = **약 8%**. LINE·SINE도 역전사로 퍼지지만 바이러스는 아님
+-   모두 수백만–수천만 년 전 조상의 **생식세포**에 끼어들어 대대로 유전 → **germline**: 모든 세포의 같은 위치에 있고 참조서열에도 들어 있음 → 세포마다 다른 것 x
+
+**그럼 모든 세포의 유전체는 똑같나 → 거의. 엄밀히는 세포마다 조금씩 다름(somatic mosaicism)**
+
+-   세포 분열·DNA 손상 → 세포마다 매년 수십 개씩 somatic 변이가 쌓임(대장·소장·간 줄기세포: 연 약 40개)
+-   일부 L1은 체세포에서도 움직임 → 특히 일부 암에서 흔함
+-   B·T세포 = 항체·T세포 수용체 유전자를 V(D)J recombination으로 **일부러** 재배열 → clone마다 유전체가 다름
+-   규모 비교: 두 사람 사이 400만–500만 위치 vs. 한 사람의 두 세포 사이 수백–수천 위치 → "모든 세포의 유전체는 같다" = 아주 좋은 근사
+
+**그런데 왜 혈액 DNA 시퀀싱에서는 안 보이나**
+
+-   Somatic 변이 하나 = 세포 하나(또는 작은 clone)에만 있음 → 수백만 세포의 DNA를 섞으면 allele fraction ≈ 0 → germline만 0.5 또는 1.0으로 보임
+-   한 clone이 크게 불어나야 보임: **종양**, **clonal hematopoiesis**(나이 들며 혈액세포 일부 clone이 확장, 70세 이상의 약 10%) → biobank 혈액 WGS에서 germline 변이로 오인될 수 있음
+:::
+
 ------------------------------------------------------------------------
 
-# 2. 리드에서 변이까지 🔬 {#w2-s2}
+# 2. 원시 데이터에서 변이까지 🔬 {#w2-s2}
 
-> 🔑 **핵심** — 변이 목록(VCF) = 사실의 목록 x. 리드에서 얻은 **추론의 목록**, 각각 신뢰도가 다름. 어떤 변이를 볼 수 있는지부터 플랫폼이 정함
+> 🔑 **핵심** — 변이 목록(VCF) = 사실의 목록 x. 리드나 형광 신호에서 얻은 **추론의 목록**, 각각 신뢰도가 다름. 어떤 변이를 볼 수 있는지부터 플랫폼이 정함
 
-## 1) 개념적 파이프라인 {#w2-s2-1}
+## 1) 플랫폼 선택 {#w2-s2-1}
 
-```
-FASTQ  →  참조서열에 정렬  →  BAM
-       →  시료별 variant calling
-       →  코호트 전체 joint genotyping
-       →  품질 필터링
-       →  VCF
-```
+변이 데이터를 얻는 길은 두 갈래 — **시퀀싱**(WGS·WES → 리드) vs. **genotyping array**(→ 형광 신호, 리드 없음)
 
+-   **WGS**(whole genome sequencing) — 유전체 전체를 시퀀싱
+-   **WES**(whole exome sequencing) — capture probe로 exon만 골라 시퀀싱
+-   **SNP array** — 미리 정한 위치의 probe가 박힌 칩에 DNA를 붙이고, 형광으로 genotype을 판독
+
+|   | WGS | WES | Array |
+|------------------|------------------|------------------|------------------|
+| 원시 데이터 | FASTQ(리드) | FASTQ(리드) | IDAT(형광 세기) |
+| 포괄하는 유전체 | 약 100% | 약 1–2%(coding) | 약 0.02%(선정된 위치) |
+| 새로운 변이 검출 | ✅ | ✅(coding만) | ❌ |
+| 희귀 변이 | ✅ | ✅(coding만) | ⚠️ 매우 희귀하면 신뢰 x([§2.2②](#w2-s2-2-2)) |
+| 구조 변이 | 부분적(long read는 우수) | 좋지 않음 | 큰 CNV만 |
+| Non-coding 조절 변이 | ✅ | ❌ | Imputation을 통해서만 |
+| 시료당 상대 비용 | 높음 | 중간 | 매우 낮음 |
+| 대표 용도 | 심층 분석, 희귀질환, SV | 희귀질환, 임상 panel | GWAS, biobank |
+
+![같은 locus를 세 기술로 측정한 모습. Coverage pattern은 도식이지만 정성적 차이는 실제](/assets/img/w2/platform_comparison.png){fig-align="center"}
+
+::: {.callout-tip collapse="true"}
+## Array가 여전히 GWAS의 주력인 이유
+
+Array는 미리 선정한 위치만 측정 → 새로운 것을 직접 발견할 수 없음. 그래도 집단유전학의 주력:
+
+-   GWAS에서는 완전한 유전체보다 **수십만 명의 표본**이 훨씬 중요
+-   Array가 측정하지 않은 위치는 통계적으로 복원 가능
+
+→ 이것이 [§2.4](#w2-s2-4)의 imputation
+:::
+
+## 2) 파이프라인: 원시 데이터에서 VCF까지 {#w2-s2-2}
+
+-   플랫폼마다 출발점이 다름 → 파이프라인도 다름: 시퀀싱은 **리드**(FASTQ)에서, array는 **형광 세기**(IDAT)에서 출발
+-   도착점은 같음 = 모든 시료 × 모든 위치의 genotype 표(VCF) → 이후 분석(GWAS 등)은 둘을 구분하지 않음
+
+![두 파이프라인. 왼쪽 = 시퀀싱(GATK Best Practices), 오른쪽 = array. 오른쪽 알약 = 그 단계에서 나오는 파일 형식(🔗 [W1 §2.2](w1_intro.qmd#w1-s2-2))](/assets/img/w2/pipelines.png){fig-align="center"}
+
+### ① WGS/WES — GATK Best Practices {#w2-s2-2-1}
+
+-   Broad Institute의 **GATK**가 정리한 표준 순서: 정렬 → 리드 정리 → 시료별 calling → 코호트 joint genotyping → 필터링
 -   **Joint calling** — 시료를 하나씩이 아니라 모두 함께 분석
 -   **Filtering** — caller는 실제 변이보다 훨씬 많은 후보를 만듦 → 판단이 가장 많이 개입하는 단계
 -   ⚠️ 같은 데이터도 필터 설정에 따라 변이 집합이 의미 있게 달라짐
+-   WES = 같은 파이프라인 + capture 영역(BED 파일)으로 범위만 제한
 
 ::: {.callout-note collapse="true" icon=false}
-## 🔍 더 알아보기 — joint calling과 filtering이 정하는 것
+## 🔍 더 알아보기 — GATK 파이프라인 단계별로 보기
 
--   **Joint calling** → "이 위치가 homozygous reference"와 "이 위치에 coverage 없음"을 구분 → 단일 시료 VCF에서는 안 보이는 차이(🔗 [W1 §2.2③](w1_intro.qmd#w1-s2-2-3))
--   **Filtering 기준** — coverage, strand balance, mapping quality, 리드 내 위치
+| 단계 | 도구 | 하는 일 | 왜 필요한가 |
+|----------------|----------------|--------------------------|--------------------------|
+| 정렬 | BWA-MEM → sort | 리드를 참조서열 위의 위치에 놓음 | 이후 모든 단계의 좌표 |
+| 중복 표시 | MarkDuplicates | 같은 DNA 조각이 PCR로 복사된 리드에 표시 | 복사본을 독립 증거로 세면 신뢰도가 부풀려짐 |
+| Base quality 보정 | BaseRecalibrator → ApplyBQSR | 기계가 매긴 품질 점수의 체계적 오차를 보정(알려진 변이 위치는 제외하고 학습) | Caller가 품질 점수를 오류 확률로 그대로 씀 |
+| 시료별 calling | HaplotypeCaller(GVCF mode) | 변이가 의심되는 구간에서 haplotype을 다시 조립해 genotype 확률 계산. 변이가 없는 구간도 "여기는 reference, 확신도 ○○"로 기록 → gVCF | 정렬 오류로 생기는 가짜 indel이 줄어듦 |
+| Joint genotyping | GenomicsDBImport → GenotypeGVCFs | 모든 시료의 gVCF를 모아 한 번에 genotype 결정 | 한 시료의 약한 신호를 다른 시료의 증거와 함께 판단. "homozygous reference"와 "coverage 없음"을 구분(🔗 [W1 §2.2③](w1_intro.qmd#w1-s2-2-3)) |
+| 필터링 | VQSR 또는 hard filter | **VQSR** = 검증된 변이 세트로 학습한 모델로 점수화(시료가 많을 때) / **Hard filter** = 지표마다 고정 기준(시료가 적을 때) | 후보 중 가짜를 걸러냄 |
+
+-   **Filtering 지표** — coverage, strand balance, mapping quality, 리드 안에서의 위치. 예: SNP hard filter = QD < 2, FS > 60, MQ < 40이면 제거
+-   **다른 caller** — DeepVariant(리드 pileup을 이미지로 보고 딥러닝으로 판정), DRAGEN(하드웨어 가속, 임상 현장에서 흔함) → 같은 BAM에서도 결과가 조금씩 다름
+-   **시료 QC**도 필요 — 오염(contamination), 기록된 성별과 불일치, 친족·중복 시료
+-   **종양** — germline 파이프라인과 별개: Mutect2로 tumour–normal 쌍을 비교(🔗 [§1.3](#w2-s1-3))
 :::
 
-## 2) ⚠️ Variant call은 확률 {#w2-s2-2}
+### ② SNP array {#w2-s2-2-2}
+
+-   **리드가 없음** → 정렬도, 리드 기반 variant calling도 없음. 칩의 probe마다 두 allele의 형광 세기를 재고, 그 패턴으로 genotype을 정함
+-   **Genotype calling** — 같은 SNP를 수천 명에서 모아 보면 AA·AB·BB 세 cluster로 나뉨 → 각 사람이 어느 cluster에 속하는지로 판정
+-   그다음은 **QC**(시료·변이 걸러내기) → 참조 패널에 맞추기 → **phasing** → 측정하지 않은 위치를 **imputation**으로 채움([§2.4](#w2-s2-4))
+-   ⚠️ Cluster를 이룰 만큼 carrier가 없으면 판정 자체가 불안정 → **매우 희귀한 변이**의 array 결과는 그대로 믿으면 안 됨
+
+![Array genotype calling. 왼쪽: 흔한 SNP는 세 cluster가 뚜렷. 오른쪽: carrier가 1,000명 중 1명이면 비교할 cluster가 없음 → 진짜 carrier와 잡음을 구분하기 어려움. 실제로 UK Biobank에서 빈도 0.001% 미만 변이의 array heterozygous call 중 시퀀싱으로 확인된 것은 16%뿐(Weedon et al. 2021)](/assets/img/w2/array_clusters.png){fig-align="center"}
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 더 알아보기 — Array QC와 imputation 준비
+
+| 대상 | 확인 | 흔한 기준 | 걸러지는 것 |
+|----------------|----------------|----------------|--------------------------|
+| 시료 | Call rate | 97–98% 미만 제거 | DNA 품질 불량 |
+| 시료 | 성별 확인 | X 염색체 heterozygosity vs. 기록된 성별 | 시료 뒤바뀜 |
+| 시료 | Heterozygosity | 평균 ± 3 SD 밖 제거 | 오염(너무 높음), 근친(너무 낮음) |
+| 시료 | 친족·중복 | Kinship 추정(KING, PLINK) | 중복 시료, 가족 |
+| 시료 | Ancestry | Genotype PCA([§3.2](#w2-s3-2)) | 이상치 |
+| 변이 | Call rate | 95–98% 미만 제거 | 잘 안 붙는 probe |
+| 변이 | HWE | 대조군에서 흔히 p < 10⁻⁶이면 제거 | Genotype calling 오류 |
+| 변이 | MAF | 흔히 1% 미만 제거 | 불안정한 희귀 변이 call |
+
+-   **참조 패널에 맞추기** — strand(+/−), genome build(GRCh37 vs. GRCh38), allele 순서를 패널과 일치시킴. A/T, C/G SNP는 strand를 구분할 수 없어 흔히 제거
+-   **Phasing** — 각 사람의 두 염색체를 분리(어느 allele들이 한 염색체에 함께 있나) → imputation의 입력
+-   **도구** — QC는 PLINK, phasing은 SHAPEIT·Eagle, imputation은 Minimac·Beagle. Michigan·TOPMed imputation server에 올려 돌리기도 함
+-   형광 세기 자체(B allele frequency, Log R ratio)로 **큰 CNV**도 검출 → 위 표의 "큰 CNV만"
+:::
+
+## 3) ⚠️ Variant call은 확률 {#w2-s2-3}
 
 -   VCF는 사실의 목록처럼 보임 → 실제로는 각각 신뢰도가 붙은 **추론의 목록**
 -   신뢰도는 유전체 위치에 따라 크게 다름: ✅ 고유하고 coverage가 충분한 서열에서 높음 / ⚠️ 반복서열처럼 읽기 어려운 영역에서 급격히 떨어짐
+-   Array도 마찬가지: genotype마다 calling 점수, imputation한 genotype은 확률(dosage)
 -   → "정확도"는 숫자 하나가 아님. **정확도 = 지도**
 
 ::: {.callout-warning collapse="true"}
@@ -169,38 +321,6 @@ FASTQ  →  참조서열에 정렬  →  BAM
 -   HLA처럼 다형성이 큰 locus — 참조서열과 다른 haplotype의 리드가 잘 정렬되지 않음
 
 → [Genome in a Bottle](https://www.nist.gov/programs-projects/genome-bottle) 같은 benchmark가 필요한 이유 = "정확도"가 숫자 하나가 아니기 때문
-:::
-
-## 3) 플랫폼 선택 {#w2-s2-3}
-
--   **WGS**(whole genome) — 유전체 약 100%, non-coding 포함 어디서든 새 변이 검출, 비용 가장 높음
--   **WES**(whole exome) — coding 부분(약 1–2%)만, 비용 중간 → 희귀질환, 임상 panel
--   **Array** — 미리 선정한 위치(약 0.02%)만, 새 변이 검출 x, 매우 저렴 → GWAS, biobank
-
-![같은 locus를 세 기술로 측정한 모습. Coverage pattern은 도식이지만 정성적 차이는 실제](/assets/img/w2/platform_comparison.png){fig-align="center"}
-
-::: {.callout-note collapse="true" icon=false}
-## 🔍 더 알아보기 — WGS vs WES vs array 상세 비교
-
-|   | WGS | WES | Array |
-|------------------|------------------|------------------|------------------|
-| 포괄하는 유전체 | 약 100% | 약 1–2%(coding) | 약 0.02%(선정된 위치) |
-| 새로운 변이 검출 | ✅ | ✅(coding만) | ❌ |
-| 구조 변이 | 부분적(long read는 우수) | 좋지 않음 | 큰 CNV만 |
-| Non-coding 조절 변이 | ✅ | ❌ | Imputation을 통해서만 |
-| 시료당 상대 비용 | 높음 | 중간 | 매우 낮음 |
-| 대표 용도 | 심층 분석, 희귀질환, SV | 희귀질환, 임상 panel | GWAS, biobank |
-:::
-
-::: {.callout-tip collapse="true"}
-## Array가 여전히 GWAS의 주력인 이유
-
-Array는 미리 선정한 위치만 측정 → 새로운 것을 직접 발견할 수 없음. 그래도 집단유전학의 주력:
-
--   GWAS에서는 완전한 유전체보다 **수십만 명의 표본**이 훨씬 중요
--   Array가 측정하지 않은 위치는 통계적으로 복원 가능
-
-→ 이것이 다음 절의 imputation
 :::
 
 ## 4) Imputation {#w2-s2-4}
@@ -665,9 +785,14 @@ $$
 
 ### 변이와 variant calling
 
-[gnomAD browser](https://gnomad.broadinstitute.org/) · [Genome in a Bottle](https://www.nist.gov/programs-projects/genome-bottle)\
+[gnomAD browser](https://gnomad.broadinstitute.org/) · [Genome in a Bottle](https://www.nist.gov/programs-projects/genome-bottle) · [GATK](https://gatk.broadinstitute.org/)\
 1000 Genomes Project Consortium. [*A global reference for human genetic variation.*](https://doi.org/10.1038/nature15393) Nature. 2015.\
-Collins RL, et al. [*A structural variation reference for medical and population genetics.*](https://pubmed.ncbi.nlm.nih.gov/?term=A+structural+variation+reference+for+medical+and+population+genetics) Nature. 2020.
+Collins RL, et al. [*A structural variation reference for medical and population genetics.*](https://pubmed.ncbi.nlm.nih.gov/?term=A+structural+variation+reference+for+medical+and+population+genetics) Nature. 2020.\
+Taliun D, et al. [*Sequencing of 53,831 diverse genomes from the NHLBI TOPMed Program.*](https://pubmed.ncbi.nlm.nih.gov/?term=Sequencing+of+53%2C831+diverse+genomes+from+the+NHLBI+TOPMed+Program) Nature. 2021.\
+Feusier J, et al. [*Pedigree-based estimation of human mobile element retrotransposition rates.*](https://pubmed.ncbi.nlm.nih.gov/?term=Pedigree-based+estimation+of+human+mobile+element+retrotransposition+rates) Genome Res. 2019.\
+Blokzijl F, et al. [*Tissue-specific mutation accumulation in human adult stem cells during life.*](https://doi.org/10.1038/nature19768) Nature. 2016.\
+Anderson CA, et al. [*Data quality control in genetic case-control association studies.*](https://pubmed.ncbi.nlm.nih.gov/?term=Data+quality+control+in+genetic+case-control+association+studies) Nat Protoc. 2010.\
+Weedon MN, et al. [*Use of SNP chips to detect rare pathogenic variants: retrospective, population based diagnostic evaluation.*](https://pubmed.ncbi.nlm.nih.gov/?term=Use+of+SNP+chips+to+detect+rare+pathogenic+variants) BMJ. 2021.
 
 ### GWAS
 

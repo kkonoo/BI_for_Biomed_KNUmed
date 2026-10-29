@@ -66,7 +66,7 @@ editor: visual
 > **Two people differ at \~4–5 million positions. Which differences cause disease?**
 
 1.  Human Genetic Variation 🧬 — SNVs, SVs, repeats; allele frequency and allelic architecture
-2.  From Reads to Variants 🔬 — variant calling as inference; WGS vs WES vs array; imputation
+2.  From Raw Data to Variants 🔬 — WGS vs WES vs array; GATK and array pipelines; variant calling as inference; imputation
 3.  Genome-Wide Association Studies 📈 — population structure, the association test, Manhattan and QQ plots, 5×10⁻⁸, linkage disequilibrium
 4.  From Association to Function 🔎 — fine-mapping, credible sets, eQTL, colocalization, TWAS
 5.  Heritability and Prediction 🧮 — SNP heritability, polygenicity, polygenic risk scores

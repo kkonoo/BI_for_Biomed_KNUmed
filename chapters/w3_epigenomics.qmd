@@ -332,7 +332,7 @@ Alternatives: **EM-seq** (enzymatic conversion, no degradation); **long-read pla
 ### ② Arrays {#w3-s5-1-2}
 
 -   Illumina **EPIC** — a fixed panel of CpG sites, on the order of 850,000 for v1 (\~3% of all CpGs), enriched for promoters, enhancers, and known disease loci
--   Same trade-off as genotyping arrays (🔗 [W2 §2.3](w2_genomics.qmd#w2-s2-3)):
+-   Same trade-off as genotyping arrays (🔗 [W2 §2.1](w2_genomics.qmd#w2-s2-1)):
     -   ❌ Cannot discover anything outside the panel
     -   ✅ Cheap enough to run on thousands of samples → almost all large epidemiological methylation studies use them
 

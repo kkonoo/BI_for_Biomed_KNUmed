@@ -332,7 +332,7 @@ ChIP   crosslink (formaldehyde)
 ### ② Array {#w3-s5-1-2}
 
 -   Illumina **EPIC** — 고정된 CpG 패널. v1은 약 850,000개(전체 CpG의 약 3%), promoter·enhancer·알려진 질병 locus에 치우침
--   Genotyping array(🔗 [W2 §2.3](w2_genomics.qmd#w2-s2-3))와 같은 trade-off:
+-   Genotyping array(🔗 [W2 §2.1](w2_genomics.qmd#w2-s2-1))와 같은 trade-off:
     -   ❌ 패널 밖에서는 아무것도 발견 불가
     -   ✅ 수천 개 시료에 적용할 만큼 저렴 → 대규모 역학 메틸화 연구는 거의 모두 array 사용
 

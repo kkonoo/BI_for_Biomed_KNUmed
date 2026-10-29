@@ -325,7 +325,7 @@ Array는 미리 선정한 위치만 측정 → 새로운 것을 직접 발견할
 
 ## 4) Imputation {#w2-s2-4}
 
--   가까운 변이들은 하나의 block으로 함께 유전([§3.6](#w2-s3-6)) → 한 변이를 측정하면 이웃 변이도 상당 부분 알 수 있음
+-   가까운 변이들은 하나의 block으로 함께 유전(LD, [§3.2](#w2-s3-2)) → 한 변이를 측정하면 이웃 변이도 상당 부분 알 수 있음
 -   **Imputation** = array로 측정한 약 50만 위치의 genotype + 촘촘하게 시퀀싱한 참조 패널 → 측정하지 않은 수천만 위치의 genotype을 통계적으로 추론
 -   ⚠️ Imputed genotype = 측정값이 아니라 **예측값**
 
@@ -363,22 +363,52 @@ Array는 미리 선정한 위치만 측정 → 새로운 것을 직접 발견할
 | **Quantitative trait** | 연속형(BMI, 혈압, 지질 수치) | 일반적으로 시료당 검정력이 더 높음 |
 | **Biobank/PheWAS** | 수천 phenotype을 동시에 분석 | 한 genotype 집합으로 여러 outcome 분석([§6](#w2-s6)) |
 
-## 2) 집단 구조와 ancestry {#w2-s3-2}
+## 2) Genetic architecture와 ancestry {#w2-s3-2}
 
-### ① Genotype PCA {#w2-s3-2-1}
+### ① 교란요인으로서의 ancestry {#w2-s3-2-1}
 
--   집단 사이 allele frequency가 체계적으로 다름 → genotype matrix의 PCA가 ancestry를 거의 완벽하게 복원
--   → 상위 PC(주성분) = 집단 구조를 설명하고 보정하는 표준 방법
+강사의 23andMe 결과 — 침 한 번, SNP array(약 60만 위치, 🔗 [§2.2②](#w2-s2-2-2))만으로 East Asian 100%, 그 안에서 Korean 96.1% · Japanese 3.9%까지 추정
 
-![왼쪽: 집단 정보를 주지 않아도 대륙별 ancestry가 분리되는 genotype PCA. 오른쪽: case와 control의 ancestry가 균형을 이루지 않을 때 생기는 문제](/assets/img/w2/pca_population.png){fig-align="center"}
+![강사의 23andMe ancestry composition. 같은 동아시아 안에서도 한국·일본을 나눌 만큼 ancestry 신호가 유전체에 남아 있음](/assets/img/w2/23andme_ancestry.png){fig-align="center" width="45%"}
 
-### ② 교란요인으로서의 ancestry {#w2-s3-2-2}
+-   → Ancestry는 유전체 **곳곳에** 새겨져 있음: 집단마다 수많은 변이의 allele frequency가 조금씩 다름
+-   💡 "Japanese 3.9%" ≠ 일본인 조상이 있다는 뜻. 가까운 집단은 haplotype을 많이 공유 → 내 유전체의 일부 구간이 참조 패널의 일본인 쪽과 더 비슷하다는 뜻. 결과는 **어떤 참조 패널과 비교했나**에 따라 달라짐(🔗 [§1.2](#w2-s1-2))
 
 🔗 [W1 §4.3](w1_intro.qmd#w1-s4-3)의 교란 문제가 유전학에서 나타나는 대표적인 형태:
 
 -   Case와 control의 ancestry가 다름 → **두 ancestry 사이에서 빈도가 다른 모든 변이가 연관성을 보임** — 원인 관계가 전혀 없어도
--   ✅ 표준 방어: 상위 genotype PC 약 10개를 공변량으로 포함, **또는** 유전적 relatedness를 직접 반영하는 mixed model 사용
+-   ⚠️ 한국과 일본처럼 가까운 집단의 차이도 읽힐 만큼 신호가 큼 → 한 연구에 여러 집단이 섞이면 질병 신호보다 **ancestry가 먼저** 보일 수 있음
+-   ✅ 표준 방어: 상위 genotype PC 약 10개를 공변량으로 포함(아래 ②), **또는** 유전적 relatedness를 직접 반영하는 mixed model 사용
 -   ⚠️ 어느 방법도 완벽 x — 잔여 집단 구조(특히 한 국가 안의 미세한 구조)는 여전히 해결 중인 문제
+
+### ② Genotype PCA {#w2-s3-2-2}
+
+-   정말 그런가? → **그림으로 그려 보면** 바로 보임
+-   집단 사이 allele frequency가 체계적으로 다름 → genotype matrix의 PCA가 집단 정보 없이도 ancestry를 거의 완벽하게 복원
+-   → 상위 PC(주성분) = 집단 구조를 설명하고 보정하는 표준 방법. 연관성 검정의 공변량으로 들어감([§3.3](#w2-s3-3))
+
+![왼쪽: 집단 정보를 주지 않아도 대륙별 ancestry가 분리되는 genotype PCA. 오른쪽: case와 control의 ancestry가 균형을 이루지 않을 때 생기는 문제](/assets/img/w2/pca_population.png){fig-align="center"}
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 더 알아보기 — PCA는 무엇을 하나 (수식 없이)
+
+-   **출발점** = 사람 × SNP 표(값 0/1/2). 열이 수십만 개 → 사람끼리 한눈에 비교하기엔 너무 많음
+-   **PCA** = 이 표에서 **사람들을 가장 크게 갈라놓는 방향**을 찾아 첫 축(PC1)으로, 그와 겹치지 않으면서 그다음으로 크게 갈라놓는 방향을 PC2로 … → 수십만 개의 숫자를 사람마다 좌표 두세 개로 요약
+-   **비유** — 키·몸무게·신발 크기는 함께 움직임 → "몸집"이라는 축 하나로 대부분 요약됨. PCA는 이런 축을 데이터에서 자동으로 찾음
+-   **왜 ancestry가 첫 축에 오나** — SNP 하나하나의 집단 차이는 작지만, 수십만 개가 같은 방향으로 조금씩 다름 → 합치면 사람들 사이에서 가장 큰 차이 = ancestry
+-   **그림 읽기** — 점 하나 = 사람 하나 / 가까울수록 genotype이 비슷 / 축 이름의 % = 전체 차이 중 그 축이 설명하는 몫 / 축 값 자체에는 단위도 의미도 없음
+-   ⚠️ PCA는 이름표(ancestry, 질병, batch)를 모름 → **가장 큰 차이가 무엇이든** 그것을 찾음. 실험 batch가 가장 크면 batch가 PC1(🔗 [W1 §4.3](w1_intro.qmd#w1-s4-3)의 그림)
+-   직접 해 보기 — [PCA·SVD 시뮬레이터 ↗](https://kkonoo.github.io/edu_sims/sims/pca-svd/?lang=ko){target="_blank"}
+:::
+
+::: {.callout-note}
+## 연관불평형(Linkage disequilibrium) — ancestry마다 다른 유전체의 block 구조
+
+-   **LD** = 가까운 locus의 allele들이 무작위가 아닌 방식으로 함께 나타나는 현상 — 염색체 조각이 함께 유전되고 recombination으로 점차 잘리는 과정이 남긴 통계적 흔적
+-   ✅ GWAS를 가능하게 함: 50만 위치만 genotyping해도 각 변이가 이웃을 tag → 사실상 수백만 위치를 조사(imputation도 같은 원리, [§2.4](#w2-s2-4))
+-   ⚠️ 해석을 어렵게 함: 신호가 나타나면 **block 안의 모든 변이가 함께 신호를 보임** → 연관성 통계만으로는 원인 변이와 상관된 이웃을 구분 x([§4](#w2-s4))
+-   🗺️ **Block 길이는 ancestry마다 다름** — 아프리카계 집단은 역사가 길어 recombination이 더 많이 쌓임 → block이 짧음 / 아프리카 밖으로 나온 집단(유럽·동아시아 등)은 그보다 김 → 한 집단에서 찾은 tag SNP와 그 위에 만든 score가 다른 집단에 그대로 이전 x
+:::
 
 ::: {.callout-warning collapse="true"}
 ## 인간 유전학의 유럽 중심 편향
@@ -406,7 +436,9 @@ Array는 미리 선정한 위치만 측정 → 새로운 것을 직접 발견할
 
 ## 3) 연관성 검정 {#w2-s3-3}
 
-각 변이에 독립적으로 다음과 비슷한 모형을 적합:
+### ① 변이 하나를 검정하기 {#w2-s3-3-1}
+
+각 변이에 독립적으로 다음과 비슷한 회귀모형을 적합:
 
 $$
 \text{phenotype} \sim \text{genotype} + \text{age} + \text{sex} + \text{PC}_1 + \dots + \text{PC}_{10}
@@ -414,9 +446,20 @@ $$
 
 -   Genotype = effect allele의 개수인 **0/1/2**로 코딩 → **additive model** 가정
 -   나이, 성별, 상위 ancestry PC는 공변량으로 보정
+-   연속형 형질 → **linear regression**: β = allele 하나당 형질 변화량 / case–control → **logistic regression**: OR = allele 하나당 odds의 배수
+-   결과 = 변이마다 **효과 크기(β 또는 OR) + 표준오차(SE) + p-value** → 이 표 전체 = **summary statistics**
 
 ::: {.callout-note collapse="true" icon=false}
-## 🔍 더 알아보기 — additive 가정과 현대의 mixed model
+## 🔍 더 알아보기 — 회귀와 χ²는 같은 검정, additive 가정과 mixed model
+
+**회귀와 χ²**
+
+-   가장 단순한 형태 = case와 control에서 allele 개수를 센 2×2 표 → **χ² 검정**. 초기 GWAS는 이와 거의 같은 trend test를 사용
+-   회귀로 하면 → 효과 크기 β와 그 표준오차 SE → z = β ÷ SE → **χ² = z²**(자유도 1) → p-value. 같은 검정에 공변량(나이, 성별, PC)을 넣을 수 있게 된 것
+-   그래서 결과 파일과 QQ plot의 λ([§3.4②](#w2-s3-4-2))는 χ² 값으로 이야기함
+-   감 잡기: p = 5×10⁻⁸ ↔ z ≈ 5.45 ↔ χ² ≈ 29.7
+
+**Additive 가정과 mixed model**
 
 -   Additive model은 대체로 합리적이며 거의 항상 사용하는 가정
 -   ⚠️ 대신 열성 효과는 효율적으로 검출 x
@@ -425,7 +468,23 @@ $$
     -   Biobank에서 흔한 극도로 불균형한 case-control 비율에서도 더 잘 보정됨
 :::
 
-## 4) 두 가지 표준 그림 읽기 {#w2-s3-4}
+### ② 여러 코호트 합치기: meta-analysis {#w2-s3-3-2}
+
+-   흔한 변이의 효과는 매우 작음 → 수십만–수백만 명이 필요 → 코호트 하나로는 부족 → **consortium**이 여러 코호트를 합침 (예: 키 GWAS = 약 540만 명)
+-   각 코호트가 같은 방식으로 GWAS → 개인 genotype이 아니라 **summary statistics만 공유** → 개인정보·동의 문제를 피함
+-   **Inverse-variance weighted meta-analysis** — 정밀한(SE가 작은) 코호트일수록 큰 가중치로 효과 크기를 평균
+-   ⚠️ 코호트마다 효과가 다르면(heterogeneity) 합친 값의 의미가 흐려짐 → I², Cochran's Q로 확인
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 더 알아보기 — meta-analysis를 읽을 때
+
+-   **도구** — METAL(가장 흔함). 여러 ancestry를 합칠 때는 ancestry 차이를 모형에 넣는 방법(MR-MEGA 등)
+-   **Fixed effect vs. random effect** — 모든 코호트의 참 효과가 같다고 가정 vs. 코호트마다 다를 수 있다고 가정. GWAS 발견 단계는 대개 fixed effect
+-   **Replication** — 원래는 발견(discovery) 코호트와 독립된 코호트에서 다시 확인하는 것이 표준. 요즘은 모든 코호트를 meta-analysis에 넣는 경우가 많음 → "독립 재현"이 따로 있었는지 확인
+-   **Summary statistics의 재사용** — [GWAS Catalog](https://www.ebi.ac.uk/gwas/) 등에 공개 → fine-mapping([§4](#w2-s4)), PRS([§5.3](#w2-s5-3)), Mendelian randomization([§6.2](#w2-s6-2))이 모두 summary statistics만으로 가능
+:::
+
+## 4) Visualization of GWAS results {#w2-s3-4}
 
 ### ① Manhattan plot {#w2-s3-4-1}
 
@@ -442,6 +501,22 @@ $$
 -   **잡음의 바닥이 평평한가?** → baseline이 올라가면 inflation 의심, QQ plot 확인
 :::
 
+::: {.callout-note collapse="true" icon=false}
+## 🔍 더 알아보기 — 가로선 5×10⁻⁸은 어디에서 왔나
+
+-   Genome-wide 유의성 기준 — 임의로 정한 숫자가 아님
+-   변이는 수백만 개지만 LD block 안에서 상관됨 → 유럽계 유전체에서 실질적으로 독립적인 흔한 변이 = 약 **100만 개**
+-   Bonferroni 보정:
+
+$$
+\alpha = \frac{0.05}{10^6} = 5 \times 10^{-8}
+$$
+
+-   → 천만 개 넘게 검정해도([§1.1](#w2-s1-1)) 기준이 그대로인 이유 = 독립 검정 수는 LD가 정함
+-   FDR이 아니라 **Bonferroni** 보정. 후속 연구 비용이 매우 커서 GWAS는 hit 하나하나에 높은 확실성을 요구(🔗 [W1 §4.2](w1_intro.qmd#w1-s4-2))
+-   ⚠️ 이 기준은 **유럽계** LD 구조에 맞춰짐. 아프리카계 유전체는 LD block이 더 짧음 → 독립 검정 수가 많음 → 더 엄격한 역치가 적절. 하지만 흔히 조정하지 않음
+:::
+
 ### ② QQ plot {#w2-s3-4-2}
 
 -   관찰 p-value vs 기대 p-value. 귀무가설(실제 연관 없음) 아래에서는 점들이 대각선을 따름
@@ -452,7 +527,7 @@ $$
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 더 알아보기 — λ가 재는 것, inflation의 원인
 
--   λ = 관찰된 검정통계량 중앙값 ÷ 기대값
+-   λ = 관찰된 검정통계량(χ²) 중앙값 ÷ 귀무가설 아래 기대값(약 0.455)
 -   λ \> 1.1 → 모형에 포함하지 않은 집단 구조, 숨은 relatedness, 기술적 배치 효과를 의심
 :::
 
@@ -464,29 +539,6 @@ Manhattan plot만 있고 QQ plot은 없음 → 눈여겨볼 것:
 -   Manhattan plot으로는 p-value가 잘 보정되었는지 알 수 없음
 -   Inflation이 있는 연구 → **아무것도 아닌 신호로 가득 찬 아름다운 Manhattan plot**
 :::
-
-## 5) 5×10⁻⁸은 어디에서 왔나 {#w2-s3-5}
-
--   Genome-wide 유의성 기준 — 임의로 정한 숫자가 아님
--   변이는 수백만 개지만 block 안에서 상관됨 → 유럽계 유전체에서 실질적으로 독립적인 흔한 변이 = 약 **100만 개**
--   Bonferroni 보정:
-
-$$
-\alpha = \frac{0.05}{10^6} = 5 \times 10^{-8}
-$$
-
-::: {.callout-note collapse="true" icon=false}
-## 🔍 더 알아보기 — 학생들이 흔히 놓치는 두 가지
-
--   FDR이 아니라 **Bonferroni** 보정. 후속 연구 비용이 매우 커서 GWAS는 hit 하나하나에 높은 확실성을 요구(🔗 [W1 §4.2](w1_intro.qmd#w1-s4-2))
--   ⚠️ 이 기준은 **유럽계** LD 구조에 맞춰짐. 아프리카계 유전체는 LD block이 더 짧음 → 독립 검정 수가 많음 → 더 엄격한 역치가 적절. 하지만 흔히 조정하지 않음
-:::
-
-## 6) 연관불평형(Linkage disequilibrium) {#w2-s3-6}
-
--   **LD** = 가까운 locus의 allele들이 무작위가 아닌 방식으로 함께 나타나는 현상 — 염색체 조각이 함께 유전되고 recombination으로 점차 잘리는 과정이 남긴 통계적 흔적
--   ✅ GWAS를 가능하게 함: 50만 위치만 genotyping해도 각 변이가 이웃을 tag → 사실상 수백만 위치를 조사
--   ⚠️ 해석을 어렵게 함: 신호가 나타나면 **block 안의 모든 변이가 함께 신호를 보임** → 연관성 통계만으로는 원인 변이와 상관된 이웃을 구분 x
 
 ------------------------------------------------------------------------
 

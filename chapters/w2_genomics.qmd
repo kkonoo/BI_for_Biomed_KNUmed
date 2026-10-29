@@ -325,7 +325,7 @@ An array measures only pre-selected sites → cannot discover anything new. Stil
 
 ## 4) Imputation {#w2-s2-4}
 
--   Nearby variants are inherited together in blocks ([§3.6](#w2-s3-6)) → measuring one tells you a lot about its neighbours
+-   Nearby variants are inherited together in blocks (LD, [§3.2](#w2-s3-2)) → measuring one tells you a lot about its neighbours
 -   **Imputation** = genotypes at 500,000 array sites + a reference panel of densely sequenced genomes → statistically infer genotypes at tens of millions of unmeasured sites
 -   ⚠️ An imputed genotype is a **prediction**, not a measurement
 
@@ -363,22 +363,52 @@ The core logic is the same in every design: **for each variant, ask whether geno
 | **Quantitative trait** | Continuous (BMI, blood pressure, lipid level) | Usually better powered per sample |
 | **Biobank / PheWAS** | Thousands of phenotypes at once | One genotype set, many outcomes ([§6](#w2-s6)) |
 
-## 2) Population structure and ancestry {#w2-s3-2}
+## 2) Genetic architecture and ancestry {#w2-s3-2}
 
-### ① PCA on genotypes {#w2-s3-2-1}
+### ① Ancestry as a confounder {#w2-s3-2-1}
 
--   Allele frequencies differ systematically between populations → PCA on a genotype matrix recovers ancestry almost perfectly
--   → the top PCs (principal components) = the standard way to describe and adjust for ancestry
+The instructor's 23andMe result — one saliva sample and a SNP array (\~600,000 sites, 🔗 [§2.2②](#w2-s2-2-2)) are enough to estimate East Asian 100%, and within it Korean 96.1% · Japanese 3.9%
 
-![Left: genotype PCA separates continental ancestries without being told about them. Right: what happens when ancestry is not balanced between cases and controls.](/assets/img/w2/pca_population.png){fig-align="center"}
+![The instructor's 23andMe ancestry composition. Ancestry leaves enough signal in the genome to separate Korea from Japan within East Asia.](/assets/img/w2/23andme_ancestry.png){fig-align="center" width="45%"}
 
-### ② Ancestry as a confounder {#w2-s3-2-2}
+-   → Ancestry is written **all over** the genome: populations differ slightly in allele frequency at a great many variants
+-   💡 "Japanese 3.9%" ≠ a Japanese ancestor. Neighbouring populations share many haplotypes → some stretches of this genome look more like the Japanese samples of the reference panel. The answer depends on **which reference panel it was compared with** (🔗 [§1.2](#w2-s1-2))
 
 🔗 [W1 §4.3](w1_intro.qmd#w1-s4-3)'s confounding problem, in its classic genetic form:
 
 -   Cases and controls differ in ancestry → **every variant whose frequency differs between those ancestries shows an association** — with no causal relationship at all
--   ✅ Standard defence: include the top \~10 genotype PCs as covariates, **or** use a mixed model that accounts for genetic relatedness directly
+-   ⚠️ The signal is strong enough to separate populations as close as Korea and Japan → when a study mixes populations, **ancestry** can show up before any disease signal
+-   ✅ Standard defence: include the top \~10 genotype PCs as covariates (② below), **or** use a mixed model that accounts for genetic relatedness directly
 -   ⚠️ Neither is perfect — residual structure (especially fine-scale structure within a country) remains a live problem
+
+### ② PCA on genotypes {#w2-s3-2-2}
+
+-   Is that really so? → **draw it** and it is plain to see
+-   Allele frequencies differ systematically between populations → PCA on a genotype matrix recovers ancestry almost perfectly, without being told the populations
+-   → the top PCs (principal components) = the standard way to describe and adjust for ancestry. They enter the association test as covariates ([§3.3](#w2-s3-3))
+
+![Left: genotype PCA separates continental ancestries without being told about them. Right: what happens when ancestry is not balanced between cases and controls.](/assets/img/w2/pca_population.png){fig-align="center"}
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 Going further — what PCA does (without the maths)
+
+-   **Starting point** = a people × SNPs table (values 0/1/2). Hundreds of thousands of columns → far too many to compare people at a glance
+-   **PCA** = finds the **direction that pulls people apart the most** and makes it the first axis (PC1), then the next-largest direction that does not overlap with it (PC2), and so on → hundreds of thousands of numbers become two or three coordinates per person
+-   **Analogy** — height, weight and shoe size move together → one axis, "body size", summarises most of them. PCA finds such axes in the data automatically
+-   **Why ancestry lands on the first axis** — each SNP differs only slightly between populations, but hundreds of thousands differ slightly in the same direction → added up, ancestry is the largest difference between people
+-   **Reading the plot** — one point = one person / closer = more similar genotypes / the % in an axis label = that axis's share of all the differences / the axis values themselves have no unit or meaning
+-   ⚠️ PCA does not know the labels (ancestry, disease, batch) → it finds **whatever the largest difference is**. If the experimental batch is largest, PC1 is batch (🔗 the figure in [W1 §4.3](w1_intro.qmd#w1-s4-3))
+-   Try it — [PCA · SVD simulator ↗](https://kkonoo.github.io/edu_sims/sims/pca-svd/?lang=en){target="_blank"}
+:::
+
+::: {.callout-note}
+## Linkage disequilibrium — the genome's block structure, different in every ancestry
+
+-   **LD** = alleles at nearby loci travel together non-randomly — the footprint of chromosomes being inherited in segments, broken up gradually by recombination
+-   ✅ Makes GWAS possible: genotype 500,000 sites → effectively survey millions, because each measured variant tags its neighbours (imputation works the same way, [§2.4](#w2-s2-4))
+-   ⚠️ Makes GWAS hard to interpret: a signal appears → **every variant in the block shows it** → the statistic cannot tell the causal one from its correlated neighbours ([§4](#w2-s4))
+-   🗺️ **Block length differs by ancestry** — African-ancestry populations are older, so more recombination has accumulated → short blocks / populations that left Africa (European, East Asian, …) have longer ones → tag SNPs found in one population, and scores built on them, do not transfer as they are
+:::
 
 ::: {.callout-warning collapse="true"}
 ## The Eurocentric bias of human genetics
@@ -406,7 +436,9 @@ A large majority of GWAS participants to date are of European ancestry, far out 
 
 ## 3) The association test {#w2-s3-3}
 
-For each variant independently, fit something close to:
+### ① Testing one variant {#w2-s3-3-1}
+
+For each variant independently, fit a regression close to:
 
 $$
 \text{phenotype} \sim \text{genotype} + \text{age} + \text{sex} + \text{PC}_1 + \dots + \text{PC}_{10}
@@ -414,9 +446,20 @@ $$
 
 -   Genotype coded **0/1/2** — the count of the effect allele → assumes an **additive model**
 -   Age, sex and the top ancestry PCs are adjusted for as covariates
+-   Continuous trait → **linear regression**: β = change in the trait per allele / case–control → **logistic regression**: OR = factor by which the odds change per allele
+-   Output = for every variant, an **effect size (β or OR) + standard error (SE) + p-value** → the whole table = the **summary statistics**
 
 ::: {.callout-note collapse="true" icon=false}
-## 🔍 Going further — the additive assumption and modern mixed models
+## 🔍 Going further — regression and χ² are the same test; the additive assumption and mixed models
+
+**Regression and χ²**
+
+-   The simplest version = a 2×2 table of allele counts in cases and controls → a **χ² test**. Early GWAS used a trend test that is nearly the same thing
+-   As a regression → an effect size β and its standard error SE → z = β ÷ SE → **χ² = z²** (1 degree of freedom) → p-value. The same test, now able to include covariates (age, sex, PCs)
+-   This is why result files and the λ of the QQ plot ([§3.4②](#w2-s3-4-2)) speak in χ² values
+-   For a feel: p = 5×10⁻⁸ ↔ z ≈ 5.45 ↔ χ² ≈ 29.7
+
+**The additive assumption and mixed models**
 
 -   The additive model is usually reasonable, and almost always assumed
 -   ⚠️ But it does mean recessive effects are detected inefficiently
@@ -425,7 +468,23 @@ $$
     -   better calibrated for the extremely unbalanced case-control ratios typical of biobanks
 :::
 
-## 4) Reading the two standard figures {#w2-s3-4}
+### ② Combining cohorts: meta-analysis {#w2-s3-3-2}
+
+-   Common variants have tiny effects → hundreds of thousands to millions of people are needed → one cohort is not enough → **consortia** combine many cohorts (e.g. the height GWAS: \~5.4 million people)
+-   Each cohort runs the same GWAS → **only summary statistics are shared**, not individual genotypes → sidesteps privacy and consent problems
+-   **Inverse-variance weighted meta-analysis** — averages the effect sizes, giving more weight to more precise (smaller-SE) cohorts
+-   ⚠️ If the effect differs between cohorts (heterogeneity), the pooled value means less → check I² and Cochran's Q
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 Going further — reading a meta-analysis
+
+-   **Tools** — METAL (the most common). Combining ancestries calls for methods that model ancestry differences (e.g. MR-MEGA)
+-   **Fixed vs. random effects** — assumes every cohort has the same true effect vs. allows it to differ. GWAS discovery usually uses fixed effects
+-   **Replication** — the standard used to be confirmation in a cohort independent of discovery. Today all cohorts often go into the meta-analysis → check whether an independent replication existed at all
+-   **Summary statistics live on** — shared through the [GWAS Catalog](https://www.ebi.ac.uk/gwas/) and elsewhere → fine-mapping ([§4](#w2-s4)), PRS ([§5.3](#w2-s5-3)) and Mendelian randomization ([§6.2](#w2-s6-2)) can all run on summary statistics alone
+:::
+
+## 4) Visualization of GWAS results {#w2-s3-4}
 
 ### ① Manhattan plot {#w2-s3-4-1}
 
@@ -442,6 +501,22 @@ $$
 -   **Is the noise floor flat?** → a rising baseline suggests inflation. Check the QQ plot
 :::
 
+::: {.callout-note collapse="true" icon=false}
+## 🔍 Going further — where the 5×10⁻⁸ line comes from
+
+-   The genome-wide significance threshold — not arbitrary
+-   Millions of variants, but correlated in LD blocks → \~**one million effectively independent** common variants in European-ancestry genomes
+-   Bonferroni correction:
+
+$$
+\alpha = \frac{0.05}{10^6} = 5 \times 10^{-8}
+$$
+
+-   → why the threshold stays put even when more than ten million variants are tested ([§1.1](#w2-s1-1)): LD sets the number of independent tests
+-   It is a **Bonferroni** correction, not FDR. GWAS demands near-certainty per hit because follow-up costs are enormous (🔗 [W1 §4.2](w1_intro.qmd#w1-s4-2))
+-   ⚠️ It was calibrated for **European** LD structure. African-ancestry genomes have shorter LD blocks → more independent tests → a stricter threshold is appropriate. An adjustment often not made
+:::
+
 ### ② QQ plot {#w2-s3-4-2}
 
 -   Observed vs. expected p-values. Under the null (no true association) → points follow the diagonal
@@ -452,7 +527,7 @@ $$
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — what λ measures, and what inflates it
 
--   λ = median observed test statistic ÷ its expected value
+-   λ = median observed test statistic (χ²) ÷ its expected value under the null (\~0.455)
 -   λ \> 1.1 → unmodelled population structure, cryptic relatedness, or technical batch effects
 :::
 
@@ -464,29 +539,6 @@ A Manhattan plot but no QQ plot is worth noticing:
 -   A Manhattan plot cannot tell you whether the p-values are calibrated
 -   An inflated study produces a **beautiful Manhattan plot full of nothing**
 :::
-
-## 5) Where 5×10⁻⁸ comes from {#w2-s3-5}
-
--   The genome-wide significance threshold — not arbitrary
--   Millions of variants, but correlated in blocks → \~**one million effectively independent** common variants in European-ancestry genomes
--   Bonferroni correction:
-
-$$
-\alpha = \frac{0.05}{10^6} = 5 \times 10^{-8}
-$$
-
-::: {.callout-note collapse="true" icon=false}
-## 🔍 Going further — two implications students routinely miss
-
--   It is a **Bonferroni** correction, not FDR. GWAS demands near-certainty per hit because follow-up costs are enormous (🔗 [W1 §4.2](w1_intro.qmd#w1-s4-2))
--   ⚠️ It was calibrated for **European** LD structure. African-ancestry genomes have shorter LD blocks → more independent tests → a stricter threshold is appropriate. An adjustment often not made
-:::
-
-## 6) Linkage disequilibrium {#w2-s3-6}
-
--   **LD** = alleles at nearby loci travel together non-randomly — the footprint of chromosomes being inherited in segments, broken up gradually by recombination
--   ✅ Makes GWAS possible: genotype 500,000 sites → effectively survey millions, because each measured variant tags its neighbours
--   ⚠️ Makes GWAS hard to interpret: a signal appears → **every variant in the block shows it** → the statistic cannot tell the causal one from its correlated neighbours
 
 ------------------------------------------------------------------------
 

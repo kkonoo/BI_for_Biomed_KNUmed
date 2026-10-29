@@ -560,6 +560,8 @@ Manhattan plot만 있고 QQ plot은 없음 → 눈여겨볼 것:
 -   결과 = **credible set** — 원인 변이를 예컨대 95% 확률로 포함하는 가장 작은 변이 집합
 -   → lead SNP 하나를 고르는 방식과 달리 불확실성을 정직하게 보여줌
 
+![Fine-mapping. 위: §4.1의 regional plot과 같은 locus — 124개 변이가 5×10⁻⁸을 넘음. 아래: 각 변이가 원인일 사후확률. 확률이 큰 순서로 더해 0.95가 될 때까지 모은 4개 = 95% credible set(빨강). Lead SNP도 그중 하나일 뿐 — 나머지 세 변이가 원인일 확률도 합쳐서 약 30%](/assets/img/w2/finemap_credible.png){fig-align="center"}
+
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 더 알아보기 — credible set은 얼마나 큰가
 
@@ -573,6 +575,8 @@ Manhattan plot만 있고 QQ plot은 없음 → 눈여겨볼 것:
 
 -   ❌ "Hit가 유전자 X 안에 있음" → GWAS hit의 약 90%는 **protein-coding 서열 밖**
 -   ❌ "그러면 가장 가까운 유전자가 원인" → 흔히 틀림. Enhancer는 중간 유전자를 건너뛰고 멀리 있는 표적에 작용 가능
+
+![두 오류를 한 locus에서 — *FTO* 비만 locus. ① hit는 *FTO*의 intron 안(non-coding → 조절로 작동) ② 실제 표적은 0.5–1.2 Mb 떨어진 *IRX3*·*IRX5*](/assets/img/w2/fto_locus.png){fig-align="center"}
 
 ::: {.callout-warning collapse="true"}
 ## "Hit가 유전자 X 안에 있음"
@@ -600,8 +604,13 @@ Enhancer는 중간 유전자를 건너뛰고 멀리 있는 표적 유전자에 �
 
 ## 4) 변이에서 유전자로 가는 도구 {#w2-s4-4}
 
+💡 **핵심 아이디어** — GWAS는 "변이 → 질병"만 보여줌. 같은 변이가 어떤 **유전자의 발현**도 바꾸는지 겹쳐 보면 → 그 유전자가 표적 후보
+
+![세 가지 질문. ① eQTL: genotype에 따라 유전자 발현이 달라지나 ② Colocalization: GWAS 신호와 eQTL 신호의 꼭대기가 같은 변이인가 ③ TWAS: 유전적으로 예측한 발현이 질병과 연관되나](/assets/img/w2/variant_to_gene.png){fig-align="center"}
+
 -   **eQTL mapping** — 어떤 변이가 어떤 유전자의 발현과 연관되나?
 -   **Colocalization** — GWAS 신호와 eQTL 신호가 같은 원인 변이를 공유하나?
+-   **TWAS**(transcriptome-wide association study) — genotype과 발현을 함께 잰 참조 데이터(GTEx 등)에서 "genotype → 발현" 예측 모델을 학습 → GWAS 코호트에 적용해 사람마다 발현을 예측 → 예측 발현과 질병의 연관성을 **유전자 단위**로 검정
 -   **CRISPR perturbation** — 이 element를 편집하면 유전자가 변하나? → 가장 강한 근거
 
 💡 [Open Targets Genetics](https://genetics.opentargets.org/) — 이 정보 대부분을 locus별 한 화면에 모아줌. 어떤 hit든 좋은 출발점
@@ -616,6 +625,21 @@ Enhancer는 중간 유전자를 건너뛰고 멀리 있는 표적 유전자에 �
 | **TWAS** | 예측된 발현이 trait와 연관되는 유전자는? | 효율적인 선별법, 인과성 확립 x |
 | **Chromatin contact** | 이 enhancer가 어느 promoter와 물리적으로 접촉하나? | 접촉 ≠ 기능(🔗 [W3 §4.3](w3_epigenomics.qmd#w3-s4-3)) |
 | **CRISPR perturbation** | 이 element를 편집하면 유전자가 변하나? | 가장 강한 근거, 처리량 낮음 |
+
+-   ⚠️ TWAS에서 흔한 함정: 같은 locus의 여러 유전자가 LD와 공동 조절 때문에 함께 유의 → 가장 유의한 유전자도 원인이 아닐 수 있음
+:::
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 더 알아보기 — 왜 multi-omics인가: 층마다 다른 QTL
+
+![GWAS는 변이와 질병을 바로 잇고, 그 사이 경로는 보여주지 않음. 각 층의 QTL이 그 경로를 한 칸씩 채움](/assets/img/w2/qtl_layers.png){fig-align="center"}
+
+-   변이의 효과는 층을 거쳐 전달: chromatin 접근성(caQTL) → DNA methylation(meQTL) → RNA 발현·splicing(eQTL, sQTL) → 단백질(pQTL) → 대사물질(mQTL)
+-   각 층의 QTL을 GWAS 신호와 colocalization → **어느 층에서** 효과가 시작되고 어떤 유전자를 거치는지
+-   eQTL만으로는 부족 — GWAS locus 중 eQTL과 colocalize하는 것은 일부. 나머지는 다른 세포 유형·발달 시기, 또는 splicing·단백질 같은 다른 층에서 작동할 수 있음
+-   pQTL = 약물이 실제로 겨누는 단백질 수준 → 신약 표적과 바로 연결([§6.3](#w2-s6-3))
+-   💡 이 수업의 W3(후성유전체)·W4–W5(전사체)·W6(단백체) = 각 층을 재는 기술
+-   ⚠️ 용어 주의: 논문에 따라 mQTL = **methylation** QTL인 경우도 많음
 :::
 
 ------------------------------------------------------------------------

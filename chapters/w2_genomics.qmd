@@ -560,6 +560,8 @@ A Manhattan plot but no QQ plot is worth noticing:
 -   Output = a **credible set** — the smallest set of variants containing the causal one with, say, 95% probability
 -   → honest about uncertainty in a way a single lead SNP is not
 
+![Fine-mapping. Top: the same locus as the regional plot in §4.1 — 124 variants pass 5×10⁻⁸. Bottom: each variant's posterior probability of being causal. Adding probabilities from the largest down until they reach 0.95 gives four variants = the 95% credible set (red). The lead SNP is only one of them — the other three together still carry \~30% of the probability.](/assets/img/w2/finemap_credible.png){fig-align="center"}
+
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — how large is a credible set?
 
@@ -573,6 +575,8 @@ A Manhattan plot but no QQ plot is worth noticing:
 
 -   ❌ "The hit is in gene X" → \~90% of GWAS hits lie **outside protein-coding sequence**
 -   ❌ "So the causal gene is the nearest one" → often wrong; enhancers can skip over genes to reach a distant target
+
+![Both errors at one locus — the *FTO* obesity locus. ① The hit lies in an *FTO* intron (non-coding → acts by regulation). ② The real targets are *IRX3* and *IRX5*, 0.5–1.2 Mb away.](/assets/img/w2/fto_locus.png){fig-align="center"}
 
 ::: {.callout-warning collapse="true"}
 ## "The hit is in gene X"
@@ -600,8 +604,13 @@ Enhancers routinely skip over intervening genes to reach their target
 
 ## 4) Variant to gene: the toolkit {#w2-s4-4}
 
+💡 **Core idea** — a GWAS shows only "variant → disease". Check whether the same variant also changes some **gene's expression** → that gene becomes the candidate target
+
+![Three questions. ① eQTL: does gene expression differ by genotype? ② Colocalization: do the GWAS and eQTL signals peak at the same variant? ③ TWAS: does genetically predicted expression associate with the disease?](/assets/img/w2/variant_to_gene.png){fig-align="center"}
+
 -   **eQTL mapping** — which variants associate with the expression of which genes?
 -   **Colocalization** — do the GWAS and eQTL signals share the same causal variant?
+-   **TWAS** (transcriptome-wide association study) — learn a "genotype → expression" model in reference data where both were measured (e.g. GTEx) → apply it to the GWAS cohort to predict each person's expression → test predicted expression against the disease, **one gene at a time**
 -   **CRISPR perturbation** — does editing the element change the gene? → the strongest evidence
 
 💡 [Open Targets Genetics](https://genetics.opentargets.org/) aggregates most of these into a single per-locus view. A good first stop for any hit
@@ -616,6 +625,21 @@ Enhancers routinely skip over intervening genes to reach their target
 | **TWAS** | Which genes' predicted expression associates with the trait? | Efficient screen; does not establish causality |
 | **Chromatin contact** | Which promoter physically contacts this enhancer? | Contact ≠ function (🔗 [W3 §4.3](w3_epigenomics.qmd#w3-s4-3)) |
 | **CRISPR perturbation** | Does editing this element change the gene? | The strongest evidence; low throughput |
+
+-   ⚠️ A common TWAS trap: several genes at one locus come up together because of LD and shared regulation → even the most significant gene may not be the causal one
+:::
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 Going further — why multi-omics: a QTL for every layer
+
+![A GWAS links variant and disease directly and hides the path between them. Each layer's QTL fills in one step of that path.](/assets/img/w2/qtl_layers.png){fig-align="center"}
+
+-   A variant's effect passes through layers: chromatin accessibility (caQTL) → DNA methylation (meQTL) → RNA expression and splicing (eQTL, sQTL) → protein (pQTL) → metabolite (mQTL)
+-   Colocalizing each layer's QTLs with the GWAS signal → **which layer** the effect starts in, and which gene it passes through
+-   eQTLs alone are not enough — only some GWAS loci colocalize with an eQTL. The rest may act in other cell types or developmental stages, or through other layers such as splicing or protein
+-   pQTLs sit at the level drugs actually target → a direct line to drug targets ([§6.3](#w2-s6-3))
+-   💡 W3 (epigenomics), W4–W5 (transcriptomics) and W6 (proteomics) of this course = the technologies that measure each layer
+-   ⚠️ Mind the jargon: in many papers mQTL means **methylation** QTL
 :::
 
 ------------------------------------------------------------------------

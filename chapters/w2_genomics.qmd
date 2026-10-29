@@ -648,28 +648,75 @@ Enhancers routinely skip over intervening genes to reach their target
 
 > 🔑 **Core idea** — common traits are shaped by thousands of variants with tiny effects. A polygenic risk score adds them up → it stratifies populations but does not diagnose individuals
 
-## 1) Twin heritability vs. SNP heritability {#w2-s5-1}
+## 1) Heritability {#w2-s5-1}
 
--   **Heritability (h²)** — the proportion of phenotypic variance in a population attributable to genetic variance
+### ① Splitting the differences between people {#w2-s5-1-1}
+
+-   Starting point: within a population a trait (height, blood pressure …) differs from person to person → that spread = the phenotypic variance $V_P$
+-   Split it into the share that comes from genetic differences ($V_G$) and the share that comes from environmental differences
+-   **Broad-sense heritability** H² = $V_G / V_P$ — all genetic effects / **narrow-sense heritability** h² = $V_A / V_P$ — only the effects that add up (additive) → GWAS and PRS deal with h²
+
+![Heritability is a ratio. The whole bar = how much people in this population differ; heritability = the share explained by genetic differences. The sizes of the parts are schematic.](/assets/img/w2/h2_variance.png){fig-align="center"}
+
 -   ⚠️ A **population** quantity, not an individual one. "Height is 80% heritable" says nothing about how much of *your* height is genetic
 -   ⚠️ **Context-dependent** — rises when the environment is uniform, falls when it varies → the same trait can have different heritability in different populations or eras
+
+### ② Estimating it from families and twins {#w2-s5-1-2}
+
+-   Families share genes **and** environment → "it runs in the family" cannot tell the two apart
+-   Compare relatives who share different fractions of their genes: identical (MZ) twins 100%, parents, children, siblings and fraternal (DZ) twins 50%, second-degree relatives 25%, third-degree 12.5%
+-   Risk rises with closeness, while family members who share the home but not the genes (adoptees, spouses) have the general-population risk → that is the genetic share. E.g. for multiple sclerosis: an MZ twin of a patient \~160×, first-degree relatives 20–40×, adoptees and spouses \~1×
+-   **Twins = an experiment of nature** — MZ and DZ twins both grow up in one home; the only difference is the share of genes (100% vs. 50%) → **the extra resemblance** of MZ pairs = the genetic share
+-   **Falconer's formula**: h² ≈ 2 × (r~MZ~ − r~DZ~)
 -   **Twin h²** (comparing twins) \> **SNP h²** (only what common SNPs tag)
 
+![① The fraction of alleles relatives share. ② MZ pairs resemble each other more than DZ pairs (schematic). ③ Twice that difference = heritability. Shared environment C is assumed equal for MZ and DZ twins.](/assets/img/w2/twin_design.png){fig-align="center"}
+
 ::: {.callout-note collapse="true" icon=false}
-## 🔍 Going further — three ways to estimate h²
+## 🔍 Going further — three ways to estimate h², and the assumptions behind twin studies
 
 | Estimate | From | Typically |
 |------------------------|------------------------|------------------------|
 | **Twin h²** | Comparing MZ and DZ twin similarity | Highest; includes all genetic variation, and inflates if shared-environment assumptions fail |
 | **SNP h²** | Genome-wide relatedness among unrelated individuals | Lower; captures only what common SNPs tag |
 | **h² from genome-wide significant hits** | Summing effects of significant loci | Lowest by far |
+
+Assumptions and limits of twin and family studies:
+
+-   **Equal environments** — if MZ twins are treated more alike than DZ twins (same clothes, same friends), that share is counted as genetic → overestimate
+-   **Ascertainment bias** — families with patients are more likely to enrol
+-   MZ twins are not perfectly identical — somatic mutations, X inactivation, epigenetic differences; and adults share less of their environment
+:::
+
+### ③ Heritability of a yes/no disease: the liability-threshold model {#w2-s5-1-3}
+
+-   A disease is 0/1 → its variance cannot be split directly
+-   → assume an unseen, continuous **liability** (the sum of genetic and environmental risk); anyone above a **threshold T** is affected
+-   The prevalence K sets the threshold (K = 5% → T = 1.64 SD)
+-   A patient's relatives share part of the patient's genes → their liability distribution shifts right → more of them cross the threshold = **familial aggregation**
+-   Twin **concordance** (if one twin is affected, how often is the other?) → converted into a liability correlation → h²
+
+![Top: the general population, prevalence 5%. Bottom: first-degree relatives of a patient — the distribution shifts right, and \~15% cross the same threshold (assuming h² = 0.6; schematic).](/assets/img/w2/liability_threshold.png){fig-align="center"}
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 Going further — from concordance to heritability: rheumatoid arthritis
+
+-   Prevalence K ≈ 1% → threshold T = 2.33
+-   Twin concordance: MZ 12%, DZ 3% → not 100% even for MZ = an environmental share (incomplete penetrance)
+-   Treat the two twins' liabilities as a bivariate normal and find the correlation r for which "both above the threshold = K × concordance"
+    -   MZ: 0.01 × 0.12 = 1.2×10⁻³ — it would be 10⁻⁴ if they were independent → r~MZ~ ≈ 0.48
+    -   DZ: 0.01 × 0.03 = 3×10⁻⁴ → r~DZ~ ≈ 0.18
+-   → H² ≈ 2 × (0.48 − 0.18) ≈ **0.6**
+-   💡 "12% concordance" sounds like a weak genetic effect, but for a disease with 1% prevalence it is a 12-fold rise → on the liability scale, heritability is about 60%
 :::
 
 ## 2) Missing heritability {#w2-s5-2}
 
--   Height: twin studies \~80% → SNP-based estimates \~50% → genome-wide significant loci when GWAS began: a few percent
+-   Height: twin studies \~80% → SNP-based estimates \~45–50% → genome-wide significant loci when GWAS began: a few percent
 -   That gap = the **missing heritability problem**
 -   Much of it is now explained by **many more, smaller effects** below the detection threshold → **polygenicity**: common traits are influenced by thousands to tens of thousands of variants
+
+![Heritability estimates for height. The 180 GWAS hits of 2010 explained \~10% → a 5.4-million-person GWAS (2022) reaches \~40% in European ancestry → the same SNPs explain 10–20% in other ancestries (🔗 [§5.3③](#w2-s5-3-3)).](/assets/img/w2/missing_heritability.png){fig-align="center"}
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — where the heritability went, and the omnigenic model
@@ -840,13 +887,26 @@ Cancer is a **somatic** genetic disease → different questions:
 |------------------------------------|------------------------------------|
 | Indel | A short insertion or deletion |
 | Tandem repeat | Short sequence repeated head-to-tail; copy number varies between people |
+| STR / VNTR | Tandem repeats with a 1–6 bp / ≥7 bp unit |
+| Transposon | Sequence that copies or moves itself around the genome — retrotransposons (LINE, SINE, LTR/ERV) and DNA transposons |
+| Mobile element insertion | A new copy of a still-active transposon (Alu, L1, SVA) — one kind of structural variant |
 | Joint calling | Calling variants across all samples together, not one at a time |
+| GATK Best Practices | The standard pipeline from reads to VCF (align → clean up reads → call per sample → joint genotyping → filter) |
+| Genotype calling (arrays) | Assigning genotypes from clusters of fluorescence intensity (AA · AB · BB) |
+| Phasing | Assigning alleles to each of a person's two chromosomes — the input to imputation |
 | Reference panel | Densely sequenced genomes used for imputation (1000 Genomes, HRC, TOPMed) |
+| PCA | Summarises a people × SNPs table in a few coordinates along the axes that separate people most |
+| Summary statistics | Per-variant effect size, SE and p-value — the input to meta-analysis and later analyses |
+| Meta-analysis | Combining cohorts' summary statistics as a precision-weighted average |
 | Genomic inflation (λ) | Median test statistic ÷ its null expectation |
 | 5×10⁻⁸ | Genome-wide significance — Bonferroni for \~1 million independent common variants |
 | Credible set | Smallest variant set containing the causal one at given probability |
 | Colocalization | Testing whether two signals share a causal variant |
+| caQTL · meQTL · pQTL | Variants associated with chromatin accessibility, DNA methylation or protein level |
 | TWAS | Testing whether genes' predicted expression associates with a trait |
+| H² / h² | Broad-sense (all genetic effects) / narrow-sense (additive effects only) heritability |
+| Concordance | Among twin pairs with one affected twin, the fraction where the other is affected too |
+| Liability-threshold model | Treats a yes/no disease as a continuous liability crossing a threshold |
 | Missing heritability | Gap between twin-based heritability and what significant loci explain |
 | Portability | How well a PRS keeps its accuracy in another ancestry |
 | Mendelian randomization | Using genotype as an instrument for causal inference |
@@ -886,6 +946,8 @@ GTEx Consortium. [*The GTEx Consortium atlas of genetic regulatory effects acros
 
 ### Heritability, polygenicity, PRS
 
+Lango Allen H, et al. [*Hundreds of variants clustered in genomic loci and biological pathways affect human height.*](https://pubmed.ncbi.nlm.nih.gov/?term=Hundreds+of+variants+clustered+in+genomic+loci+and+biological+pathways+affect+human+height) Nature. 2010.\
+Yengo L, et al. [*A saturated map of common genetic variants associated with human height.*](https://pubmed.ncbi.nlm.nih.gov/?term=A+saturated+map+of+common+genetic+variants+associated+with+human+height) Nature. 2022.\
 Boyle EA, Li YI, Pritchard JK. [*An expanded view of complex traits: from polygenic to omnigenic.*](https://pubmed.ncbi.nlm.nih.gov/?term=An+expanded+view+of+complex+traits%3A+from+polygenic+to+omnigenic) Cell. 2017.\
 Choi SW, Mak TS, O'Reilly PF. [*Tutorial: a guide to performing polygenic risk score analyses.*](https://pubmed.ncbi.nlm.nih.gov/?term=Tutorial%3A+a+guide+to+performing+polygenic+risk+score+analyses) Nat Protoc. 2020.\
 [PGS Catalog](https://www.pgscatalog.org/)

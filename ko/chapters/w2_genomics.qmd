@@ -648,28 +648,75 @@ Enhancer는 중간 유전자를 건너뛰고 멀리 있는 표적 유전자에 �
 
 > 🔑 **핵심** — 흔한 형질 = 효과가 아주 작은 변이 수천 개의 합작. Polygenic risk score = 이를 더한 값 → 집단을 층화할 뿐, 개인 진단 x
 
-## 1) Twin heritability와 SNP heritability {#w2-s5-1}
+## 1) 유전력(Heritability) {#w2-s5-1}
 
--   **유전력**(heritability, h²) — 한 집단에서 phenotype 분산 중 유전적 분산으로 설명되는 비율
+### ① 사람 사이의 차이를 나누기 {#w2-s5-1-1}
+
+-   출발점: 한 집단 안에서 형질(키, 혈압 …)은 사람마다 다름 → 그 퍼짐 = phenotype 분산 $V_P$
+-   이 분산을 유전 차이에서 오는 몫($V_G$)과 환경 차이에서 오는 몫으로 나눔
+-   **넓은 의미 유전력** H² = $V_G / V_P$ — 모든 유전 효과 / **좁은 의미 유전력** h² = $V_A / V_P$ — 더해지는(additive) 효과만 → GWAS·PRS가 다루는 것은 h²
+
+![유전력 = 비율. 막대 전체 = 이 집단에서 사람들이 보이는 차이, 그중 유전 차이로 설명되는 몫. 각 칸의 크기는 도식](/assets/img/w2/h2_variance.png){fig-align="center"}
+
 -   ⚠️ 개인이 아니라 **집단**의 양. "키의 유전력 80%" → *내* 키의 몇 퍼센트가 유전 때문인지는 말해주지 않음
 -   ⚠️ **맥락 의존적** — 환경이 균일하면 올라가고 다양하면 내려감 → 같은 trait도 집단·시대에 따라 유전력이 다를 수 있음
+
+### ② 가족과 쌍둥이로 추정하기 {#w2-s5-1-2}
+
+-   가족은 유전자와 환경을 **함께** 공유 → "집안 내력"만으로는 둘을 구분 x
+-   공유하는 유전자 비율이 다른 친척을 비교: 일란성(MZ) 쌍둥이 100%, 부모·자녀·형제·이란성(DZ) 쌍둥이 50%, 2촌 25%, 3촌 12.5%
+-   가까운 친척일수록 위험이 큼, 한집에 살아도 혈연이 아닌 가족(입양 형제, 배우자)은 일반인과 같음 → 유전의 몫. 예: 다발성 경화증 환자의 MZ 쌍둥이는 일반인보다 약 160배, 1촌 20–40배, 입양 형제·배우자 약 1배
+-   **쌍둥이 = 자연의 실험** — MZ도 DZ도 같은 집에서 자람, 다른 것은 공유 유전자 비율(100% vs. 50%)뿐 → MZ가 DZ보다 **더 닮은 만큼** = 유전의 몫
+-   **Falconer 공식**: h² ≈ 2 × (r~MZ~ − r~DZ~)
 -   **Twin h²**(쌍둥이 비교) \> **SNP h²**(흔한 SNP가 tag하는 부분만)
 
+![① 친척이 공유하는 allele 비율 ② MZ 쌍은 DZ 쌍보다 더 닮음(도식) ③ 그 차이의 두 배 = 유전력. 공유환경 C는 MZ와 DZ에서 같다고 가정](/assets/img/w2/twin_design.png){fig-align="center"}
+
 ::: {.callout-note collapse="true" icon=false}
-## 🔍 더 알아보기 — h²를 추정하는 세 가지 방법
+## 🔍 더 알아보기 — h²를 추정하는 세 가지 방법, 쌍둥이 연구의 가정
 
 | 추정치 | 계산 자료 | 일반적 특징 |
 |------------------------|------------------------|------------------------|
 | **Twin h²** | 일란성·이란성 쌍둥이의 유사도 비교 | 가장 높음. 모든 유전 변이를 포함, 공유환경 가정이 틀리면 과대 추정 |
 | **SNP h²** | 서로 무관한 사람들의 전장유전체 relatedness | 더 낮음. 흔한 SNP가 tag하는 부분만 포착 |
 | **Genome-wide significant hit의 h²** | 유의한 locus의 효과 합산 | 압도적으로 가장 낮음 |
+
+쌍둥이·가족 연구의 가정과 한계:
+
+-   **같은 환경 가정** — MZ가 DZ보다 더 비슷한 대우를 받으면(같은 옷, 같은 친구) 그 몫까지 유전으로 계산 → 과대 추정
+-   **확인 편향**(ascertainment bias) — 환자가 있는 가족일수록 연구에 잘 모임
+-   MZ도 완전히 같지는 않음 — 체세포 변이, X 불활성화, 후성유전 차이. 성인이 되면 공유하는 환경도 줄어듦
+:::
+
+### ③ 질병(있다/없다)의 유전력: liability-threshold model {#w2-s5-1-3}
+
+-   질병은 0/1 → 분산을 바로 나눌 수 없음
+-   → 눈에 보이지 않는 연속적인 **liability**(유전 + 환경 위험의 합)를 가정, **역치 T**를 넘으면 발병
+-   유병률 K가 역치 위치를 정함(K = 5% → T = 1.64 SD)
+-   환자의 가족 = 유전자 일부를 공유 → liability 분포가 오른쪽으로 이동 → 역치를 넘는 비율이 커짐 = **가족 집적**(familial aggregation)
+-   쌍둥이 **일치율**(concordance: 한 명이 환자일 때 다른 한 명도 환자인 비율) → liability 상관으로 바꿔 h² 추정
+
+![위: 일반 집단, 유병률 5%. 아래: 환자의 1촌 — 분포가 오른쪽으로 이동해 같은 역치에서 약 15%(h² = 0.6 가정, 도식)](/assets/img/w2/liability_threshold.png){fig-align="center"}
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 더 알아보기 — 일치율에서 유전력까지: 류마티스관절염 예시
+
+-   유병률 K ≈ 1% → 역치 T = 2.33
+-   쌍둥이 일치율: MZ 12%, DZ 3% → MZ도 100%가 아님 = 환경의 몫(불완전 침투도)
+-   두 쌍둥이의 liability를 이변량 정규분포로 놓고, "둘 다 역치를 넘을 확률 = K × 일치율"이 되는 상관 r을 찾음
+    -   MZ: 0.01 × 0.12 = 1.2×10⁻³ — 서로 독립이라면 10⁻⁴ → r~MZ~ ≈ 0.48
+    -   DZ: 0.01 × 0.03 = 3×10⁻⁴ → r~DZ~ ≈ 0.18
+-   → H² ≈ 2 × (0.48 − 0.18) ≈ **0.6**
+-   💡 "일치율 12%"만 보면 유전 영향이 작아 보이지만, 유병률 1%인 질병에서 12배 → liability 척도로는 유전력 약 60%
 :::
 
 ## 2) 사라진 유전력(Missing heritability) {#w2-s5-2}
 
--   키의 예: 쌍둥이 연구 약 80% → SNP 기반 추정 약 50% → GWAS 초기의 genome-wide significant locus 수 퍼센트
+-   키의 예: 쌍둥이 연구 약 80% → SNP 기반 추정 약 45–50% → GWAS 초기의 genome-wide significant locus 수 퍼센트
 -   이 차이 = **missing heritability problem**
 -   현재는 상당 부분 설명됨: 검출 역치 아래의 **훨씬 많고 작은 효과** → **polygenicity** — 흔한 trait는 수천–수만 변이의 영향을 받음
+
+![키의 유전력 추정치 비교. 2010년 GWAS hit 180개는 약 10%만 설명 → 540만 명 GWAS(2022)는 유럽계에서 약 40%까지 → 같은 SNP를 다른 ancestry에 쓰면 10–20%(🔗 [§5.3③](#w2-s5-3-3))](/assets/img/w2/missing_heritability.png){fig-align="center"}
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 더 알아보기 — 사라진 유전력의 행방, omnigenic model
@@ -840,13 +887,26 @@ $$
 |------------------------------------|------------------------------------|
 | Indel | 짧은 삽입 또는 결실 |
 | Tandem repeat | 짧은 서열이 머리–꼬리 방향으로 반복, 사람마다 copy number가 다름 |
+| STR / VNTR | 반복 단위가 1–6 bp / 7 bp 이상인 tandem repeat |
+| Transposon | 유전체 안에서 스스로를 복사·이동하는 서열 — retrotransposon(LINE·SINE·LTR/ERV)과 DNA transposon |
+| Mobile element insertion | 아직 움직이는 transposon(Alu, L1, SVA)의 새 삽입 — 구조 변이의 한 종류 |
 | Joint calling | 시료를 하나씩이 아니라 모두 함께 분석하는 variant calling |
+| GATK Best Practices | 리드에서 VCF까지의 표준 파이프라인(정렬 → 리드 정리 → 시료별 calling → joint genotyping → 필터링) |
+| Genotype calling(array) | 형광 세기의 cluster(AA·AB·BB)로 genotype을 판정하는 것 |
+| Phasing | 각 사람의 두 염색체에 allele을 나눠 배정하는 것 — imputation의 입력 |
 | 참조 패널 | Imputation에 쓰는 촘촘하게 시퀀싱한 유전체 모음 (1000 Genomes, HRC, TOPMed) |
+| PCA | 사람 × SNP 표에서 사람들을 가장 크게 갈라놓는 축을 찾아 몇 개의 좌표로 요약하는 방법 |
+| Summary statistics | 변이별 효과 크기·SE·p-value 표 — meta-analysis와 후속 분석의 재료 |
+| Meta-analysis | 여러 코호트의 summary statistics를 정밀도로 가중 평균해 합치는 것 |
 | Genomic inflation(λ) | 검정통계량 중앙값을 귀무가설 기대값으로 나눈 값 |
 | 5×10⁻⁸ | Genome-wide 유의성 기준 — 독립적인 흔한 변이 약 100만 개에 대한 Bonferroni |
 | Credible set | 정해진 확률로 원인 변이를 포함하는 가장 작은 변이 집합 |
 | Colocalization | 두 신호가 원인 변이를 공유하는지 검정하는 것 |
+| caQTL·meQTL·pQTL | Chromatin 접근성·DNA methylation·단백질 수준과 연관된 변이 |
 | TWAS | 예측된 발현과 trait의 연관성을 유전자별로 검정하는 방법 |
+| H² / h² | 넓은 의미(모든 유전 효과) / 좁은 의미(additive 효과만) 유전력 |
+| Concordance(일치율) | 쌍둥이 한 명이 환자일 때 다른 한 명도 환자인 비율 |
+| Liability-threshold model | 0/1 질병을 연속적인 위험(liability)이 역치를 넘는 것으로 보는 모형 |
 | Missing heritability | Twin 기반 유전력과 유의한 locus가 설명하는 부분 사이의 차이 |
 | Portability | PRS가 다른 ancestry에서도 정확도를 유지하는 정도 |
 | Mendelian randomization | 인과 추론을 위해 genotype을 도구 변수로 사용하는 방법 |
@@ -886,6 +946,8 @@ GTEx Consortium. [*The GTEx Consortium atlas of genetic regulatory effects acros
 
 ### 유전력, polygenicity, PRS
 
+Lango Allen H, et al. [*Hundreds of variants clustered in genomic loci and biological pathways affect human height.*](https://pubmed.ncbi.nlm.nih.gov/?term=Hundreds+of+variants+clustered+in+genomic+loci+and+biological+pathways+affect+human+height) Nature. 2010.\
+Yengo L, et al. [*A saturated map of common genetic variants associated with human height.*](https://pubmed.ncbi.nlm.nih.gov/?term=A+saturated+map+of+common+genetic+variants+associated+with+human+height) Nature. 2022.\
 Boyle EA, Li YI, Pritchard JK. [*An expanded view of complex traits: from polygenic to omnigenic.*](https://pubmed.ncbi.nlm.nih.gov/?term=An+expanded+view+of+complex+traits%3A+from+polygenic+to+omnigenic) Cell. 2017.\
 Choi SW, Mak TS, O'Reilly PF. [*Tutorial: a guide to performing polygenic risk score analyses.*](https://pubmed.ncbi.nlm.nih.gov/?term=Tutorial%3A+a+guide+to+performing+polygenic+risk+score+analyses) Nat Protoc. 2020.\
 [PGS Catalog](https://www.pgscatalog.org/)

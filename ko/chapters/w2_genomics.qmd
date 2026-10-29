@@ -606,11 +606,18 @@ Enhancer는 중간 유전자를 건너뛰고 멀리 있는 표적 유전자에 �
 
 💡 **핵심 아이디어** — GWAS는 "변이 → 질병"만 보여줌. 같은 변이가 어떤 **유전자의 발현**도 바꾸는지 겹쳐 보면 → 그 유전자가 표적 후보
 
-![세 가지 질문. ① eQTL: genotype에 따라 유전자 발현이 달라지나 ② Colocalization: GWAS 신호와 eQTL 신호의 꼭대기가 같은 변이인가 ③ TWAS: 유전적으로 예측한 발현이 질병과 연관되나](/assets/img/w2/variant_to_gene.png){fig-align="center"}
-
 -   **eQTL mapping** — 어떤 변이가 어떤 유전자의 발현과 연관되나?
+
+![eQTL. GWAS 변이의 genotype(AA·AB·BB)에 따라 유전자 G의 발현을 비교. B allele이 많을수록 발현이 높음 → 이 변이 = 유전자 G의 eQTL](/assets/img/w2/eqtl.png){fig-align="center"}
+
 -   **Colocalization** — GWAS 신호와 eQTL 신호가 같은 원인 변이를 공유하나?
+
+![Colocalization. 왼쪽: 두 신호의 꼭대기가 같은 변이 → 질병 신호가 유전자 G의 발현을 거쳐 작동할 가능성. 오른쪽: 같은 locus에 있어도 꼭대기가 다른 변이 → 우연히 가까이 있는 두 신호일 뿐](/assets/img/w2/coloc.png){fig-align="center"}
+
 -   **TWAS**(transcriptome-wide association study) — genotype과 발현을 함께 잰 참조 데이터(GTEx 등)에서 "genotype → 발현" 예측 모델을 학습 → GWAS 코호트에 적용해 사람마다 발현을 예측 → 예측 발현과 질병의 연관성을 **유전자 단위**로 검정
+
+![TWAS. ① genotype과 발현을 함께 잰 참조 데이터에서 SNP마다 가중치를 학습 ② GWAS 코호트의 genotype에 같은 가중치를 적용해 사람마다 발현을 예측(측정값 x) ③ 예측 발현을 case와 control 사이에서 비교 — 유전자마다 반복](/assets/img/w2/twas.png){fig-align="center"}
+
 -   **CRISPR perturbation** — 이 element를 편집하면 유전자가 변하나? → 가장 강한 근거
 
 💡 [Open Targets Genetics](https://genetics.opentargets.org/) — 이 정보 대부분을 locus별 한 화면에 모아줌. 어떤 hit든 좋은 출발점
@@ -650,8 +657,6 @@ Enhancer는 중간 유전자를 건너뛰고 멀리 있는 표적 유전자에 �
 
 ## 1) 유전력(Heritability) {#w2-s5-1}
 
-### ① 사람 사이의 차이를 나누기 {#w2-s5-1-1}
-
 -   출발점: 한 집단 안에서 형질(키, 혈압 …)은 사람마다 다름 → 그 퍼짐 = phenotype 분산 $V_P$
 -   이 분산을 유전 차이에서 오는 몫($V_G$)과 환경 차이에서 오는 몫으로 나눔
 -   **넓은 의미 유전력** H² = $V_G / V_P$ — 모든 유전 효과 / **좁은 의미 유전력** h² = $V_A / V_P$ — 더해지는(additive) 효과만 → GWAS·PRS가 다루는 것은 h²
@@ -660,20 +665,21 @@ Enhancer는 중간 유전자를 건너뛰고 멀리 있는 표적 유전자에 �
 
 -   ⚠️ 개인이 아니라 **집단**의 양. "키의 유전력 80%" → *내* 키의 몇 퍼센트가 유전 때문인지는 말해주지 않음
 -   ⚠️ **맥락 의존적** — 환경이 균일하면 올라가고 다양하면 내려감 → 같은 trait도 집단·시대에 따라 유전력이 다를 수 있음
+-   어떻게 재나: 유전자를 공유하는 비율이 다른 친척, 특히 **일란성 vs. 이란성 쌍둥이**가 얼마나 닮았는지 비교 / 있다·없다로 나뉘는 질병은 **liability-threshold model**로 → 아래 더 알아보기
+-   **Twin h²**(쌍둥이 비교) \> **SNP h²**(흔한 SNP가 tag하는 부분만)
 
-### ② 가족과 쌍둥이로 추정하기 {#w2-s5-1-2}
+::: {.callout-note collapse="true" icon=false}
+## 🔍 더 알아보기 — 가족과 쌍둥이로 유전력 추정하기
 
 -   가족은 유전자와 환경을 **함께** 공유 → "집안 내력"만으로는 둘을 구분 x
 -   공유하는 유전자 비율이 다른 친척을 비교: 일란성(MZ) 쌍둥이 100%, 부모·자녀·형제·이란성(DZ) 쌍둥이 50%, 2촌 25%, 3촌 12.5%
 -   가까운 친척일수록 위험이 큼, 한집에 살아도 혈연이 아닌 가족(입양 형제, 배우자)은 일반인과 같음 → 유전의 몫. 예: 다발성 경화증 환자의 MZ 쌍둥이는 일반인보다 약 160배, 1촌 20–40배, 입양 형제·배우자 약 1배
 -   **쌍둥이 = 자연의 실험** — MZ도 DZ도 같은 집에서 자람, 다른 것은 공유 유전자 비율(100% vs. 50%)뿐 → MZ가 DZ보다 **더 닮은 만큼** = 유전의 몫
 -   **Falconer 공식**: h² ≈ 2 × (r~MZ~ − r~DZ~)
--   **Twin h²**(쌍둥이 비교) \> **SNP h²**(흔한 SNP가 tag하는 부분만)
 
 ![① 친척이 공유하는 allele 비율 ② MZ 쌍은 DZ 쌍보다 더 닮음(도식) ③ 그 차이의 두 배 = 유전력. 공유환경 C는 MZ와 DZ에서 같다고 가정](/assets/img/w2/twin_design.png){fig-align="center"}
 
-::: {.callout-note collapse="true" icon=false}
-## 🔍 더 알아보기 — h²를 추정하는 세 가지 방법, 쌍둥이 연구의 가정
+**h²를 추정하는 세 가지 방법**
 
 | 추정치 | 계산 자료 | 일반적 특징 |
 |------------------------|------------------------|------------------------|
@@ -681,14 +687,15 @@ Enhancer는 중간 유전자를 건너뛰고 멀리 있는 표적 유전자에 �
 | **SNP h²** | 서로 무관한 사람들의 전장유전체 relatedness | 더 낮음. 흔한 SNP가 tag하는 부분만 포착 |
 | **Genome-wide significant hit의 h²** | 유의한 locus의 효과 합산 | 압도적으로 가장 낮음 |
 
-쌍둥이·가족 연구의 가정과 한계:
+**쌍둥이·가족 연구의 가정과 한계**
 
 -   **같은 환경 가정** — MZ가 DZ보다 더 비슷한 대우를 받으면(같은 옷, 같은 친구) 그 몫까지 유전으로 계산 → 과대 추정
 -   **확인 편향**(ascertainment bias) — 환자가 있는 가족일수록 연구에 잘 모임
 -   MZ도 완전히 같지는 않음 — 체세포 변이, X 불활성화, 후성유전 차이. 성인이 되면 공유하는 환경도 줄어듦
 :::
 
-### ③ 질병(있다/없다)의 유전력: liability-threshold model {#w2-s5-1-3}
+::: {.callout-note collapse="true" icon=false}
+## 🔍 더 알아보기 — 질병(있다/없다)의 유전력: liability-threshold model
 
 -   질병은 0/1 → 분산을 바로 나눌 수 없음
 -   → 눈에 보이지 않는 연속적인 **liability**(유전 + 환경 위험의 합)를 가정, **역치 T**를 넘으면 발병
@@ -698,8 +705,7 @@ Enhancer는 중간 유전자를 건너뛰고 멀리 있는 표적 유전자에 �
 
 ![위: 일반 집단, 유병률 5%. 아래: 환자의 1촌 — 분포가 오른쪽으로 이동해 같은 역치에서 약 15%(h² = 0.6 가정, 도식)](/assets/img/w2/liability_threshold.png){fig-align="center"}
 
-::: {.callout-note collapse="true" icon=false}
-## 🔍 더 알아보기 — 일치율에서 유전력까지: 류마티스관절염 예시
+**예시 — 류마티스관절염: 일치율에서 유전력까지**
 
 -   유병률 K ≈ 1% → 역치 T = 2.33
 -   쌍둥이 일치율: MZ 12%, DZ 3% → MZ도 100%가 아님 = 환경의 몫(불완전 침투도)

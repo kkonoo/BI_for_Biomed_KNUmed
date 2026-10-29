@@ -21,9 +21,12 @@ def tint(a):
 def card(ax,x,y,w,h,fc="white",ec=LINE,lw=0.9,z=2):
     ax.add_patch(mp.Rectangle((x-w/2,y-h/2),w,h,fc=fc,ec=ec,lw=lw,zorder=z))
 
-def header(ax,eyebrow,title,x=0):
-    """Gallery slide header in axes coords: crimson eyebrow, bold message title, thin rule."""
+def header(ax,eyebrow,title,x=0,dy=0,x1=1):
+    """Gallery slide header in axes coords: crimson eyebrow, bold message title, thin rule.
+    dy (points) lifts it, e.g. above panel titles; x1 stretches the rule across later panels."""
+    from matplotlib.transforms import offset_copy
     kw=dict(xycoords="axes fraction",textcoords="offset points",ha="left",va="bottom")
-    ax.annotate(eyebrow,(x,1),xytext=(0,34),fontsize=10.5,color=CRIMSON,**kw)
-    ax.annotate(title,(x,1),xytext=(0,10),fontsize=16,fontweight="bold",color=TEXT,**kw)
-    ax.plot([x,1],[1,1],transform=ax.transAxes,color="#E3E6EB",lw=0.9,clip_on=False)
+    ax.annotate(eyebrow,(x,1),xytext=(0,34+dy),fontsize=10.5,color=CRIMSON,**kw)
+    ax.annotate(title,(x,1),xytext=(0,10+dy),fontsize=16,fontweight="bold",color=TEXT,**kw)
+    ax.plot([x,x1],[1,1],transform=offset_copy(ax.transAxes,ax.figure,y=dy,units="points"),
+            color="#E3E6EB",lw=0.9,clip_on=False)

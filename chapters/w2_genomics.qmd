@@ -606,11 +606,18 @@ Enhancers routinely skip over intervening genes to reach their target
 
 💡 **Core idea** — a GWAS shows only "variant → disease". Check whether the same variant also changes some **gene's expression** → that gene becomes the candidate target
 
-![Three questions. ① eQTL: does gene expression differ by genotype? ② Colocalization: do the GWAS and eQTL signals peak at the same variant? ③ TWAS: does genetically predicted expression associate with the disease?](/assets/img/w2/variant_to_gene.png){fig-align="center"}
-
 -   **eQTL mapping** — which variants associate with the expression of which genes?
+
+![eQTL. Expression of gene G compared across genotypes (AA · AB · BB) at the GWAS variant. The more B alleles, the higher the expression → the variant is an eQTL for gene G.](/assets/img/w2/eqtl.png){fig-align="center"}
+
 -   **Colocalization** — do the GWAS and eQTL signals share the same causal variant?
+
+![Colocalization. Left: both signals peak at the same variant → the disease signal plausibly acts through the expression of gene G. Right: same locus but different top variants → two signals that merely sit close together.](/assets/img/w2/coloc.png){fig-align="center"}
+
 -   **TWAS** (transcriptome-wide association study) — learn a "genotype → expression" model in reference data where both were measured (e.g. GTEx) → apply it to the GWAS cohort to predict each person's expression → test predicted expression against the disease, **one gene at a time**
+
+![TWAS. ① Learn a weight per SNP in reference data with both genotypes and expression. ② Apply the same weights to the GWAS cohort's genotypes to predict each person's expression (not measured). ③ Compare predicted expression between cases and controls — repeated for every gene.](/assets/img/w2/twas.png){fig-align="center"}
+
 -   **CRISPR perturbation** — does editing the element change the gene? → the strongest evidence
 
 💡 [Open Targets Genetics](https://genetics.opentargets.org/) aggregates most of these into a single per-locus view. A good first stop for any hit
@@ -650,8 +657,6 @@ Enhancers routinely skip over intervening genes to reach their target
 
 ## 1) Heritability {#w2-s5-1}
 
-### ① Splitting the differences between people {#w2-s5-1-1}
-
 -   Starting point: within a population a trait (height, blood pressure …) differs from person to person → that spread = the phenotypic variance $V_P$
 -   Split it into the share that comes from genetic differences ($V_G$) and the share that comes from environmental differences
 -   **Broad-sense heritability** H² = $V_G / V_P$ — all genetic effects / **narrow-sense heritability** h² = $V_A / V_P$ — only the effects that add up (additive) → GWAS and PRS deal with h²
@@ -660,20 +665,21 @@ Enhancers routinely skip over intervening genes to reach their target
 
 -   ⚠️ A **population** quantity, not an individual one. "Height is 80% heritable" says nothing about how much of *your* height is genetic
 -   ⚠️ **Context-dependent** — rises when the environment is uniform, falls when it varies → the same trait can have different heritability in different populations or eras
+-   How it is measured: compare how much relatives who share different fractions of their genes resemble each other — above all **identical vs. fraternal twins** / for yes-or-no diseases, through the **liability-threshold model** → Going further below
+-   **Twin h²** (comparing twins) \> **SNP h²** (only what common SNPs tag)
 
-### ② Estimating it from families and twins {#w2-s5-1-2}
+::: {.callout-note collapse="true" icon=false}
+## 🔍 Going further — estimating heritability from families and twins
 
 -   Families share genes **and** environment → "it runs in the family" cannot tell the two apart
 -   Compare relatives who share different fractions of their genes: identical (MZ) twins 100%, parents, children, siblings and fraternal (DZ) twins 50%, second-degree relatives 25%, third-degree 12.5%
 -   Risk rises with closeness, while family members who share the home but not the genes (adoptees, spouses) have the general-population risk → that is the genetic share. E.g. for multiple sclerosis: an MZ twin of a patient \~160×, first-degree relatives 20–40×, adoptees and spouses \~1×
 -   **Twins = an experiment of nature** — MZ and DZ twins both grow up in one home; the only difference is the share of genes (100% vs. 50%) → **the extra resemblance** of MZ pairs = the genetic share
 -   **Falconer's formula**: h² ≈ 2 × (r~MZ~ − r~DZ~)
--   **Twin h²** (comparing twins) \> **SNP h²** (only what common SNPs tag)
 
 ![① The fraction of alleles relatives share. ② MZ pairs resemble each other more than DZ pairs (schematic). ③ Twice that difference = heritability. Shared environment C is assumed equal for MZ and DZ twins.](/assets/img/w2/twin_design.png){fig-align="center"}
 
-::: {.callout-note collapse="true" icon=false}
-## 🔍 Going further — three ways to estimate h², and the assumptions behind twin studies
+**Three ways to estimate h²**
 
 | Estimate | From | Typically |
 |------------------------|------------------------|------------------------|
@@ -681,14 +687,15 @@ Enhancers routinely skip over intervening genes to reach their target
 | **SNP h²** | Genome-wide relatedness among unrelated individuals | Lower; captures only what common SNPs tag |
 | **h² from genome-wide significant hits** | Summing effects of significant loci | Lowest by far |
 
-Assumptions and limits of twin and family studies:
+**Assumptions and limits of twin and family studies**
 
 -   **Equal environments** — if MZ twins are treated more alike than DZ twins (same clothes, same friends), that share is counted as genetic → overestimate
 -   **Ascertainment bias** — families with patients are more likely to enrol
 -   MZ twins are not perfectly identical — somatic mutations, X inactivation, epigenetic differences; and adults share less of their environment
 :::
 
-### ③ Heritability of a yes/no disease: the liability-threshold model {#w2-s5-1-3}
+::: {.callout-note collapse="true" icon=false}
+## 🔍 Going further — heritability of a yes/no disease: the liability-threshold model
 
 -   A disease is 0/1 → its variance cannot be split directly
 -   → assume an unseen, continuous **liability** (the sum of genetic and environmental risk); anyone above a **threshold T** is affected
@@ -698,8 +705,7 @@ Assumptions and limits of twin and family studies:
 
 ![Top: the general population, prevalence 5%. Bottom: first-degree relatives of a patient — the distribution shifts right, and \~15% cross the same threshold (assuming h² = 0.6; schematic).](/assets/img/w2/liability_threshold.png){fig-align="center"}
 
-::: {.callout-note collapse="true" icon=false}
-## 🔍 Going further — from concordance to heritability: rheumatoid arthritis
+**Example — rheumatoid arthritis: from concordance to heritability**
 
 -   Prevalence K ≈ 1% → threshold T = 2.33
 -   Twin concordance: MZ 12%, DZ 3% → not 100% even for MZ = an environmental share (incomplete penetrance)

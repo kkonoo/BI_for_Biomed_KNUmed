@@ -1,0 +1,109 @@
+<!-- Key-term hover: reads the chapter's "🔑 Key terms / 핵심 용어" tables (including the
+     advanced-terms callout) and marks the first place each term appears in the body.
+     Hover (or tap on mobile) shows the one-line meaning with Quarto's own tippy. -->
+<script>
+(function () {
+  // Never mark terms inside these (or inside a term that is already marked).
+  var SKIP = 'pre, code, a, h1, h2, h3, h4, h5, h6, header, .callout-header, .math, ' +
+             'mjx-container, svg, script, style, button, iframe, .key-term';
+
+  // "MS1 / MS2" → MS1, MS2 · "caQTL · meQTL · pQTL" → three terms ·
+  // "Allele frequency (MAF)" → Allele frequency, MAF · "Genotype calling (arrays)" → Genotype calling.
+  // A bracket counts as a second name only if it looks like one (capitals, digits, symbols, Korean);
+  // a plain-word qualifier such as "(arrays)" is not searched.  Single characters (λ, φ) are dropped.
+  function aliases(term) {
+    var out = [];
+    term.split(/\s*[\/·]\s*/).forEach(function (part) {
+      var m = part.match(/^(.+?)\s*\(([^()]+)\)$/);
+      if (!m) return out.push(part);
+      out.push(m[1]);
+      if (/[A-Z0-9]|[^\x00-\x7F]/.test(m[2])) out.push(m[2]);
+    });
+    return out.filter(function (a) { return a.length > 1; });
+  }
+
+  function termPattern(alias) {
+    var escaped = alias.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    var plural = /[A-Za-z]$/.test(alias) ? 's?' : '';
+    // Acronyms and short symbols match case-sensitively (PCA, kNN, H² vs h²).
+    var strict = alias.length <= 2 || /[A-Z]/.test(alias.slice(1));
+    // Word edges are ASCII only, so Korean particles still match (VCF는, read가).
+    return new RegExp('(^|[^A-Za-z0-9-])(' + escaped + plural + ')(?![A-Za-z0-9-])', strict ? '' : 'i');
+  }
+
+  function initKeyTerms() {
+    var main = document.getElementById('quarto-document-content');
+    if (!main) return;
+    var heading = Array.prototype.find.call(main.querySelectorAll('h1'), function (h) {
+      return h.textContent.trim().indexOf('🔑') === 0;
+    });
+    var glossary = heading && heading.closest('section');
+    if (!glossary) return;
+
+    // One entry per alias; the first row that names it wins.
+    var entries = [], seen = {};
+    glossary.querySelectorAll('tbody tr').forEach(function (tr) {
+      var cells = tr.querySelectorAll('td');
+      if (cells.length < 2) return;
+      var content = '<strong>' + cells[0].innerHTML + '</strong><br>' + cells[1].innerHTML;
+      var title = cells[0].textContent.trim() + ': ' + cells[1].textContent.trim();
+      aliases(cells[0].textContent.trim()).forEach(function (alias) {
+        var re = termPattern(alias);
+        var key = re.ignoreCase ? alias.toLowerCase() : alias;
+        if (seen[key]) return;
+        seen[key] = true;
+        entries.push({ re: re, len: alias.length, content: content, title: title });
+      });
+    });
+    // Longer terms first, so "heterotypic doublet" is claimed before "doublet".
+    entries.sort(function (a, b) { return b.len - a.len; });
+    // Touch screens have no hover: a tap opens the meaning, a tap elsewhere closes it.
+    var trigger = window.matchMedia('(hover: none)').matches ? 'click' : 'mouseenter focus';
+
+    // Body text before the key-terms section. Text in collapsed callouts (learning objectives,
+    // "Going further") goes last, so a term is marked where readers see it first.
+    var shown = [], folded = [];
+    var walker = document.createTreeWalker(main, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, {
+      acceptNode: function (n) {
+        if (n.nodeType === Node.TEXT_NODE) return NodeFilter.FILTER_ACCEPT;
+        return n.matches(SKIP) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_SKIP;
+      }
+    });
+    for (var n = walker.nextNode(); n; n = walker.nextNode()) {
+      if (glossary.compareDocumentPosition(n) & Node.DOCUMENT_POSITION_FOLLOWING) break;
+      (n.parentElement.closest('.callout-collapse:not(.show)') ? folded : shown).push(n);
+    }
+    var nodes = shown.concat(folded);
+
+    entries.forEach(function (entry) {
+      for (var i = 0; i < nodes.length; i++) {
+        var m = entry.re.exec(nodes[i].data);
+        if (!m) continue;
+        var word = nodes[i].splitText(m.index + m[1].length);
+        var rest = word.splitText(m[2].length);
+        var span = document.createElement('span');
+        span.className = 'key-term';
+        span.tabIndex = 0;
+        word.parentNode.replaceChild(span, word);
+        span.appendChild(word);
+        nodes.splice(i + 1, 0, rest);
+        if (window.tippy) {
+          window.tippy(span, {
+            content: entry.content, allowHTML: true, trigger: trigger, maxWidth: 360, delay: 100,
+            arrow: false, theme: 'quarto', placement: 'bottom-start'
+          });
+        } else {
+          span.title = entry.title;
+        }
+        return;
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initKeyTerms);
+  } else {
+    initKeyTerms();
+  }
+})();
+</script>

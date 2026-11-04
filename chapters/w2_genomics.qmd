@@ -101,9 +101,11 @@ About half of the human genome is repetitive. The first thing to ask = **how the
 
 -   **Transposons are classed by how they move**: **retrotransposons** = transcribed to RNA → reverse-transcribed → inserted at a new site (copy and paste: the original stays, so copies keep accumulating) / **DNA transposons** = cut out and moved (cut and paste)
 -   **LINEs and SINEs** are kinds of retrotransposon. The names say it — *Long/Short INterspersed Nuclear Element* = "scattered" repeats → arranged differently from STRs in the first place
--   Most are fossils, too mutated to move. **Still active** = L1 (\~80–100 copies per person), Alu, SVA (a SINE–VNTR–Alu composite)
+-   Most are fossils that can no longer move — mutated over time, or inserted with their front end cut off (5′ truncation). **Still active** = L1 (\~80–100 copies per person), Alu, SVA (a SINE–VNTR–Alu composite)
     -   A new copy = a **mobile element insertion (MEI)** → one kind of structural variant (②). A person carries \~900 Alu, \~130 L1 and \~50 SVA insertions that are not in the reference
     -   Still happening: a new Alu insertion in about 1 in 40 births, L1 and SVA in about 1 in 63
+
+![How an L1 copies itself. ① An active L1 carries the blueprint for its own machinery (promoter, ORF1p, and ORF2p's EN and RT). ② It is transcribed, its proteins are made, and they cut a new site and copy the RNA into DNA right there — copy and paste, the original stays. ③ Copying starts at the poly-A end, so stopping early loses the front (5′ truncation); once inserted, nothing keeps a copy intact and mutations pile up → most copies are fossils.](/assets/img/w2/transposon.png){fig-align="center"}
 -   ⚠️ Why it matters for analysis: hundreds of thousands of near-identical copies → a short read cannot be assigned to one of them → MAPQ ≈ 0 (🔗 [W1 §2.2②](w1_intro.qmd#w1-s2-2-2)) → the "where accuracy falls sharply" of [§2.3](#w2-s2-3)
 :::
 
@@ -160,6 +162,50 @@ Both start from sequenced genomes. The difference = **what is released**
 | NARD | 1,779 Northeast Asians (850 Korean) | Reference panel | Used together with 1000 Genomes |
 
 ⚠️ Imputing Korean samples → whether the panel's **ancestry matches** matters more than its size (🔗 "Imputation quality is not uniform" in [§2.4](#w2-s2-4))
+:::
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 Going further — REF/ALT, major/minor, effect/other, A1/A2: one allele, many names
+
+A SNP has two alleles. Papers and files name them differently because **each name follows a different rule**
+
+| Names | Rule | Fixed? | Where you see it |
+|----------------|--------------------------|----------------|----------------|
+| **REF / ALT** | REF = the base in the reference genome (GRCh38); the other = ALT | ✅ for a given genome build | VCF, gnomAD |
+| **Major / minor** | The more / less common allele in that population or sample | ❌ can change between populations and samples | MAF, QC filters |
+| **Effect / other** (non-effect) | The allele counted 0/1/2 in the regression = the one β and OR refer to | ❌ chosen by the analyst or tool | GWAS summary statistics |
+| **Risk / protective** | The allele that turns out to raise risk (β > 0, OR > 1) | Set by the result | GWAS Catalog, paper text |
+| **A1 / A2** (A0) | **Depends on the tool** (table below) | ❌ | PLINK, REGENIE, SAIGE output |
+
+-   The rules are independent → one allele can be ALT, minor and effect at once — or none of them may coincide
+-   ⚠️ REF ≠ major. The reference genome was built from a few people → at many sites REF is the minor allele
+-   Frequencies follow the names — **MAF** is always ≤ 0.5 / **AF** in a VCF or gnomAD = ALT frequency / **EAF** = effect-allele frequency → AF and EAF can exceed 0.5 (not an error)
+-   Flip the effect allele → β → −β, OR → 1/OR, EAF → 1 − EAF. The p-value does not change
+
+**What "A1" means in each tool**
+
+| Tool | Columns | Allele that β / OR refers to |
+|----------------|----------------|--------------------------------|
+| PLINK 1.9 | A1 / A2 | A1 = by default **the minor allele in that dataset** (`--keep-allele-order` keeps the input order) |
+| PLINK 2 `--glm` | REF / ALT / A1 | A1 = the minor allele by default (`omit-ref` makes it always ALT) |
+| REGENIE · BOLT-LMM | ALLELE0 / ALLELE1 | ALLELE1 (frequency = A1FREQ). BOLT-LMM calls ALLELE0 the "reference allele" → not necessarily the genome's REF |
+| SAIGE | Allele1 / Allele2 | ⚠️ **Allele2** (= ALT, frequency = AF_Allele2) |
+| GWAS Catalog standard format | effect_allele / other_allele | effect_allele |
+
+→ Never judge from column names alone → **check the README for which allele β refers to**
+
+**Example — a hypothetical SNP (REF = G, ALT = A); A raises risk with OR 1.2 in both populations**
+
+|   | European sample | East Asian sample |
+|----------------|----------------|----------------|
+| Frequency of A (= AF) | 0.30 | 0.70 |
+| Minor allele | A (= ALT) | G (= REF) |
+| PLINK 1.9 A1 | A | G |
+| Reported OR | 1.2 | 1/1.2 ≈ 0.83 |
+
+-   Same effect, yet the numbers point opposite ways → combined as they are, they cancel out in a meta-analysis
+-   → Before combining, **harmonize alleles**: align both results to the same effect allele and convert the flipped one's β, OR and EAF by the rules above
+-   ⚠️ **A/T and C/G SNPs** (palindromic) — the opposite strand gives the same pair of bases → a strand flip cannot be told from an allele flip → decide by frequency; drop them when MAF is near 0.5
 :::
 
 ## 3) Germline vs. somatic {#w2-s1-3}
@@ -444,7 +490,7 @@ $$
 \text{phenotype} \sim \text{genotype} + \text{age} + \text{sex} + \text{PC}_1 + \dots + \text{PC}_{10}
 $$
 
--   Genotype coded **0/1/2** — the count of the effect allele → assumes an **additive model**
+-   Genotype coded **0/1/2** — the count of the effect allele → assumes an **additive model** (🔗 allele names: Going further in [§1.2](#w2-s1-2))
 -   Age, sex and the top ancestry PCs are adjusted for as covariates
 -   Continuous trait → **linear regression**: β = change in the trait per allele / case–control → **logistic regression**: OR = factor by which the odds change per allele
 -   Output = for every variant, an **effect size (β or OR) + standard error (SE) + p-value** → the whole table = the **summary statistics**

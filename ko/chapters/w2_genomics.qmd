@@ -101,9 +101,11 @@ execute:
 
 -   **Transposon은 이동 방식으로 나뉨**: **retrotransposon** = RNA로 전사 → 역전사 → 새 위치에 삽입(copy & paste: 원본이 남으니 복사본이 계속 늘어남) / **DNA transposon** = 잘라서 옮김(cut & paste)
 -   **LINE·SINE** = retrotransposon의 하위 종류. 이름 자체가 *Long/Short INterspersed Nuclear Element* = "흩어진" 반복 → STR과는 배치부터 다름
--   대부분은 돌연변이가 쌓여 더는 못 움직이는 화석. **아직 움직이는 것** = L1(한 사람당 약 80–100개), Alu, SVA(SINE–VNTR–Alu 복합체)
+-   대부분은 돌연변이가 쌓이거나 앞부분이 잘린 채(5′ truncation) 삽입되어 더는 못 움직이는 화석. **아직 움직이는 것** = L1(한 사람당 약 80–100개), Alu, SVA(SINE–VNTR–Alu 복합체)
     -   새로 끼어든 복사본 = **mobile element insertion(MEI)** → 구조 변이(②)의 한 종류. 한 사람이 참조서열에 없는 Alu 약 900개, L1 약 130개, SVA 약 50개를 가짐
     -   지금도 생기는 중: 새 Alu 삽입 약 40명 출생당 1회, L1·SVA 약 63명당 1회
+
+![L1이 스스로를 복사하는 원리. ① 활성 L1은 자기를 옮길 장비(promoter, ORF1p, ORF2p의 EN·RT)의 설계도를 스스로 가짐 ② RNA로 전사 → 단백질 합성 → 새 자리를 자르고 그 자리에서 RNA를 DNA로 복사(copy & paste, 원본은 그대로) ③ 복사는 poly-A 끝에서 시작 → 중간에 끊기면 앞부분이 잘린 채 삽입(5′ truncation). 끼어든 뒤에는 서열을 지켜 줄 선택압이 없어 돌연변이가 쌓임 → 대부분 화석](/assets/img/w2/transposon.png){fig-align="center"}
 -   ⚠️ 분석에서 중요한 이유: 거의 같은 복사본이 수십만 개 → short read가 어느 복사본에서 왔는지 결정 x → MAPQ ≈ 0(🔗 [W1 §2.2②](w1_intro.qmd#w1-s2-2-2)) → [§2.3](#w2-s2-3)의 "정확도가 급격히 떨어지는 곳"
 :::
 
@@ -160,6 +162,50 @@ Exome 결과가 음성이어도 다음 변이에 대해서는 아무것도 말�
 | NARD | 동북아시아인 1,779명(한국인 850명) | 참조 패널 | 1000 Genomes와 합쳐 사용 |
 
 ⚠️ 한국인 시료를 imputation할 때 → 패널 크기보다 **ancestry가 맞는지**가 중요(🔗 [§2.4](#w2-s2-4)의 "Imputation 품질은 균일하지 않음")
+:::
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 더 알아보기 — REF/ALT, major/minor, effect/other, A1/A2: 같은 allele의 다른 이름
+
+SNP 하나에는 allele이 둘. 논문·파일마다 부르는 이름이 다른 이유 = **이름을 붙이는 기준이 다름**
+
+| 이름 | 기준 | 고정인가 | 주로 보이는 곳 |
+|----------------|--------------------------|----------------|----------------|
+| **REF / ALT** | 참조 유전체(GRCh38)에 적힌 염기 = REF, 나머지 = ALT | ✅ 같은 유전체 버전이면 고정 | VCF, gnomAD |
+| **Major / minor** | 그 집단·표본에서 더 흔한 / 드문 allele | ❌ 집단·표본마다 바뀔 수 있음 | MAF, QC 필터 |
+| **Effect / other** (non-effect) | 회귀에서 0/1/2로 센 allele = β·OR이 가리키는 쪽 | ❌ 분석자·툴이 정함 | GWAS summary statistics |
+| **Risk / protective** | 결과적으로 위험을 높이는 쪽(β > 0, OR > 1) | 결과로 정해짐 | GWAS Catalog, 논문 본문 |
+| **A1 / A2** (A0) | **툴마다 다름**(아래 표) | ❌ | PLINK·REGENIE·SAIGE 출력 |
+
+-   기준이 서로 독립 → 한 allele이 ALT이면서 minor이면서 effect일 수도, 하나도 겹치지 않을 수도 있음
+-   ⚠️ REF ≠ major. 참조 유전체 = 소수의 사람으로 만든 서열 → REF가 minor allele인 자리도 많음
+-   빈도도 이름을 따라감 — **MAF** = 항상 0.5 이하 / VCF·gnomAD의 **AF** = ALT 빈도 / **EAF** = effect allele 빈도 → AF·EAF는 0.5를 넘을 수 있음(오류 x)
+-   Effect allele을 반대쪽으로 바꾸면 → β → −β, OR → 1/OR, EAF → 1 − EAF. p-value는 그대로
+
+**툴별 "A1"의 뜻**
+
+| 툴 | 열 이름 | β·OR이 가리키는 allele |
+|----------------|----------------|--------------------------------|
+| PLINK 1.9 | A1 / A2 | A1 = 기본적으로 **그 데이터의 minor allele**(`--keep-allele-order`를 주면 입력 순서 유지) |
+| PLINK 2 `--glm` | REF / ALT / A1 | A1 = 기본적으로 minor allele(`omit-ref`를 주면 항상 ALT) |
+| REGENIE · BOLT-LMM | ALLELE0 / ALLELE1 | ALLELE1(빈도 = A1FREQ). BOLT-LMM은 ALLELE0을 "reference allele"이라 부름 → 유전체 REF라는 보장 x |
+| SAIGE | Allele1 / Allele2 | ⚠️ **Allele2**(= ALT, 빈도 = AF_Allele2) |
+| GWAS Catalog 표준 형식 | effect_allele / other_allele | effect_allele |
+
+→ 열 이름만 보고 판단 x → **README에서 "β가 어느 allele 기준인가"를 먼저 확인**
+
+**예시 — 가상의 SNP(REF = G, ALT = A). A가 두 집단 모두에서 위험을 OR 1.2만큼 높임**
+
+|   | 유럽계 표본 | 동아시아계 표본 |
+|----------------|----------------|----------------|
+| A 빈도(= AF) | 0.30 | 0.70 |
+| Minor allele | A(= ALT) | G(= REF) |
+| PLINK 1.9의 A1 | A | G |
+| 보고되는 OR | 1.2 | 1/1.2 ≈ 0.83 |
+
+-   같은 효과인데 숫자만 보면 정반대 → 그대로 합치면 meta-analysis에서 서로 상쇄
+-   → 합치기 전 **allele 맞추기(harmonization)**: 두 결과의 effect allele을 같은 염기로 통일, 뒤집힌 쪽은 β·OR·EAF를 위 규칙대로 변환
+-   ⚠️ **A/T, C/G SNP**(palindromic) — 반대 가닥으로 읽어도 같은 염기 쌍 → strand가 뒤집혔는지 allele이 뒤집혔는지 구분 x → 빈도로 판단, MAF가 0.5에 가까우면 제거
 :::
 
 ## 3) Germline과 somatic {#w2-s1-3}
@@ -444,7 +490,7 @@ $$
 \text{phenotype} \sim \text{genotype} + \text{age} + \text{sex} + \text{PC}_1 + \dots + \text{PC}_{10}
 $$
 
--   Genotype = effect allele의 개수인 **0/1/2**로 코딩 → **additive model** 가정
+-   Genotype = effect allele의 개수인 **0/1/2**로 코딩 → **additive model** 가정(🔗 allele 이름 정리: [§1.2 더 알아보기](#w2-s1-2))
 -   나이, 성별, 상위 ancestry PC는 공변량으로 보정
 -   연속형 형질 → **linear regression**: β = allele 하나당 형질 변화량 / case–control → **logistic regression**: OR = allele 하나당 odds의 배수
 -   결과 = 변이마다 **효과 크기(β 또는 OR) + 표준오차(SE) + p-value** → 이 표 전체 = **summary statistics**

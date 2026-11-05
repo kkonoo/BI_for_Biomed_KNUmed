@@ -475,13 +475,13 @@ The course closes here, because everything in this chapter generalises
 -   What exactly is being compared, and what is the **unit of replication**? ([W1 §5.3](w1_intro.qmd#w1-s5-3), [W5 §6.2](w5_singlecell.qmd#w5-s6-2))
 -   How many biological replicates? Is that plausibly enough? ([W4 §5.4](w4_transcriptomics.qmd#w4-s5-4))
 -   Are **batch and condition confounded**? Was randomisation described? ([W1 §4.3](w1_intro.qmd#w1-s4-3))
--   What covariates were collected — and which obvious ones were **not**? ([W3 §5.3②](w3_epigenomics.qmd#w3-s5-3-2), [W7 §2.2](#w7-s2-2))
+-   What covariates were collected — and which obvious ones were **not**? ([W3 §5.3](w3_epigenomics.qmd#w3-s5-3), [W7 §2.2](#w7-s2-2))
 
 **Measurement**
 
 -   What does this assay actually measure, and what is it **blind to**? ([W2 §1.1](w2_genomics.qmd#w2-s1-1), [W6 §1](w6_proteomics.qmd#w6-s1))
 -   Which reference, which annotation, **which version**? ([W1 §2.3](w1_intro.qmd#w1-s2-3))
--   What are the QC numbers — and are they shown? ([W3 §2.3](w3_epigenomics.qmd#w3-s2-3), [W5 §3.3](w5_singlecell.qmd#w5-s3-3))
+-   What are the QC numbers — and are they shown? ([W3 §2.2①](w3_epigenomics.qmd#w3-s2-2-1), [W5 §3.3](w5_singlecell.qmd#w5-s3-3))
 
 **Analysis**
 

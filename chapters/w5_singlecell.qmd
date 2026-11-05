@@ -49,7 +49,7 @@ By the end of this chapter you should be able to:
 ## 🔍 Going further — ③ composition shifts are more common than you think
 
 -   ⚠️ Common in inflamed, fibrotic or infiltrated tissue — exactly the tissue clinicians study — and routinely written up as if it were ①
--   The same problem in other guises: bulk tissue deconvolution (🔗 [W4 §7.2](w4_transcriptomics.qmd#w4-s7-2)), epigenomics (🔗 [W3 §5.3②](w3_epigenomics.qmd#w3-s5-3-2))
+-   The same problem in other guises: bulk tissue deconvolution (🔗 [W4 §7.2](w4_transcriptomics.qmd#w4-s7-2)), epigenomics (🔗 [W3 §5.3](w3_epigenomics.qmd#w3-s5-3))
 :::
 
 ## 2) When to use single cell {#w5-s1-2}

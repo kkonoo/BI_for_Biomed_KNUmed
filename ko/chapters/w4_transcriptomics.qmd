@@ -460,7 +460,7 @@ $$
 ::: {.callout-warning collapse="true"}
 ## "신경세포 유전자 감소, microglia 유전자 증가"
 
--   🔗 다른 assay에서 나타난 [W3 §5.3②](w3_epigenomics.qmd#w3-s5-3-2)의 교란과 정확히 같음
+-   🔗 다른 assay에서 나타난 [W3 §5.3](w3_epigenomics.qmd#w3-s5-3)의 교란과 정확히 같음
 -   → 수많은 bulk 조직 연구에서 세포 유형 marker 유전자가 최상위 hit로 보고되는 이유
 
 **대응 방법:**

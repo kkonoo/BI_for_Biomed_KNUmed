@@ -14,7 +14,8 @@ execute:
 By the end of this chapter you should be able to:
 
 -   Name the four layers of the epigenome and the assay that measures each
--   ⚠️ Explain why there is no linear molecular order among those layers
+-   ⚠️ Explain why there is no fixed order among those layers
+-   Walk through each assay as principle → pre-processing (QC, statistical tests) → results
 -   Say why ATAC-seq needs accessibility but ChIP-seq does not
 -   Read histone marks as combinations (active promoter, active enhancer, repressed)
 -   Read a genome browser track panel and say what kind of element you are looking at
@@ -24,7 +25,7 @@ By the end of this chapter you should be able to:
 
 > 🤔 **Motivating question**\
 > Every cell in your body carries the same genome\
-> → So why is a neuron not a hepatocyte? And why does that matter for interpreting the 90% of GWAS hits that fall outside genes?
+> → So why do a neuron and a hepatocyte look so different? And why does that matter for interpreting the 90% of GWAS hits that fall outside genes?
 
 ![](images/clipboard-2383268863.png)
 
@@ -36,12 +37,12 @@ By the end of this chapter you should be able to:
 
 > 🔑 **Core idea** — the genome is the same in every cell. The epigenome decides which parts of it are read → it differs by cell type, and that difference is what makes a neuron a neuron
 
-## 1) Four layers, four assays {#w3-s1-1}
-
 -   **Genome** — a fixed text
 -   **Epigenome** — everything determining which parts of that text are read, in this cell, right now
 
 ![The DNA sequence is identical on both sides. Everything that differs is epigenetic.](/assets/img/w3/epigenome_layers.png){fig-align="center"}
+
+## 1) Four layers, four assays {#w3-s1-1}
 
 | Layer | What it is | Standard assay | Section |
 |------------------|------------------|------------------|------------------|
@@ -65,14 +66,14 @@ By the end of this chapter you should be able to:
 → Every epigenomic measurement is specific to the cells you happened to assay\
 → Assay a tissue, and you measured an **average over whatever mixture it contained**
 
-This single fact generates [§5.3②](#w3-s5-3-2) and most of the field's reproducibility problems
+This single fact generates [§5.3](#w3-s5-3) and most of the field's reproducibility problems
 :::
 
-## 3) ⚠️ There is no linear molecular order {#w3-s1-3}
+## 3) ⚠️ The four layers have no order {#w3-s1-3}
 
 -   Which layer comes first? Does methylation close the chromatin, or does closed chromatin get methylated?
 -   **The honest answer — the layers reinforce each other. Causality runs both ways**
--   ⚠️ Any linear ordering — including this chapter's — is a **teaching choice**, not a molecular claim
+-   ⚠️ No ordering carries meaning — including this chapter's. It is an arrangement for teaching only
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — the loops between layers
@@ -104,7 +105,13 @@ This single fact generates [§5.3②](#w3-s5-3-2) and most of the field's reprod
 ## 🔍 Going further — why transgenerational inheritance is contested in mammals
 
 -   Real in plants and *C. elegans*
--   In mammals: contested, mechanism unclear — the germline undergoes near-complete epigenetic reprogramming **twice**
+-   In mammals: contested, mechanism unclear
+-   The reason = within one generation, DNA methylation is almost completely erased and rewritten **twice** → **epigenetic reprogramming**
+    -   ① **The early embryo, right after fertilisation** — the genome from the sperm is stripped fast (active demethylation by TET3), the genome from the egg slowly, division by division (passive dilution) → re-methylated around implantation. ⚠️ Imprinted regions are spared this time
+    -   ② **Primordial germ cells (PGCs)** — the cells that will become the next generation's sperm and eggs erase almost everything, imprints included → rewritten by sex as the gametes form
+-   → A mark a parent acquired during life has to escape both resets to reach the child → hard to achieve, hence contested
+
+![DNA methylation across one generation (mouse-based schematic). Methylation is almost completely erased once in the early embryo (①) and again in primordial germ cells (②). Imprinted regions escape ① but are erased in ② and reset by sex.](/assets/img/w3/reprogramming.png){fig-align="center"}
 :::
 
 ------------------------------------------------------------------------
@@ -115,9 +122,12 @@ This single fact generates [§5.3②](#w3-s5-3-2) and most of the field's reprod
 
 ## 1) The principle {#w3-s2-1}
 
+![How ATAC-seq works. Tn5 loaded with adapters cuts only open DNA and attaches adapters → only those fragments are sequenced → where reads pile up = open chromatin.](/assets/img/w3/atac_principle.png){fig-align="center"}
+
 -   **ATAC-seq** — a hyperactive Tn5 transposase (a DNA-cutting enzyme), preloaded with sequencing adapters
 -   Tn5 inserts preferentially where DNA is **not wrapped in nucleosomes** (the histone spools) — i.e. where regulatory proteins are actively holding chromatin open
--   Fragmentation and adapter ligation in **one step** → fast protocol, works from few cells
+-   Fragmentation and adapter attachment in **one step** (tagmentation) → fast protocol, works from few cells
+-   → only fragments from open regions get sequenced → where reads pile up = open chromatin
 
 ::: {.callout-important collapse="true"}
 ## Accessibility is a genuine prerequisite — for this assay only
@@ -128,19 +138,31 @@ This single fact generates [§5.3②](#w3-s5-3-2) and most of the field's reprod
 Compare with ChIP ([§3.2](#w3-s3-2)), where chromatin is **fragmented before** the antibody ever meets it → the reason ATAC and ChIP see different things. Worth holding onto — it is often stated backwards
 :::
 
-## 2) Why it is the natural first assay {#w3-s2-2}
+::: {.callout-tip collapse="true"}
+## The easiest epigenomic assay to run
 
 -   **No antibody** → no antibody-quality problem, no target chosen in advance
+-   Works from few cells (hundreds to \~50,000) with a short protocol
 -   One experiment → promoters, active enhancers, and TF-bound sites, all at once — a first-pass regulatory map, with no prior hypothesis about which factor to pull down
--   ⚠️ What it does **not** tell you: *which kind* of element you found — a promoter, an enhancer, an insulator, or a repressed-but-primed element? → [§3](#w3-s3)
+:::
 
-## 3) QC — the two figures to demand {#w3-s2-3}
+## 2) Pre-processing and analysis {#w3-s2-2}
 
-![Both panels are diagnostic. Neither is optional.](/assets/img/w3/atac_qc.png){fig-align="center"}
+![The ATAC-seq workflow. Align and filter reads (pre-processing) → ① QC → ② statistical tests (peak calling, differential accessibility).](/assets/img/w3/atac_pipeline.png){fig-align="center"}
+
+-   The flow = align reads → filter → call peaks → a sample × peak count matrix → compare groups
+-   Two steps specific to ATAC:
+    -   **Remove chrM reads** — mtDNA has no nucleosomes → Tn5 attacks it heavily (🔗 ①)
+    -   **Correct the Tn5 position (+4 / −5 bp)** — Tn5 inserts into the two strands 9 bp apart → read ends must be shifted to the true insertion site. Needed for footprinting ([§2.3②](#w3-s2-3-2))
+-   Remove the **ENCODE blacklist** — regions that give abnormally high signal in any experiment. Applies to ChIP-seq just the same (🔗 [§3.3①](#w3-s3-3-1))
+
+### ① QC {#w3-s2-2-1}
+
+![The two basic ATAC-seq QC plots. Left: fragment size distribution. Right: TSS enrichment.](/assets/img/w3/atac_qc.png){fig-align="center"}
 
 -   **Fragment size distribution** — ✅ a ladder: a nucleosome-free peak, then steps every \~200 bp. ❌ A smooth, featureless curve → failed
--   **TSS enrichment** — ✅ a sharp peak at transcription start sites (TSS). ❌ Flat → the assay failed
--   💡 Ask for both plots before trusting an ATAC result
+-   **TSS enrichment** — ✅ a peak at transcription start sites (TSS). ❌ Flat → the assay failed
+-   **FRiP** (fraction of reads in peaks) — the share of reads falling in peaks. Low → much background
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — reading the QC numbers in detail
@@ -149,14 +171,29 @@ Compare with ChIP ([§3.2](#w3-s3-2)), where chromatin is **fragmented before** 
     -   ✅ A nucleosome-free peak below \~100 bp, then \~200 bp periodicity from mono-, di-, tri-nucleosomes
     -   ❌ A smooth, featureless curve → the transposition failed
 -   **TSS enrichment**
-    -   Promoters are open in essentially every cell type → a sharp peak at TSSs is a **floor expectation**, not a finding
+    -   Promoters are open in essentially every cell type → a peak at TSSs is a **floor expectation**, not a finding
     -   ❌ A flat TSS profile → the assay failed. Not unusual biology
 -   **Mitochondrial fraction**
     -   mtDNA has no nucleosomes → Tn5 attacks it enthusiastically
     -   Untreated protocols can waste well over half the reads on chrM; Omni-ATAC and similar improvements reduce this
 :::
 
-## 4) Footprinting, and its limits {#w3-s2-4}
+### ② Statistical tests {#w3-s2-2-2}
+
+-   **Peak calling** — are there significantly more reads here than in the surrounding background? → MACS2/MACS3. Same principle as for ChIP-seq (🔗 [§3.3②](#w3-s3-3-2)), except ATAC has no input, so only the local background is used
+-   **Differential accessibility** — merge all samples' peaks into a consensus set → a sample × peak count matrix → the same count models as RNA-seq (DESeq2, edgeR, DiffBind; 🔗 [W4 §5](w4_transcriptomics.qmd#w4-s5))
+-   ⚠️ Do not compare the **number of peaks** between groups → it depends on sequencing depth and QC. Compare counts over one shared peak set
+
+## 3) Results: open chromatin and footprints {#w3-s2-3}
+
+![Two things ATAC-seq gives you. (a) Peaks = open chromatin. (b) A footprint = the small dip left where a bound transcription factor protected its site from Tn5.](/assets/img/w3/atac_results.png){fig-align="center"}
+
+### ① Open chromatin {#w3-s2-3-1}
+
+-   A peak = somewhere Tn5 could get in → promoters, active enhancers, TF-bound sites, insulators
+-   ⚠️ What it does **not** tell you: *which kind* of element you found — a promoter, an enhancer, an insulator, or a repressed-but-primed element? → [§3](#w3-s3)
+
+### ② Footprints {#w3-s2-3-2}
 
 -   A bound transcription factor protects its own site from Tn5 → a small dip (a **footprint**) inside a larger accessible region
 -   In principle: locate specific factors without ChIP
@@ -173,55 +210,53 @@ Compare with ChIP ([§3.2](#w3-s3-2)), where chromatin is **fragmented before** 
 
 # 3. Histone Modifications: ChIP-seq and CUT&RUN 🧵 {#w3-s3}
 
-> 🔑 **Core idea** — you have an open region. What kind of element is it? The histone marks answer that — read in **combination**, never one mark alone
+> 🔑 **Core idea** — you have an open region. What kind of element is it? → a **combination** of histone marks tells you
 
-## 1) What the marks mean {#w3-s3-1}
+## 1) Kinds of histone mark {#w3-s3-1}
 
-Dozens exist. Five do most of the work in genomics:
+Dozens exist. Six do most of the work in genomics:
+
+![Each mark has its own place and signal shape. Active marks (top four) and repressive marks (bottom two).](/assets/img/w3/histone_marks.png){fig-align="center"}
 
 | Mark | Indicates | Shape of signal |
 |------------------------|------------------------|------------------------|
-| **H3K4me3** | Active promoter | Sharp, at TSS |
-| **H3K27ac** | Active promoter **or** enhancer | Sharp-ish, flanking the element |
-| **H3K4me1** | Enhancer — primed or active | Broad |
-| **H3K27me3** | Polycomb-repressed | Broad domains |
-| **H3K9me3** | Constitutive heterochromatin | Very broad, repeats |
+| **H3K4me3** | Active promoter | Peak at the TSS |
+| **H3K27ac** | Active promoter **or** enhancer | Peaks at promoters and enhancers |
+| **H3K4me1** | Enhancer — primed or active | Broad peak at enhancers |
+| **H3K36me3** | Transcribed gene | Rises along the gene body toward 3′ |
+| **H3K27me3** | Polycomb-repressed | Broad domain covering genes |
+| **H3K9me3** | Constitutive heterochromatin | Very broad domain covering repeats |
 
-**The key interpretive move — no single mark identifies an element. Combinations do:**
+-   ⚠️ No single mark identifies an element → read them in combination ([§3.4](#w3-s3-4))
 
--   H3K4me3 + H3K27ac → **active promoter**
--   H3K4me1 + H3K27ac → **active enhancer**
+## 2) The principle {#w3-s3-2}
 
-::: {.callout-note collapse="true" icon=false}
-## 🔍 Going further — primed and bivalent elements
+### ① The core idea {#w3-s3-2-1}
 
--   H3K4me1 alone → **primed enhancer** — poised, not firing
--   H3K4me3 + H3K27me3 → **bivalent** — developmental genes held ready in stem cells
+![How ChIP-seq works. An antibody pulls down only the fragments carrying one mark → reads pile up where that mark is. Input = the same chromatin sequenced without an antibody, as background.](/assets/img/w3/chip_principle.png){fig-align="center"}
+
+-   **ChIP-seq** (chromatin immunoprecipitation sequencing) — use an antibody against one histone mark (or protein) to pick out only the DNA fragments carrying it, then sequence them
+-   Steps: crosslink (formaldehyde) → fragment the chromatin (sonication or MNase) → immunoprecipitate (IP) with the antibody → reverse crosslinks, purify DNA → sequence
+-   → where reads pile up = where the mark is
+-   ⚠️ **Antibody quality** — ChIP-seq is an antibody experiment. Specificity for histone modifications is variable and **lot-dependent** → a wet-lab problem no analysis can repair
+
+::: {.callout-important collapse="true"}
+## ChIP does not require accessibility
+
+![ATAC needs Tn5 to reach the DNA in an intact nucleus → closed chromatin stays invisible. ChIP fragments the chromatin first → the antibody meets fragments in solution → marks on closed chromatin are seen too.](/assets/img/w3/atac_vs_chip.png){fig-align="center"}
+
+-   **ATAC** — nuclei intact → Tn5 must reach the DNA *in situ* → accessibility IS required
+-   **ChIP** — crosslink, then fragment the chromatin first → the antibody meets FRAGMENTS in solution → accessibility is NOT required
+-   → This is exactly why ChIP can map **H3K9me3 and H3K27me3** — marks of the most tightly closed chromatin in the nucleus, which ATAC cannot see at all
+-   💡 The two assays are complementary, not redundant. Often explained backwards — watch for it
 :::
 
-## 2) ⚠️ ChIP does not require accessibility {#w3-s3-2}
+### ② Input / IgG controls {#w3-s3-2-2}
 
-A common misconception, worth stating explicitly:
-
-```
-ATAC   nuclei intact → Tn5 must reach the DNA in situ
-                     → accessibility IS required
-
-ChIP   crosslink (formaldehyde)
-       → shear / MNase-digest the chromatin
-       → antibody meets FRAGMENTS in solution
-                     → accessibility is NOT required
-```
-
--   → This is exactly why ChIP can map **H3K9me3 and H3K27me3** — marks of the most tightly closed chromatin in the nucleus, which ATAC cannot see at all
--   💡 The two assays are complementary, not redundant
-
-## 3) The assay, and the control you must have {#w3-s3-3}
-
-Two failure points dominate:
-
--   ⚠️ **Antibody quality** — ChIP-seq is an antibody experiment. Specificity for histone modifications is variable and **lot-dependent** → a wet-lab problem no analysis can repair
--   ⚠️ **The input control** — without a matched **input** (sonicated chromatin, no antibody) or **IgG** control → you cannot tell enrichment from artifact
+-   **Input** — the same chromatin, fragmented the same way, sequenced directly without an antibody
+-   **IgG** — the same IP done with a non-specific antibody that has no target
+-   ⚠️ Without a control → you cannot tell enrichment from artifact
+-   → A peak = where ChIP is significantly higher **than the control** ([§3.3②](#w3-s3-3-2))
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — why the control is needed
@@ -229,30 +264,60 @@ Two failure points dominate:
 -   Chromatin does not fragment uniformly:
     -   open regions shear more easily
     -   copy number varies
+-   Input is the standard for ChIP-seq. IgG yields few reads, so its background estimate is unstable → used mainly for low-background CUT&RUN and CUT&Tag ([§3.5](#w3-s3-5))
 :::
 
-## 4) Peak calling and QC {#w3-s3-4}
+## 3) Pre-processing and analysis {#w3-s3-3}
 
--   **Peak calling** — compare signal to control → identify regions of significant enrichment ("peaks"). MACS2 and successors are standard
--   Parameters matter: **narrow** mode for point-source marks (H3K4me3), **broad** mode for domains (H3K27me3)
--   Key QC number: **FRiP** (fraction of reads in peaks) — low FRiP → weak IP (immunoprecipitation)
+![The ChIP-seq workflow. Align and filter ChIP and input the same way → ① QC → ② statistical tests (peak calling, group comparison).](/assets/img/w3/chip_pipeline.png){fig-align="center"}
+
+-   Process ChIP and input identically → compare them at peak calling
+-   CUT&RUN and CUT&Tag ([§3.5](#w3-s3-5)) follow almost the same flow
+
+### ① QC {#w3-s3-3-1}
+
+-   **FRiP** (fraction of reads in peaks) — the share of all reads that fall in peaks. Low FRiP → weak IP
+-   **Cross-correlation** (NSC / RSC) — whether reads on the two strands pile up one fragment length apart, as expected
+-   **Library complexity** — distinct fragments vs. PCR duplicates
+-   ⚠️ Remove the **ENCODE blacklist** — regions that give abnormally high signal in any experiment and any cell → a classic source of fake peaks unrelated to real enrichment
 
 ::: {.callout-note collapse="true" icon=false}
-## 🔍 Going further — the other QC numbers
+## 🔍 Going further — what the blacklist is
 
--   **FRiP** — how much sequencing went into signal rather than background
--   **Cross-correlation** (NSC / RSC) — whether strand-shifted signal shows the expected structure
--   **Library complexity** — distinct fragments vs. PCR duplicates
+-   Centromeres, telomeres, satellite repeats, rDNA and the like — repeats present in far more copies in real genomes than in the reference → reads pile up in one place
+-   ENCODE collected the regions that spike across many input and ChIP datasets and released them → remove reads or peaks in these regions before analysis
+-   Applies equally to ATAC-seq ([§2.2](#w3-s2-2)) and CUT&RUN
 :::
 
-## 5) CUT&RUN and CUT&Tag {#w3-s3-5}
+### ② Statistical test: peak calling {#w3-s3-3-2}
 
--   The problem with ChIP: many cells needed, lots of background
--   **The fix** — tether the cleaving enzyme (MNase, or Tn5) directly to the antibody → only the targeted region is released or tagged
--   → far higher signal-to-noise, from **thousands** of cells rather than millions
--   This is what made single-cell chromatin profiling practical (🔗 W5)
+![How peak calling works. The input gives the local background level → where ChIP reads are far more than that background can explain = a peak. Narrow or broad mode depending on the mark's shape.](/assets/img/w3/peak_calling.png){fig-align="center"}
 
-## 6) Reading the tracks together {#w3-s3-6}
+-   **Peak calling** — compare signal to control → identify regions of significant enrichment ("peaks"). MACS2 and successors are standard
+-   The principle (MACS2): estimate the local background level λ from the input → in each window, is the ChIP read count far above what Poisson(λ) predicts? → p-value → multiple-testing correction (q-value) → peak
+-   → A bump that is equally present in the input is not a peak
+-   Parameters matter: **narrow** mode for point-source marks (H3K4me3), **broad** mode for domains (H3K27me3)
+-   **Comparing groups** — differential binding (DiffBind, csaw): a sample × peak count matrix → the same count models as RNA-seq (🔗 [W4 §5](w4_transcriptomics.qmd#w4-s5))
+
+## 4) Results: the histone code — reading combinations {#w3-s3-4}
+
+-   **Histone code** — the idea that a **combination** of marks, not any single one, tells you what kind of element sits there and what state it is in (Strahl & Allis, 2000)
+
+| Combination | Element |
+|------------------------------------|------------------------------------|
+| H3K4me3 + H3K27ac | **Active promoter** |
+| H3K4me1 + H3K27ac | **Active enhancer** |
+| H3K4me1 alone | Primed enhancer |
+| H3K4me3 + H3K27me3 | Bivalent promoter |
+| H3K27me3 | Polycomb-repressed |
+| H3K36me3 | Transcribed gene body |
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 Going further — primed and bivalent elements
+
+-   H3K4me1 alone → **primed enhancer** — poised, not firing
+-   H3K4me3 + H3K27me3 → **bivalent** — developmental genes held ready in stem cells
+:::
 
 ![The combination of tracks, not any single one, tells you what kind of element you are looking at.](/assets/img/w3/browser_tracks.png){fig-align="center"}
 
@@ -264,53 +329,113 @@ The single most common figure in the epigenomics literature. Work top to bottom,
 4.  **H3K27me3 domain?** → repressed, regardless of what else is there
 5.  **Compare to input** — if the "peak" is also in input, it is not a peak
 
+💡 This combination reading, applied automatically across the whole genome = chromatin states (🔗 [§6.2](#w3-s6-2))
+
+## 5) CUT&RUN and CUT&Tag {#w3-s3-5}
+
+-   The problem with ChIP: many cells needed, lots of background
+-   **The fix** — tether the cleaving enzyme (MNase, or Tn5) directly to the antibody → only the targeted region is released or tagged
+-   → far higher signal-to-noise, from **thousands** of cells rather than millions
+-   This is what made single-cell chromatin profiling practical (🔗 W5)
+
+![How CUT&RUN and CUT&Tag work. In unfixed nuclei the antibody binds its target, and an enzyme tethered to the antibody cuts out (MNase) or tags (Tn5) only the DNA around it.](/assets/img/w3/cutrun_principle.png){fig-align="center"}
+
+|   | ChIP-seq | CUT&RUN | CUT&Tag |
+|------------------|------------------|------------------|------------------|
+| Sample handling | Crosslink, then fragment all chromatin | Unfixed; reaction inside the nucleus | Unfixed; reaction inside the nucleus |
+| Cutting / tagging | Sonication / MNase | pA-MNase on the antibody cuts only around the target | pA-Tn5 on the antibody inserts adapters only around the target |
+| Cells needed | Millions | Tens to hundreds of thousands (down to thousands) | Thousands to hundreds of thousands; single cells possible |
+| Sequencing depth | Tens of millions of reads | \~1/10 of ChIP | \~1/10 of ChIP or less |
+| Control | Input essential | IgG (sometimes skipped, background is low) | IgG (sometimes skipped, background is low) |
+| Watch out for | High background, antibody quality | Over-digestion by MNase | Tn5's preference for open chromatin → suppressed by high-salt washes |
+
+-   Analysis follows almost the same ChIP-seq flow ([§3.3](#w3-s3-3)). Because background is so low, dedicated peak callers such as SEACR are also used
+
 ------------------------------------------------------------------------
 
 # 4. The 3D Genome: Hi-C 🔗 {#w3-s4}
 
 > 🔑 **Core idea** — you have an active enhancer. Which promoter does it actually regulate? Hi-C shows which regions physically touch — ⚠️ but contact ≠ function
 
-## 1) The assay {#w3-s4-1}
+## 1) The principle {#w3-s4-1}
 
--   **Hi-C** — crosslink chromatin → digest → ligate whatever ends are physically close → sequence the junctions
+![How Hi-C works. Two loci touching in the nucleus are fixed by crosslinking → cut → nearby ends ligated → junctions sequenced → one read pair = +1 in one cell of the contact matrix.](/assets/img/w3/hic_principle.png){fig-align="center"}
+
+-   **Hi-C** — crosslink chromatin → cut with a restriction enzyme → label the ends with biotin → ligate ends that are close in space (**proximity ligation**) → pull down biotinylated junctions → paired-end sequencing
+-   The two ends of one read pair map to two different places in the genome → one piece of evidence that those two places touched in the nucleus
 -   Output: a matrix of contact frequencies between every pair of genomic bins (stretches of the genome)
 
-![Contact frequency falls with distance, but not smoothly — the blocks are the point.](/assets/img/w3/hic_tad.png){fig-align="center"}
-
-## 2) What the matrix shows {#w3-s4-2}
-
--   **A/B compartments** — active (A) and inactive (B) chromatin kept apart
--   **TADs** — blocks with frequent internal contacts and sharp boundaries. Boundaries are **largely conserved across cell types**
--   **Loops** — specific enhancer–promoter contacts. **Not** conserved across cell types → these are what you actually want for variant interpretation
-
 ::: {.callout-note collapse="true" icon=false}
-## 🔍 Going further — scale and boundaries
+## 🔍 Going further — the 3C family compared
 
--   **A/B compartments** — megabase-scale segregation into active and inactive chromatin
--   **TADs** (topologically associating domains) — sub-megabase blocks with sharp, CTCF-bound boundaries
+All use the same principle, proximity ligation. The difference = **which contacts they ask about**
+
+| Method | Question asked | Scope |
+|------------------|------------------------------------|------------------|
+| **3C** | Do these two sites touch? | One vs one |
+| **4C** | What does this one site (the viewpoint) touch? | One vs all |
+| **5C** | Contacts among sites within a chosen region | Many vs many |
+| **Hi-C** | Every pair across the genome | All vs all |
+| **Micro-C** | Like Hi-C, but cut to single nucleosomes with MNase | All vs all, higher resolution |
+| **Capture Hi-C** | Chosen sites (e.g. all promoters) vs everything else | Many vs all |
+| **HiChIP / ChIA-PET** | Only contacts mediated by one protein (H3K27ac, CTCF, …) | Hi-C + ChIP |
 :::
 
-## 3) ⚠️ Contact is not function {#w3-s4-3}
+## 2) Pre-processing and analysis {#w3-s4-2}
+
+![The Hi-C workflow. Align the two read ends separately → bin valid pairs into a matrix → normalise → ① QC → ② statistical tests (compartments, TADs, loops).](/assets/img/w3/hic_pipeline.png){fig-align="center"}
+
+-   The flow: align the two ends of each read separately → keep only valid pairs → group them into bins of a chosen size to make the matrix → normalise (ICE, KR balancing)
+-   ⚠️ **Resolution = bin size**, and sequencing depth sets it. Compartments show up with few reads; kilobase-scale loops need billions of read pairs
+
+### ① QC {#w3-s4-2-1}
+
+-   **Valid-pair fraction** — what remains after removing self-ligations, dangling ends, and pairs within one fragment
+-   **Cis/trans ratio** — most contacts should fall within one chromosome. Many trans contacts → suspect random ligation
+-   **Long-range cis fraction** — the share of cis contacts more than 20 kb apart
+-   **Distance-decay curve P(s)** — contact probability should fall smoothly with distance
+
+### ② Statistical tests {#w3-s4-2-2}
+
+-   ⚠️ Nearby sites always contact each other more → always compare against the **expected value for that distance** (observed / expected)
+-   **Compartments** — correlation matrix of the map → the sign of the first eigenvector separates A from B
+-   **TADs** — insulation score: where contacts crossing a position suddenly drop = a boundary
+-   **Loops** — HiCCUPS and similar: is one pixel significantly brighter than its neighbours (the local background)?
+-   **Comparing groups** — diffHic, multiHiCcompare
+
+## 3) Results: the Hi-C contact matrix {#w3-s4-3}
+
+![Three structures read from a contact matrix. (a) A/B compartments = a megabase-scale checkerboard. (b) TADs = blocks along the diagonal. (c) Loops = bright dots off the diagonal.](/assets/img/w3/hic_features.png){fig-align="center"}
+
+-   **A/B compartments** — megabase scale. Active (A) chromatin contacts A, inactive (B) contacts B → the checkerboard in the matrix
+-   **TADs** (topologically associating domains) — sub-megabase blocks with frequent internal contacts and sharp, CTCF-bound boundaries. Boundaries are **largely conserved across cell types**
+-   **Loops** — point contacts between two specific sites (CTCF pairs, enhancer–promoter) → bright dots off the diagonal. Enhancer–promoter loops are **not** conserved across cell types → these are what you actually want for variant interpretation
+
+::: {.callout-warning collapse="true"}
+## Contact is not function
 
 -   A loop says two regions are near each other
 -   It does not say the enhancer regulates that promoter
 -   → Perturbation experiments (CRISPRi on the element) are what establish function
+:::
 
 ------------------------------------------------------------------------
 
 # 5. DNA Methylation 🔵 {#w3-s5}
 
-> 🔑 **Core idea** — the DNA-level layer, and the one that dominates clinical and epidemiological work. Its biggest trap = **cell-type composition**
+> 🔑 **Core idea** — genome-level, and the layer most used in clinical and epidemiological work. Its biggest trap = **cell-type composition**
 
 -   Methyl group on the 5-carbon of cytosine, overwhelmingly at **CpG** dinucleotides (a C followed by a G)
 -   \~70–80% of genomic CpGs are methylated
 -   Exceptions cluster in **CpG islands** — at most promoters, usually unmethylated when the gene is active
 
-## 1) Measurement {#w3-s5-1}
+## 1) The principle {#w3-s5-1}
 
 Two routes: **bisulfite sequencing**, or a fixed panel of CpGs on an **array**
 
 ### ① Bisulfite sequencing {#w3-s5-1-1}
+
+![How bisulfite sequencing works. Only unmethylated C turns into U (read as T) → a CpG that still reads C was methylated. The fraction of C at each CpG = its β value.](/assets/img/w3/bisulfite_principle.png){fig-align="center"}
 
 -   Sodium bisulfite converts unmethylated C → U (read as T); methylated C is protected and still reads as C
 -   → sequence, compare to reference: a C that stayed C was methylated
@@ -331,12 +456,21 @@ Alternatives: **EM-seq** (enzymatic conversion, no degradation); **long-read pla
 
 ### ② Arrays {#w3-s5-1-2}
 
+![How a methylation array (Infinium) works. Bisulfite-converted DNA binds a probe fixed for each CpG → a single-base extension reads C (methylated) and T (unmethylated) in different fluorescent colours → β from the two signals.](/assets/img/w3/array_principle.png){fig-align="center"}
+
 -   Illumina **EPIC** — a fixed panel of CpG sites, on the order of 850,000 for v1 (\~3% of all CpGs), enriched for promoters, enhancers, and known disease loci
+-   The principle: bisulfite-converted DNA binds a probe fixed for each CpG → fluorescence shows whether the site stayed C (methylated) or became T (unmethylated) → methylated signal M, unmethylated signal U → β
 -   Same trade-off as genotyping arrays (🔗 [W2 §2.1](w2_genomics.qmd#w2-s2-1)):
     -   ❌ Cannot discover anything outside the panel
     -   ✅ Cheap enough to run on thousands of samples → almost all large epidemiological methylation studies use them
 
-## 2) β values and M values {#w3-s5-2}
+## 2) Pre-processing and analysis {#w3-s5-2}
+
+![The methylation workflow. Sequencing and arrays start differently but meet in the same β / M value matrix → ① QC → ② statistical tests (DMPs, DMRs).](/assets/img/w3/methylation_pipeline.png){fig-align="center"}
+
+-   Either route ends in the same thing = a **CpG × sample matrix of β values (M values)**
+
+**β values and M values**
 
 ![Left: real methylation data is bimodal. Right: the transformation almost every analysis applies before testing.](/assets/img/w3/methylation_beta.png){fig-align="center"}
 
@@ -358,18 +492,24 @@ $$
 -   ⚠️ A paper running t-tests directly on β at CpGs with β ≈ 0.02 is doing something statistically dubious
 :::
 
-## 3) Differential methylation {#w3-s5-3}
+### ① QC {#w3-s5-2-1}
 
-Which CpGs differ between groups? → check the unit (①) and the cell mix (②)
+-   **Bisulfite conversion efficiency** — Cs outside CpGs are almost never methylated → if they still read as C after conversion, the conversion failed. Usually should be ≥ 99%
+-   **Coverage** (sequencing) / **detection p-value** (array) — use only CpGs with enough signal
+-   **Probe filters** (array) — drop probes overlapping SNPs, cross-reactive probes that bind several places, and sex-chromosome probes
+-   **Sex check, β distribution, PCA** — catch sample swaps and batch effects
 
-### ① DMP vs. DMR {#w3-s5-3-1}
+### ② Statistical tests: DMPs and DMRs {#w3-s5-2-2}
 
--   **DMP** (differentially methylated position) — a single CpG differing between groups
--   **DMR** (differentially methylated region) — a run of adjacent CpGs changing together
+Which CpGs differ between groups? → check the unit (DMP vs. DMR) and the cell mix ([§5.3](#w3-s5-3))
+
+-   **DMP** (differentially methylated position) — a single CpG differing between groups. A regression on M values for each CpG (limma)
+-   **DMR** (differentially methylated region) — a run of adjacent CpGs changing together. DMRcate, bumphunter, dmrseq
 -   ✅ DMRs are more believable — neighbouring CpGs are biologically correlated → a consistent regional shift is harder to produce by chance or by one bad probe
 -   ⚠️ A lone significant CpG in an otherwise flat region deserves suspicion
+-   ⚠️ Covariates: cell composition ([§5.3](#w3-s5-3)), batch, age, sex
 
-### ② ⚠️ Cell-type composition {#w3-s5-3-2}
+## 3) ⚠️ Cell-type composition {#w3-s5-3}
 
 The most important subsection in the chapter
 
@@ -428,11 +568,13 @@ Not hypothetical. Disease, infection, medication, age, and smoking all shift blo
 
 ------------------------------------------------------------------------
 
-# 6. Putting It Together 🏥 {#w3-s6}
+# 6. Putting It Together: Downstream Analysis 🏥 {#w3-s6}
 
 > 🔑 **Core idea** — epigenomics turns a non-coding GWAS hit into a mechanism you can test — **provided you have data from the right cell type**
 
 ## 1) Transcription factor motif analysis {#w3-s6-1}
+
+![The core idea of motif analysis. Which motif turns up far more often in the peak set than in a background set? → the hypothesis that a TF recognising it regulates these regions.](/assets/img/w3/motif_enrichment.png){fig-align="center"}
 
 -   Given a set of peaks → which TF binding motifs (the short DNA sequence a TF recognises) are over-represented relative to a background set?
 -   Tools: HOMER, MEME suite, chromVAR (single-cell)
@@ -447,14 +589,11 @@ Not hypothetical. Disease, infection, medication, age, and smoking all shift blo
 
 ## 2) Chromatin states and reference atlases {#w3-s6-2}
 
--   **Chromatin state** — several mark tracks combined into one label per genomic segment ("active TSS", "weak enhancer", "heterochromatin")
+![The Roadmap Epigenomics 15-state model (schematic). Left: how likely each of five marks is in each state. Right: five noisy tracks turned into one row of state annotation.](/assets/img/w3/chromatin_states.png){fig-align="center"}
 
-::: {.callout-note collapse="true" icon=false}
-## 🔍 Going further — ChromHMM
-
--   **ChromHMM** — learns recurring combinations of marks, labels every genomic segment with a state
--   Converts five noisy tracks into one interpretable annotation
-:::
+-   **Chromatin state** — several mark tracks combined into one label per genomic segment ("active TSS", "enhancer", "heterochromatin")
+-   **ChromHMM** — learns recurring combinations of marks, labels every genomic segment with a state → five noisy tracks become one interpretable annotation
+-   Roadmap's reference model = the **15-state** model learned from five marks (H3K4me3, H3K4me1, H3K36me3, H3K27me3, H3K9me3). Each state has a fixed colour, so it looks the same in papers and browsers
 
 Public atlases already hold this for hundreds of cell types:
 
@@ -466,10 +605,12 @@ Public atlases already hold this for hundreds of cell types:
 
 -   🗺️ These atlases are also a **reference bias** problem (🔗 [W1 §2.3③](w1_intro.qmd#w1-s2-3-3)) — your cell type not in ENCODE? → the annotations you inherit come from something else → elements active only in your cells are **invisible**
 
-## 3) From a non-coding GWAS hit to a mechanism {#w3-s6-3}
+## 3) Functional characterisation of GWAS variants {#w3-s6-3}
 
 -   Recall: \~90% of GWAS associations are non-coding (🔗 [W2 §4.3](w2_genomics.qmd#w2-s4-3)) → a variant in intergenic space is uninterpretable alone
 -   Epigenomics supplies the missing annotation, step by step:
+
+![From genetic variation to actual players in pathogenesis](images/clipboard-959575580.png)
 
 ```
 ① GWAS signal, fine-mapped to a credible set        (W2 §4.2)
@@ -481,19 +622,13 @@ Public atlases already hold this for hundreds of cell types:
 ⑥ Does deleting or editing the element do anything?  (CRISPR)
 ```
 
-::: {.callout-note collapse="true" icon=false}
-## 🔍 Going further — partitioned heritability
-
-**Partitioned heritability** (LDSC-SEG, stratified LD score regression) runs the same logic in aggregate rather than locus by locus:
-
--   Which cell types' regulatory annotations are enriched for a trait's heritability?
--   → often the strongest available evidence about which tissue a disease lives in — microglia for Alzheimer disease, specific T cell subsets for autoimmune disease
-:::
-
-## 4) ⚠️ The central problem: which cells? {#w3-s6-4}
+## 4) Prioritising the most relevant cell types {#w3-s6-4}
 
 -   An enhancer active in hepatocytes → invisible in a lymphoblastoid cell line
 -   ⚠️ Choosing which ENCODE cell types to use is a **scientific decision, not a technical default**
+-   **Partitioned heritability** (LDSC-SEG, stratified LD score regression) = the logic of §6.3 run on the whole genome's signal at once rather than locus by locus
+    -   Which cell types' regulatory annotations are enriched for a trait's heritability?
+    -   → often the strongest available evidence about which tissue a disease lives in — microglia for Alzheimer disease, specific T cell subsets for autoimmune disease
 
 ::: {.callout-warning collapse="true"}
 ## The right annotation in the wrong cell type is worthless
@@ -525,12 +660,14 @@ This is why the field pushed so hard toward single-cell chromatin profiling (�
 # 📝 Summary
 
 -   The genome is the same in every cell; the epigenome is **different in every cell type** — four measurable layers
--   ⚠️ **No linear molecular order.** The layers reinforce each other; this chapter's ordering is regulatory logic, not causality
--   **ATAC-seq** — Tn5 in intact nuclei → accessibility is a genuine prerequisite. No antibody. The natural first assay
--   ⚠️ **ChIP-seq works on sheared chromatin** → accessibility is *not* required → it can map closed-chromatin marks. Needs an input control and a validated antibody
--   No single histone mark identifies an element. **Combinations do** — H3K4me3 + H3K27ac = active promoter; H3K4me1 + H3K27ac = active enhancer
--   Hi-C shows which regions touch (compartments, TADs, loops). ⚠️ Contact ≠ function
--   Methylation: report β values, test on M values
+-   ⚠️ **The four layers have no order.** They reinforce each other; this chapter's arrangement is for teaching only
+-   Read every assay as **principle → pre-processing (① QC ② statistical tests) → results**
+-   **ATAC-seq** — Tn5 in intact nuclei → accessibility is a genuine prerequisite. No antibody. Results = open chromatin (peaks) and footprints
+-   ⚠️ **ChIP-seq works on fragmented chromatin** → accessibility is *not* required → it can map closed-chromatin marks. Needs an input control, a validated antibody, and blacklist removal
+-   **The histone code** — no single mark identifies an element; **combinations do**: H3K4me3 + H3K27ac = active promoter; H3K4me1 + H3K27ac = active enhancer
+-   CUT&RUN and CUT&Tag — enzyme tethered to the antibody → fewer cells, less background
+-   Hi-C = a contact matrix → A/B compartments, TADs, loops. ⚠️ Contact ≠ function
+-   Methylation: report β values, test on M values. A DMR is more believable than a lone DMP
 -   ⚠️ **Cell-type composition is the dominant confounder** in tissue methylation studies. Measure or estimate it, and adjust
 -   Epigenetic clocks: the residual (age acceleration) is the finding; 1st- and 2nd-generation clocks measure different things
 -   Epigenomics turns a non-coding GWAS hit into a mechanism — **provided you have data from the right cell type**
@@ -545,8 +682,12 @@ This is why the field pushed so hard toward single-cell chromatin profiling (�
 | ChIP-seq | Mapping where a protein or mark sits on DNA |
 | Input control | Sonicated chromatin without antibody |
 | Peak calling | Finding regions enriched over control |
+| Blacklist | Regions with abnormally high signal in any experiment, removed before analysis |
+| Histone code | The idea that combinations of histone marks define an element's kind and state |
 | CUT&RUN / CUT&Tag | Antibody-tethered enzyme; less background, fewer cells |
+| A/B compartment | Megabase-scale split into active and inactive chromatin |
 | TAD | Self-interacting genomic block with sharp boundaries |
+| Loop | Point contact between two specific sites |
 | CpG island | CpG-dense region, usually at promoters |
 | Bisulfite conversion | Chemistry that reads unmethylated C as T |
 | β value | Proportion of molecules methylated at a site |
@@ -561,10 +702,13 @@ This is why the field pushed so hard toward single-cell chromatin profiling (�
 
 | Term | One-line meaning |
 |------------------------------------|------------------------------------|
+| Epigenetic reprogramming | Near-complete erasure and rewriting of methylation in the early embryo and in primordial germ cells |
+| Tagmentation | Tn5 cutting DNA and attaching adapters in one reaction |
 | TSS enrichment | Signal at transcription start sites; core ATAC QC |
 | Footprint | Protection from cleavage by a bound protein |
 | FRiP | Fraction of reads falling in peaks |
 | Bivalent domain | H3K4me3 + H3K27me3; poised developmental gene |
+| Proximity ligation | Joining DNA ends that are close in space — the key step of Hi-C |
 | ChromHMM | Segments the genome into chromatin states |
 | Partitioned heritability | Which annotations carry a trait's genetic signal |
 :::
@@ -577,7 +721,8 @@ This is why the field pushed so hard toward single-cell chromatin profiling (�
 
 Stricker SH, Köferle A, Beck S. [*From profiles to function in epigenomics.*](https://pubmed.ncbi.nlm.nih.gov/?term=From+profiles+to+function+in+epigenomics) Nat Rev Genet. 2017.\
 Klemm SL, Shipony Z, Greenleaf WJ. [*Chromatin accessibility and the regulatory epigenome.*](https://doi.org/10.1038/s41576-018-0089-8) Nat Rev Genet. 2019.\
-Zhu H, Wang G, Qian J. [*Transcription factors as readers and effectors of DNA methylation.*](https://pubmed.ncbi.nlm.nih.gov/?term=Transcription+factors+as+readers+and+effectors+of+DNA+methylation) Nat Rev Genet. 2016.
+Zhu H, Wang G, Qian J. [*Transcription factors as readers and effectors of DNA methylation.*](https://pubmed.ncbi.nlm.nih.gov/?term=Transcription+factors+as+readers+and+effectors+of+DNA+methylation) Nat Rev Genet. 2016.\
+Reik W, Dean W, Walter J. [*Epigenetic reprogramming in mammalian development.*](https://pubmed.ncbi.nlm.nih.gov/?term=Epigenetic+reprogramming+in+mammalian+development+Reik) Science. 2001.
 
 ### Chromatin accessibility
 
@@ -587,12 +732,17 @@ Grandi FC, et al. [*Chromatin accessibility profiling by ATAC-seq.*](https://doi
 
 ### Histone modifications
 
+Strahl BD, Allis CD. [*The language of covalent histone modifications.*](https://pubmed.ncbi.nlm.nih.gov/?term=The+language+of+covalent+histone+modifications) Nature. 2000. (histone code)\
 Park PJ. [*ChIP-seq: advantages and challenges of a maturing technology.*](https://doi.org/10.1038/nrg2641) Nat Rev Genet. 2009.\
 Landt SG, et al. [*ChIP-seq guidelines and practices of the ENCODE and modENCODE consortia.*](https://doi.org/10.1101/gr.136184.111) Genome Res. 2012.\
-Skene PJ, Henikoff S. [*An efficient targeted nuclease strategy for high-resolution mapping of DNA binding sites.*](https://pubmed.ncbi.nlm.nih.gov/?term=An+efficient+targeted+nuclease+strategy+for+high-resolution+mapping+of+DNA+binding+sites) eLife. 2017. (CUT&RUN)
+Zhang Y, et al. [*Model-based analysis of ChIP-Seq (MACS).*](https://pubmed.ncbi.nlm.nih.gov/?term=Model-based+analysis+of+ChIP-Seq+(MACS)) Genome Biol. 2008.\
+Amemiya HM, Kundaje A, Boyle AP. [*The ENCODE Blacklist: identification of problematic regions of the genome.*](https://pubmed.ncbi.nlm.nih.gov/?term=The+ENCODE+Blacklist+identification+of+problematic+regions+of+the+genome) Sci Rep. 2019.\
+Skene PJ, Henikoff S. [*An efficient targeted nuclease strategy for high-resolution mapping of DNA binding sites.*](https://pubmed.ncbi.nlm.nih.gov/?term=An+efficient+targeted+nuclease+strategy+for+high-resolution+mapping+of+DNA+binding+sites) eLife. 2017. (CUT&RUN)\
+Kaya-Okur HS, et al. [*CUT&Tag for efficient epigenomic profiling of small samples and single cells.*](https://pubmed.ncbi.nlm.nih.gov/?term=CUT%26Tag+for+efficient+epigenomic+profiling+of+small+samples+and+single+cells) Nat Commun. 2019. (CUT&Tag)
 
 ### 3D genome
 
+Lieberman-Aiden E, et al. [*Comprehensive mapping of long-range interactions reveals folding principles of the human genome.*](https://pubmed.ncbi.nlm.nih.gov/?term=Comprehensive+mapping+of+long-range+interactions+reveals+folding+principles+of+the+human+genome) Science. 2009. (Hi-C)\
 Rao SSP, et al. [*A 3D map of the human genome at kilobase resolution reveals principles of chromatin looping.*](https://pubmed.ncbi.nlm.nih.gov/?term=A+3D+map+of+the+human+genome+at+kilobase+resolution+reveals+principles+of+chromatin+looping) Cell. 2014.\
 Dekker J, Mirny L. [*The 3D genome as moderator of chromosomal communication.*](https://pubmed.ncbi.nlm.nih.gov/?term=The+3D+genome+as+moderator+of+chromosomal+communication) Cell. 2016.
 
@@ -606,5 +756,6 @@ Capper D, et al. [*DNA methylation-based classification of central nervous syste
 ### Atlases and integration
 
 [ENCODE](https://www.encodeproject.org/) · [Roadmap Epigenomics](http://www.roadmapepigenomics.org/) · [WashU Epigenome Browser](https://epigenomegateway.wustl.edu/)\
+Roadmap Epigenomics Consortium. [*Integrative analysis of 111 reference human epigenomes.*](https://pubmed.ncbi.nlm.nih.gov/?term=Integrative+analysis+of+111+reference+human+epigenomes) Nature. 2015.\
 ENCODE Project Consortium. [*Perspectives on ENCODE.*](https://pubmed.ncbi.nlm.nih.gov/?term=Perspectives+on+ENCODE) Nature. 2020.\
 Finucane HK, et al. [*Heritability enrichment of specifically expressed genes identifies disease-relevant tissues and cell types.*](https://pubmed.ncbi.nlm.nih.gov/?term=Heritability+enrichment+of+specifically+expressed+genes+identifies+disease-relevant+tissues+and+cell+types) Nat Genet. 2018.

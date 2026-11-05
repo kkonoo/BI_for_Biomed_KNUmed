@@ -49,7 +49,7 @@ execute:
 ## 🔍 더 알아보기 — ③ 조성 변화는 생각보다 흔함
 
 -   ⚠️ 염증·섬유화·침윤 조직 — 임상에서 주로 연구하는 바로 그 조직 — 에서 흔함. 그런데 논문에는 흔히 ①처럼 기술됨
--   같은 문제의 다른 모습: bulk 조직 deconvolution(🔗 [W4 §7.2](w4_transcriptomics.qmd#w4-s7-2)), 후성유전체(🔗 [W3 §5.3②](w3_epigenomics.qmd#w3-s5-3-2))
+-   같은 문제의 다른 모습: bulk 조직 deconvolution(🔗 [W4 §7.2](w4_transcriptomics.qmd#w4-s7-2)), 후성유전체(🔗 [W3 §5.3](w3_epigenomics.qmd#w3-s5-3))
 :::
 
 ## 2) 언제 single cell을 쓰나 {#w5-s1-2}

@@ -475,13 +475,13 @@ Rarefaction (모든 시료를 같은 깊이로 subsampling)
 -   정확히 무엇을 비교? **반복의 단위**는? ([W1 §5.3](w1_intro.qmd#w1-s5-3), [W5 §6.2](w5_singlecell.qmd#w5-s6-2))
 -   생물학적 반복은 몇 개? 충분해 보이나? ([W4 §5.4](w4_transcriptomics.qmd#w4-s5-4))
 -   **Batch와 조건이 교락**되어 있나? 무작위화 설명은? ([W1 §4.3](w1_intro.qmd#w1-s4-3))
--   어떤 공변량을 수집? 명백한데 수집하지 **않은** 변수는? ([W3 §5.3②](w3_epigenomics.qmd#w3-s5-3-2), [W7 §2.2](#w7-s2-2))
+-   어떤 공변량을 수집? 명백한데 수집하지 **않은** 변수는? ([W3 §5.3](w3_epigenomics.qmd#w3-s5-3), [W7 §2.2](#w7-s2-2))
 
 **측정**
 
 -   이 assay가 실제로 측정하는 것은? **볼 수 없는** 것은? ([W2 §1.1](w2_genomics.qmd#w2-s1-1), [W6 §1](w6_proteomics.qmd#w6-s1))
 -   어떤 참조, 어떤 annotation, **어떤 version**? ([W1 §2.3](w1_intro.qmd#w1-s2-3))
--   QC 수치는? 제시되어 있나? ([W3 §2.3](w3_epigenomics.qmd#w3-s2-3), [W5 §3.3](w5_singlecell.qmd#w5-s3-3))
+-   QC 수치는? 제시되어 있나? ([W3 §2.2①](w3_epigenomics.qmd#w3-s2-2-1), [W5 §3.3](w5_singlecell.qmd#w5-s3-3))
 
 **분석**
 

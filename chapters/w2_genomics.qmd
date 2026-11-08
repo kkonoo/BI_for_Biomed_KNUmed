@@ -41,7 +41,7 @@ By the end of this chapter you should be able to:
 
 -   **\~4–5 million** single nucleotide variants (SNVs) and short indels
 -   **\~20,000–25,000** structural variants (SVs)
--   ⚠️ SVs are far fewer — but together they affect **more base pairs** than all SNVs combined → count and impact point in opposite directions, and this decides which technology you need
+-   ⚠️ SVs are far fewer — but together they affect **more base pairs** than all SNVs combined → count and impact point in opposite directions, so which kind of variant you want to see decides which technology you need
 
 💡 4–5 million is **per person**. Each person carries a different set (most of them rare, [§1.2](#w2-s1-2)) → the list grows as you add people: gnomAD (\~810,000 people) holds \~900 million SNVs and indels. This is also why a GWAS tests more than ten million variants — a **population-level** list built by imputation from a reference panel, minus the variants that are too rare or too poorly imputed (🔗 [§2.4](#w2-s2-4))
 
@@ -125,7 +125,7 @@ A negative exome result says nothing about:
 
 -   **Allele frequency** — the proportion of chromosomes in a population carrying a given allele
 -   **Common** = minor allele frequency (MAF) above 1–5% / **Rare** = below
--   **Frequency and effect size are inversely related** — strongly harmful variants are removed by selection → this one number determines almost everything about study design
+-   **Frequency and effect size are inversely related** — strongly harmful variants are removed by selection. So this one number, frequency, determines almost everything about study design
 
 ![Allelic architecture. The three labelled regions require completely different study designs; a study designed for one is nearly blind to the others.](/assets/img/w2/allelic_architecture.png){fig-align="center"}
 
@@ -147,7 +147,7 @@ A negative exome result says nothing about:
 Both start from sequenced genomes. The difference = **what is released**
 
 -   **Frequency database** — only a **summary** per variant ("what % carry it") → judging rarity, interpreting clinical variants
--   **Imputation reference panel** — every person's **phased haplotypes** (which alleles sit together on one chromosome) → only then can the pattern at the sites an array measured be used to fill in the rest (🔗 [§2.4](#w2-s2-4))
+-   **Imputation reference panel** — every person's **phased haplotypes** (which alleles sit together on one chromosome) → only then can the pattern at the sites that an array measured be used to fill in the rest (🔗 [§2.4](#w2-s2-4))
 -   → gnomAD itself releases only summary frequencies → it cannot serve as an imputation panel. Some resources, such as 1000 Genomes and TOPMed, provide both
 
 | Resource | Size | Main use | Note |
@@ -300,7 +300,7 @@ An array measures only pre-selected sites → cannot discover anything new. Stil
 
 -   The standard order set out by the Broad Institute's **GATK**: align → clean up the reads → call per sample → joint genotyping across the cohort → filter
 -   **Joint calling** — analyses all samples together rather than one at a time
--   **Filtering** — callers produce far more candidates than are real → this is where most of the judgement lives
+-   **Filtering** — callers produce far more candidates than are real → this is the step that involves the most judgement
 -   ⚠️ Different filter settings → meaningfully different variant sets from identical data
 -   WES = the same pipeline, restricted to the capture regions (a BED file)
 
@@ -348,12 +348,12 @@ An array measures only pre-selected sites → cannot discover anything new. Stil
 -   **Matching the reference panel** — strand (+/−), genome build (GRCh37 vs. GRCh38) and allele order are made consistent with the panel. A/T and C/G SNPs cannot be strand-resolved and are often dropped
 -   **Phasing** — separates each person's two chromosomes (which alleles sit together on one chromosome) → the input to imputation
 -   **Tools** — PLINK for QC, SHAPEIT or Eagle for phasing, Minimac or Beagle for imputation; often run on the Michigan or TOPMed imputation servers
--   The intensities themselves (B allele frequency, Log R ratio) also reveal **large CNVs** → the "large CNVs only" in the table above
+-   The intensities themselves (B allele frequency, Log R ratio) also reveal **large CNVs** → the "large CNVs only" in the platform comparison table
 :::
 
 ## 3) ⚠️ Variant calls are probabilities {#w2-s2-3}
 
--   A VCF looks like a list of facts → it is a list of **inferences**, each with a confidence
+-   A VCF looks like a list of facts, but it is a list of **inferences**, each with a confidence
 -   The confidence varies enormously across the genome: ✅ high in unique, well-covered sequence / ⚠️ falls sharply in repetitive and hard-to-read regions
 -   Arrays too: every genotype has a calling score, and imputed genotypes are probabilities (dosages)
 -   → "Accuracy" is not one number. **It is a map**
@@ -502,7 +502,7 @@ $$
 
 -   The simplest version = a 2×2 table of allele counts in cases and controls → a **χ² test**. Early GWAS used a trend test that is nearly the same thing
 -   As a regression → an effect size β and its standard error SE → z = β ÷ SE → **χ² = z²** (1 degree of freedom) → p-value. The same test, now able to include covariates (age, sex, PCs)
--   This is why result files and the λ of the QQ plot ([§3.4②](#w2-s3-4-2)) speak in χ² values
+-   This is why result files and the λ of the QQ plot ([§3.4②](#w2-s3-4-2)) are based on χ² values
 -   For a feel: p = 5×10⁻⁸ ↔ z ≈ 5.45 ↔ χ² ≈ 29.7
 
 **The additive assumption and mixed models**
@@ -688,7 +688,7 @@ Enhancers routinely skip over intervening genes to reach their target
 ![A GWAS links variant and disease directly and hides the path between them. Each layer's QTL fills in one step of that path.](/assets/img/w2/qtl_layers.png){fig-align="center"}
 
 -   A variant's effect passes through layers: chromatin accessibility (caQTL) → DNA methylation (meQTL) → RNA expression and splicing (eQTL, sQTL) → protein (pQTL) → metabolite (mQTL)
--   Colocalizing each layer's QTLs with the GWAS signal → **which layer** the effect starts in, and which gene it passes through
+-   Colocalizing each layer's QTLs with the GWAS signal → shows **which layer** the effect starts in, and which gene it passes through
 -   eQTLs alone are not enough — only some GWAS loci colocalize with an eQTL. The rest may act in other cell types or developmental stages, or through other layers such as splicing or protein
 -   pQTLs sit at the level drugs actually target → a direct line to drug targets ([§6.3](#w2-s6-3))
 -   💡 W3 (epigenomics), W4–W5 (transcriptomics) and W6 (proteomics) of this course = the technologies that measure each layer
@@ -719,7 +719,7 @@ Enhancers routinely skip over intervening genes to reach their target
 
 -   Families share genes **and** environment → "it runs in the family" cannot tell the two apart
 -   Compare relatives who share different fractions of their genes: identical (MZ) twins 100%, parents, children, siblings and fraternal (DZ) twins 50%, second-degree relatives 25%, third-degree 12.5%
--   Risk rises with closeness, while family members who share the home but not the genes (adoptees, spouses) have the general-population risk → that is the genetic share. E.g. for multiple sclerosis: an MZ twin of a patient \~160×, first-degree relatives 20–40×, adoptees and spouses \~1×
+-   Risk rises with closeness, while family members who share the home but not the genes (adoptees, spouses) have the general-population risk → the extra risk seen only in blood relatives is the genetic share. E.g. for multiple sclerosis: an MZ twin of a patient \~160×, first-degree relatives 20–40×, adoptees and spouses \~1×
 -   **Twins = an experiment of nature** — MZ and DZ twins both grow up in one home; the only difference is the share of genes (100% vs. 50%) → **the extra resemblance** of MZ pairs = the genetic share
 -   **Falconer's formula**: h² ≈ 2 × (r~MZ~ − r~DZ~)
 
@@ -758,7 +758,7 @@ Enhancers routinely skip over intervening genes to reach their target
 -   Treat the two twins' liabilities as a bivariate normal and find the correlation r for which "both above the threshold = K × concordance"
     -   MZ: 0.01 × 0.12 = 1.2×10⁻³ — it would be 10⁻⁴ if they were independent → r~MZ~ ≈ 0.48
     -   DZ: 0.01 × 0.03 = 3×10⁻⁴ → r~DZ~ ≈ 0.18
--   → H² ≈ 2 × (0.48 − 0.18) ≈ **0.6**
+-   → h² ≈ 2 × (0.48 − 0.18) ≈ **0.6**
 -   💡 "12% concordance" sounds like a weak genetic effect, but for a disease with 1% prevalence it is a 12-fold rise → on the liability scale, heritability is about 60%
 :::
 
@@ -885,7 +885,7 @@ Cancer is a **somatic** genetic disease → different questions:
 
 -   Most drug candidates fail in clinical development — commonly from lack of efficacy: **the target was not causal for the disease**
 -   Genetics gives evidence on exactly that question → targets with supporting human genetic evidence are **roughly twice as likely to succeed**
--   e.g. *PCSK9* loss-of-function carriers → low LDL, low cardiovascular risk → anticipated PCSK9 inhibitors
+-   e.g. *PCSK9* loss-of-function carriers → low LDL, low cardiovascular risk → anticipated the effect of PCSK9 inhibitors
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — impact on industry, and another example

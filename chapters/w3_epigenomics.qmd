@@ -66,7 +66,7 @@ By the end of this chapter you should be able to:
 → Every epigenomic measurement is specific to the cells you happened to assay\
 → Assay a tissue, and you measured an **average over whatever mixture it contained**
 
-This single fact generates [§5.3](#w3-s5-3) and most of the field's reproducibility problems
+This single fact is behind the cell-composition problem in [§5.3](#w3-s5-3) and most of the field's reproducibility problems
 :::
 
 ## 3) ⚠️ The four layers have no order {#w3-s1-3}
@@ -90,7 +90,7 @@ This single fact generates [§5.3](#w3-s5-3) and most of the field's reproducibi
 ```
 
 -   "Is TF binding a cause or a consequence of accessibility?" is an **open question in the field**, not a settled fact
--   **This chapter's ordering principle: regulatory logic** — accessibility as the gate → what kind of element sits there → which promoter it reaches → finally the DNA-level layer, which has its own distinct measurement problems
+-   **This chapter's ordering principle: regulatory logic** — find where the DNA is open (§2) → what kind of element sits there (§3) → which promoter it reaches (§4) → finally the DNA-level layer, methylation (§5). Methylation comes last because it has its own distinct measurement problems
 :::
 
 ## 4) What is and is not heritable {#w3-s1-4}
@@ -107,8 +107,8 @@ This single fact generates [§5.3](#w3-s5-3) and most of the field's reproducibi
 -   Real in plants and *C. elegans*
 -   In mammals: contested, mechanism unclear
 -   The reason = within one generation, DNA methylation is almost completely erased and rewritten **twice** → **epigenetic reprogramming**
-    -   ① **The early embryo, right after fertilisation** — the genome from the sperm is stripped fast (active demethylation by TET3), the genome from the egg slowly, division by division (passive dilution) → re-methylated around implantation. ⚠️ Imprinted regions are spared this time
-    -   ② **Primordial germ cells (PGCs)** — the cells that will become the next generation's sperm and eggs erase almost everything, imprints included → rewritten by sex as the gametes form
+    -   ① **The early embryo, right after fertilisation** — the genome from the sperm is stripped fast (active demethylation by TET3). The genome from the egg is stripped slowly, division by division (passive dilution). Both are then re-methylated around implantation. ⚠️ Imprinted regions are spared this time
+    -   ② **Primordial germ cells (PGCs)** — the cells that will become the next generation's sperm and eggs. Here almost everything is erased, imprints included → rewritten by sex as the gametes form
 -   → A mark a parent acquired during life has to escape both resets to reach the child → hard to achieve, hence contested
 
 ![DNA methylation across one generation (mouse-based schematic). Methylation is almost completely erased once in the early embryo (①) and again in primordial germ cells (②). Imprinted regions escape ① but are erased in ② and reset by sex.](/assets/img/w3/reprogramming.png){fig-align="center"}
@@ -135,7 +135,7 @@ This single fact generates [§5.3](#w3-s5-3) and most of the field's reproducibi
 -   ATAC is performed on **intact nuclei**. Tn5 must physically reach the DNA *in situ*
 -   → closed chromatin is invisible to ATAC by construction
 
-Compare with ChIP ([§3.2](#w3-s3-2)), where chromatin is **fragmented before** the antibody ever meets it → the reason ATAC and ChIP see different things. Worth holding onto — it is often stated backwards
+In ChIP ([§3.2](#w3-s3-2)), by contrast, chromatin is **fragmented before** the antibody ever meets it. This difference in order is why ATAC and ChIP see different things. Worth holding onto — it is often stated backwards
 :::
 
 ::: {.callout-tip collapse="true"}
@@ -171,18 +171,18 @@ Compare with ChIP ([§3.2](#w3-s3-2)), where chromatin is **fragmented before** 
     -   ✅ A nucleosome-free peak below \~100 bp, then \~200 bp periodicity from mono-, di-, tri-nucleosomes
     -   ❌ A smooth, featureless curve → the transposition failed
 -   **TSS enrichment**
-    -   Promoters are open in essentially every cell type → a peak at TSSs is a **floor expectation**, not a finding
+    -   Promoters are open in essentially every cell type → a peak at TSSs is a **minimum expectation**, not a finding
     -   ❌ A flat TSS profile → the assay failed. Not unusual biology
 -   **Mitochondrial fraction**
     -   mtDNA has no nucleosomes → Tn5 attacks it enthusiastically
-    -   Untreated protocols can waste well over half the reads on chrM; Omni-ATAC and similar improvements reduce this
+    -   Protocols with no step to reduce mtDNA can waste well over half the reads on chrM; Omni-ATAC and similar improvements reduce this
 :::
 
 ### ② Statistical tests {#w3-s2-2-2}
 
 -   **Peak calling** — are there significantly more reads here than in the surrounding background? → MACS2/MACS3. Same principle as for ChIP-seq (🔗 [§3.3②](#w3-s3-3-2)), except ATAC has no input, so only the local background is used
 -   **Differential accessibility** — merge all samples' peaks into a consensus set → a sample × peak count matrix → the same count models as RNA-seq (DESeq2, edgeR, DiffBind; 🔗 [W4 §5](w4_transcriptomics.qmd#w4-s5))
--   ⚠️ Do not compare the **number of peaks** between groups → it depends on sequencing depth and QC. Compare counts over one shared peak set
+-   ⚠️ Do not compare the **number of peaks** between groups → the number depends on sequencing depth and QC. Compare counts over one shared peak set
 
 ## 3) Results: open chromatin and footprints {#w3-s2-3}
 
@@ -238,7 +238,7 @@ Dozens exist. Six do most of the work in genomics:
 -   **ChIP-seq** (chromatin immunoprecipitation sequencing) — use an antibody against one histone mark (or protein) to pick out only the DNA fragments carrying it, then sequence them
 -   Steps: crosslink (formaldehyde) → fragment the chromatin (sonication or MNase) → immunoprecipitate (IP) with the antibody → reverse crosslinks, purify DNA → sequence
 -   → where reads pile up = where the mark is
--   ⚠️ **Antibody quality** — ChIP-seq is an antibody experiment. Specificity for histone modifications is variable and **lot-dependent** → a wet-lab problem no analysis can repair
+-   ⚠️ **Antibody quality** — ChIP-seq is an antibody experiment. Antibody specificity for histone modifications is variable and **lot-dependent** → a wet-lab problem that no analysis can repair
 
 ::: {.callout-important collapse="true"}
 ## ChIP does not require accessibility
@@ -247,7 +247,7 @@ Dozens exist. Six do most of the work in genomics:
 
 -   **ATAC** — nuclei intact → Tn5 must reach the DNA *in situ* → accessibility IS required
 -   **ChIP** — crosslink, then fragment the chromatin first → the antibody meets FRAGMENTS in solution → accessibility is NOT required
--   → This is exactly why ChIP can map **H3K9me3 and H3K27me3** — marks of the most tightly closed chromatin in the nucleus, which ATAC cannot see at all
+-   → This is exactly why ChIP can map **H3K9me3 and H3K27me3**. These two marks label the most tightly closed chromatin in the nucleus → regions ATAC cannot see at all
 -   💡 The two assays are complementary, not redundant. Often explained backwards — watch for it
 :::
 
@@ -386,7 +386,7 @@ All use the same principle, proximity ligation. The difference = **which contact
 ![The Hi-C workflow. Align the two read ends separately → bin valid pairs into a matrix → normalise → ① QC → ② statistical tests (compartments, TADs, loops).](/assets/img/w3/hic_pipeline.png){fig-align="center"}
 
 -   The flow: align the two ends of each read separately → keep only valid pairs → group them into bins of a chosen size to make the matrix → normalise (ICE, KR balancing)
--   ⚠️ **Resolution = bin size**, and sequencing depth sets it. Compartments show up with few reads; kilobase-scale loops need billions of read pairs
+-   ⚠️ **Resolution = bin size**. Sequencing depth sets how small the bins can be. Compartments show up with few reads; kilobase-scale loops need billions of read pairs
 
 ### ① QC {#w3-s4-2-1}
 
@@ -409,7 +409,7 @@ All use the same principle, proximity ligation. The difference = **which contact
 
 -   **A/B compartments** — megabase scale. Active (A) chromatin contacts A, inactive (B) contacts B → the checkerboard in the matrix
 -   **TADs** (topologically associating domains) — sub-megabase blocks with frequent internal contacts and sharp, CTCF-bound boundaries. Boundaries are **largely conserved across cell types**
--   **Loops** — point contacts between two specific sites (CTCF pairs, enhancer–promoter) → bright dots off the diagonal. Enhancer–promoter loops are **not** conserved across cell types → these are what you actually want for variant interpretation
+-   **Loops** — point contacts between two specific sites (CTCF pairs, enhancer–promoter) → bright dots off the diagonal. Enhancer–promoter loops are **not** conserved across cell types. Yet these are the loops you actually need for variant interpretation
 
 ::: {.callout-warning collapse="true"}
 ## Contact is not function
@@ -423,11 +423,11 @@ All use the same principle, proximity ligation. The difference = **which contact
 
 # 5. DNA Methylation 🔵 {#w3-s5}
 
-> 🔑 **Core idea** — genome-level, and the layer most used in clinical and epidemiological work. Its biggest trap = **cell-type composition**
+> 🔑 **Core idea** — the DNA-level layer, and the one most used in clinical and epidemiological work. Its biggest trap = **cell-type composition**
 
 -   Methyl group on the 5-carbon of cytosine, overwhelmingly at **CpG** dinucleotides (a C followed by a G)
 -   \~70–80% of genomic CpGs are methylated
--   Exceptions cluster in **CpG islands** — at most promoters, usually unmethylated when the gene is active
+-   The exceptions (unmethylated CpGs) cluster in **CpG islands** — at most promoters, usually unmethylated when the gene is active
 
 ## 1) The principle {#w3-s5-1}
 
@@ -439,7 +439,7 @@ Two routes: **bisulfite sequencing**, or a fixed panel of CpGs on an **array**
 
 -   Sodium bisulfite converts unmethylated C → U (read as T); methylated C is protected and still reads as C
 -   → sequence, compare to reference: a C that stayed C was methylated
--   **WGBS** — every CpG, single-base resolution. Expensive. **RRBS** — enzymatic digestion enriches CpG-dense regions. Far cheaper, biased subset
+-   **WGBS** — every CpG, single-base resolution. Expensive. **RRBS** — enzymatic digestion enriches CpG-dense regions. Far cheaper, but covers only a biased subset of CpGs
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — the limits of bisulfite, and alternatives
@@ -459,7 +459,7 @@ Alternatives: **EM-seq** (enzymatic conversion, no degradation); **long-read pla
 ![How a methylation array (Infinium) works. Bisulfite-converted DNA binds a probe fixed for each CpG → a single-base extension reads C (methylated) and T (unmethylated) in different fluorescent colours → β from the two signals.](/assets/img/w3/array_principle.png){fig-align="center"}
 
 -   Illumina **EPIC** — a fixed panel of CpG sites, on the order of 850,000 for v1 (\~3% of all CpGs), enriched for promoters, enhancers, and known disease loci
--   The principle: bisulfite-converted DNA binds a probe fixed for each CpG → fluorescence shows whether the site stayed C (methylated) or became T (unmethylated) → methylated signal M, unmethylated signal U → β
+-   The principle: bisulfite-converted DNA binds a probe fixed for each CpG → fluorescence shows whether the site stayed C (methylated) or became T (unmethylated) → methylated signal M, unmethylated signal U → β (this M is a signal intensity, not the M value below)
 -   Same trade-off as genotyping arrays (🔗 [W2 §2.1](w2_genomics.qmd#w2-s2-1)):
     -   ❌ Cannot discover anything outside the panel
     -   ✅ Cheap enough to run on thousands of samples → almost all large epidemiological methylation studies use them
@@ -486,7 +486,7 @@ $$
 $$
 
 -   **M value** = $\log_2(\beta / (1-\beta))$
--   β is **bounded** at 0 and 1 → variance compressed at both extremes → exactly where most CpGs sit
+-   β is **bounded** at 0 and 1 → variance is compressed near both ends. Most CpGs sit exactly there
 -   → violates linear model assumptions
 -   M is unbounded and roughly homoscedastic
 -   ⚠️ A paper running t-tests directly on β at CpGs with β ≈ 0.02 is doing something statistically dubious
@@ -516,7 +516,7 @@ The most important subsection in the chapter
 ![The mechanism of the field's most common false positive.](/assets/img/w3/cell_composition_confounder.png){fig-align="center"}
 
 -   Methylation differs enormously **between cell types** — far more than between individuals or disease states within one cell type
--   → cases and controls with even slightly different cell mixtures → thousands of CpGs appear "differentially methylated" → **without a single cell having changed anything**
+-   → if cases and controls differ even slightly in cell mixture, thousands of CpGs appear "differentially methylated", **even though nothing changed in any individual cell**
 -   ✅ Measure or estimate the cell composition, and adjust for it
 
 ::: {.callout-warning collapse="true"}
@@ -533,7 +533,7 @@ Not hypothetical. Disease, infection, medication, age, and smoking all shift blo
 -   ✅ Reference-free methods (RefFreeEWAS, ReFACTor, SVA) for tissues without reference panels — at the cost of possibly removing real signal too
 -   ✅ **State exactly what you did.** "We adjusted for cell composition" with no detail is not enough
 
-🔗 The chapter-spanning version of [W1 §4.3](w1_intro.qmd#w1-s4-3)'s confounding thread. It returns in [W4 §7.2](w4_transcriptomics.qmd#w4-s7-2) as bulk tissue deconvolution, and in [W5 §6.3](w5_singlecell.qmd#w5-s6-3) as differential abundance
+🔗 This continues the confounding thread from [W1 §4.3](w1_intro.qmd#w1-s4-3), which runs across chapters. It returns in [W4 §7.2](w4_transcriptomics.qmd#w4-s7-2) as bulk tissue deconvolution, and in [W5 §6.3](w5_singlecell.qmd#w5-s6-3) as differential abundance
 :::
 
 ## 4) Epigenetic clocks ⏳ {#w3-s5-4}
@@ -549,7 +549,7 @@ Not hypothetical. Disease, infection, medication, age, and smoking all shift blo
 
 **① Which clock?**
 
--   **1st generation** (Horvath, Hannum) — trained to predict *chronological* age → by construction, **penalised** for detecting biological ageing
+-   **1st generation** (Horvath, Hannum) — trained to predict *chronological* age → any sign of biological ageing counts as prediction error, so training **penalises** it
 -   **2nd generation** (PhenoAge, GrimAge) — trained against clinical biomarkers and mortality → predict health outcomes considerably better
 -   → not interchangeable; results do not transfer between them
 
@@ -626,7 +626,7 @@ Public atlases already hold this for hundreds of cell types:
 
 -   An enhancer active in hepatocytes → invisible in a lymphoblastoid cell line
 -   ⚠️ Choosing which ENCODE cell types to use is a **scientific decision, not a technical default**
--   **Partitioned heritability** (LDSC-SEG, stratified LD score regression) = the logic of §6.3 run on the whole genome's signal at once rather than locus by locus
+-   **Partitioned heritability** (LDSC-SEG, stratified LD score regression) = the logic of §6.3, applied to the whole genome's signal at once rather than locus by locus
     -   Which cell types' regulatory annotations are enriched for a trait's heritability?
     -   → often the strongest available evidence about which tissue a disease lives in — microglia for Alzheimer disease, specific T cell subsets for autoimmune disease
 

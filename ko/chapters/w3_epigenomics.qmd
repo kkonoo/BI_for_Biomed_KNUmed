@@ -13,14 +13,14 @@ execute:
 
 이 장을 마치면:
 
--   후성유전체의 네 가지 층과 각 층을 측정하는 assay
--   ⚠️ 이 층들 사이에 정해진 순서가 없는 이유
+-   후성유전체의 네 가지 층과 각 층을 측정하는 assay 짝짓기
+-   ⚠️ 이 층들 사이에 정해진 순서가 없는 이유 설명
 -   각 assay를 원리 → pre-processing(QC, 통계 검정) → 결과 순서로 설명
--   ATAC-seq에는 접근성이 필요하고 ChIP-seq에는 필요 없는 이유
+-   ATAC-seq에는 접근성이 필요하고 ChIP-seq에는 필요 없는 이유 설명
 -   히스톤 마크를 조합으로 읽기 (활성 promoter, 활성 enhancer, 억제)
 -   유전체 브라우저 트랙 패널을 읽고 어떤 종류의 조절 요소인지 추론
--   ⚠️ 조직 메틸화 연구의 가장 큰 교란요인 = 세포 유형 조성
--   후성유전체학이 비암호화 GWAS hit에서 기전으로 이어지는 다리인 이유
+-   ⚠️ 조직 메틸화 연구에서 세포 유형 조성이 가장 큰 교란요인인 이유 설명
+-   후성유전체학이 비암호화 GWAS hit에서 기전으로 이어지는 다리인 이유 설명
 :::
 
 > 🤔 **출발 질문**\
@@ -66,7 +66,7 @@ execute:
 → 모든 후성유전체 측정값 = 실제로 측정한 세포에 특이적\
 → 조직을 측정하면 그 안에 섞여 있던 **여러 세포의 평균**을 측정한 것
 
-이 한 가지 사실에서 [§5.3](#w3-s5-3)과 이 분야 재현성 문제의 대부분이 발생
+[§5.3](#w3-s5-3)의 세포 조성 문제, 그리고 이 분야에서 결과가 재현되지 않는 문제의 대부분이 이 한 가지 사실에서 생김
 :::
 
 ## 3) ⚠️ 네 가지 층에 순서는 없음 {#w3-s1-3}
@@ -90,7 +90,7 @@ execute:
 ```
 
 -   “TF 결합은 접근성의 원인인가, 결과인가?” = **이 분야의 미해결 질문**, 확립된 사실 x
--   **이 장의 배열 원리 = 조절 논리** — 접근성이 문을 열고 → 그 자리에 어떤 요소가 있는지 → 그 요소가 어느 promoter에 닿는지 → 마지막으로 고유한 측정 문제를 가진 DNA 수준의 층
+-   **이 장의 배열 원리 = 조절 논리** — 열린 곳 찾기(§2) → 그곳이 어떤 요소인지(§3) → 그 요소가 어느 promoter에 닿는지(§4) → 마지막으로 DNA 수준의 층인 메틸화(§5). 메틸화는 측정 방법에 따로 따질 문제가 많아 마지막에 둠
 :::
 
 ## 4) 무엇이 유전되고 무엇이 유전되지 않는가 {#w3-s1-4}
@@ -107,7 +107,7 @@ execute:
 -   식물과 *C. elegans*에서는 실제로 일어남
 -   포유류: 논쟁 중, 기전 불명확
 -   이유 = 한 세대 동안 DNA 메틸화가 **두 번** 거의 전부 지워졌다가 다시 쓰임 → **후성유전적 재프로그래밍(epigenetic reprogramming)**
-    -   ① **수정 직후 초기 배아** — 정자에서 온 유전체는 빠르게(TET3에 의한 능동적 탈메틸화), 난자에서 온 유전체는 세포분열마다 천천히(수동적 희석) 지워짐 → 착상 무렵 다시 메틸화. ⚠️ 각인(imprinting) 영역은 이때 지워지지 않음
+    -   ① **수정 직후 초기 배아** — 정자에서 온 유전체는 빠르게 지워짐(TET3에 의한 능동적 탈메틸화). 난자에서 온 유전체는 세포분열마다 천천히 지워짐(수동적 희석). → 착상 무렵 다시 메틸화. ⚠️ 각인(imprinting) 영역은 이때 지워지지 않음
     -   ② **원시생식세포(primordial germ cell, PGC)** — 다음 세대의 정자·난자가 될 세포에서 각인까지 포함해 거의 전부 지움 → 생식세포가 만들어지면서 성별에 맞게 다시 씀
 -   → 부모가 살면서 얻은 마크가 자녀에게 전달되려면 두 번의 초기화를 모두 피해야 함 → 그래서 일어나기 어렵고, 논쟁 중
 
@@ -124,8 +124,8 @@ execute:
 
 ![ATAC-seq의 원리. Adapter를 실은 Tn5가 열린 DNA만 자르고 adapter를 붙임 → 그 절편만 sequencing → read가 쌓인 곳 = 열린 염색질](/assets/img/w3/atac_principle.png){fig-align="center"}
 
--   **ATAC-seq** — sequencing adapter가 미리 결합된 과활성 Tn5 transposase(DNA를 자르는 효소) 사용
--   Tn5는 DNA가 **nucleosome에 감겨 있지 않은** 곳(nucleosome = DNA가 감기는 히스톤 덩어리), 즉 조절 단백질이 염색질을 활발히 열어 둔 곳에 우선 삽입
+-   **ATAC-seq** — Tn5 transposase(DNA를 자르는 효소) 사용. 활성을 높인 Tn5에 sequencing adapter를 미리 실어 둠
+-   Nucleosome = DNA가 감기는 히스톤 덩어리. Tn5는 DNA가 **nucleosome에 감겨 있지 않은** 곳에 우선 삽입됨. 조절 단백질이 염색질을 활발히 열어 둔 곳이 바로 이런 곳
 -   절편화와 adapter 부착이 **한 단계**(tagmentation)에서 → 실험이 빠르고 적은 세포로도 가능
 -   → 열린 곳에서 나온 절편만 sequencing됨 → read가 쌓인 곳 = 열린 염색질
 
@@ -135,7 +135,7 @@ execute:
 -   ATAC은 **온전한 핵**에서 수행. Tn5가 *in situ* 상태의 DNA에 물리적으로 도달해야 함
 -   → 닫힌 염색질은 ATAC의 원리상 보이지 않음
 
-항체가 염색질을 만나기 **전에 절편화**하는 ChIP([§3.2](#w3-s3-2))과 비교 → ATAC과 ChIP이 서로 다른 것을 보는 이유. 꼭 기억할 것 — 설명이 반대로 제시되는 경우도 많음
+ChIP([§3.2](#w3-s3-2))은 항체가 염색질을 만나기 **전에 절편화**함. 이 순서 차이 때문에 ATAC과 ChIP은 서로 다른 것을 봄. 꼭 기억할 것 — 다른 자료에서 이 설명이 반대로 나오는 경우도 많음
 :::
 
 ::: {.callout-tip collapse="true"}
@@ -153,7 +153,7 @@ execute:
 -   흐름 = read 정렬 → 필터링 → peak calling → 시료 × peak의 count 행렬 → 집단 비교
 -   ATAC에 특이한 단계 두 가지:
     -   **chrM read 제거** — mtDNA에는 nucleosome x → Tn5가 매우 많이 공격(🔗 ①)
-    -   **Tn5 위치 보정(+4 / −5 bp)** — Tn5는 두 가닥에 9 bp 엇갈리게 삽입 → read 끝을 옮겨야 실제 삽입 위치. Footprint 분석([§2.3②](#w3-s2-3-2))에 필요
+    -   **Tn5 위치 보정(+4 / −5 bp)** — Tn5는 두 가닥에 9 bp 엇갈리게 삽입 → read 끝을 그만큼 옮겨야 실제 삽입 위치가 됨. Footprint 분석([§2.3②](#w3-s2-3-2))에 필요
 -   **ENCODE blacklist** 제거 — 어떤 실험에서든 신호가 비정상적으로 높게 나오는 영역. ChIP-seq에서도 똑같이 적용(🔗 [§3.3①](#w3-s3-3-1))
 
 ### ① QC {#w3-s2-2-1}
@@ -175,14 +175,14 @@ execute:
     -   ❌ 평평한 TSS profile → 특이한 생물학이 아니라 assay 실패
 -   **미토콘드리아 분율(mitochondrial fraction)**
     -   mtDNA에는 nucleosome x → Tn5가 매우 적극적으로 공격
-    -   처리하지 않은 protocol은 read의 절반 이상을 chrM에 낭비할 수 있음. Omni-ATAC 등 개선법으로 감소
+    -   mtDNA를 줄이는 처리가 없는 protocol은 read의 절반 이상을 chrM에 낭비할 수 있음. Omni-ATAC 등 개선법으로 줄일 수 있음
 :::
 
 ### ② 통계 검정 {#w3-s2-2-2}
 
 -   **Peak calling** — 이 구간의 read가 주변 배경보다 유의하게 많은가? → MACS2/MACS3. 원리는 ChIP-seq과 같음(🔗 [§3.3②](#w3-s3-3-2)), 다만 ATAC에는 input이 없어 주변 배경만으로 판단
 -   **차등 접근성(differential accessibility)** — 모든 시료의 peak를 합친 consensus peak 집합 → 시료 × peak count 행렬 → RNA-seq과 같은 count 모형(DESeq2, edgeR, DiffBind; 🔗 [W4 §5](w4_transcriptomics.qmd#w4-s5))
--   ⚠️ 집단 사이에 **peak 개수**를 비교 x → sequencing 깊이와 QC에 따라 달라짐. 같은 peak 집합 위의 count로 비교
+-   ⚠️ 집단 사이에 **peak 개수**를 비교 x → peak 개수는 sequencing 깊이와 QC에 따라 달라짐. 같은 peak 집합 위의 count로 비교
 
 ## 3) 결과: 열린 염색질과 footprint {#w3-s2-3}
 
@@ -195,7 +195,7 @@ execute:
 
 ### ② Footprint {#w3-s2-3-2}
 
--   결합한 전사인자 → 자기 결합 부위를 Tn5로부터 보호 → 더 큰 접근 가능 영역 안에 작은 골짜기(**footprint**)
+-   전사인자가 결합한 자리는 Tn5가 자르지 못함 → 열린 영역 안에 read가 적은 작은 골짜기(**footprint**)가 생김
 -   원리상 ChIP 없이도 특정 factor의 위치를 찾을 수 있음
 -   ⚠️ 실제로는 많은 factor에서 신뢰하기 어려움 → footprint 기반 factor 판정은 **가설**로 취급
 
@@ -214,7 +214,7 @@ execute:
 
 ## 1) Histone mark의 종류 {#w3-s3-1}
 
-수십 가지가 있지만 유전체학에서 대부분의 역할 = 여섯 가지
+수십 가지가 있지만 유전체학에서 주로 쓰는 것은 여섯 가지
 
 ![마크마다 놓이는 자리와 신호 모양이 다름. 활성 마크(위 네 개)와 억제 마크(아래 두 개)](/assets/img/w3/histone_marks.png){fig-align="center"}
 
@@ -238,7 +238,7 @@ execute:
 -   **ChIP-seq**(chromatin immunoprecipitation sequencing) — 특정 histone mark(또는 단백질)에 대한 항체로 그 마크가 있는 DNA 절편만 골라 sequencing
 -   순서: crosslink(formaldehyde) → 염색질 절편화(sonication 또는 MNase) → 항체로 면역침강(IP) → crosslink 해제, DNA 정제 → sequencing
 -   → read가 쌓인 곳 = 그 마크가 있는 곳
--   ⚠️ **항체 품질** — ChIP-seq = 항체 실험. 히스톤 변형에 대한 특이성은 일정하지 않고 **lot마다 다름** → 어떤 분석으로도 복구할 수 없는 wet-lab 문제
+-   ⚠️ **항체 품질** — ChIP-seq = 항체 실험. 항체가 히스톤 변형을 얼마나 특이적으로 알아보는지는 일정하지 않고 **lot마다 다름** → 분석으로는 바로잡을 수 없는 wet-lab 문제
 
 ::: {.callout-important collapse="true"}
 ## ChIP에는 접근성이 필요 없음
@@ -247,7 +247,7 @@ execute:
 
 -   **ATAC** — 온전한 핵에서 Tn5가 *in situ* 상태의 DNA에 도달해야 함 → 접근성이 필요함
 -   **ChIP** — crosslink 후 염색질을 먼저 절편화 → 항체는 용액 속 절편을 만남 → 접근성이 필요하지 않음
--   → 바로 이 때문에 ChIP은 핵에서 가장 단단히 닫힌 염색질을 정의하는 **H3K9me3와 H3K27me3**를 지도화 가능. ATAC으로는 전혀 볼 수 없는 영역
+-   → 바로 이 때문에 ChIP은 **H3K9me3와 H3K27me3**도 지도화 가능. 두 마크는 핵에서 가장 단단히 닫힌 염색질의 표지 → ATAC으로는 전혀 볼 수 없는 영역
 -   💡 두 assay = 중복이 아니라 상호보완. 흔히 반대로 설명되니 주의
 :::
 
@@ -363,7 +363,7 @@ execute:
 
 -   **Hi-C** — 염색질 crosslink → 제한효소로 절단 → 끝을 biotin으로 표지 → 공간적으로 가까운 끝끼리 ligation(**proximity ligation**) → biotin 접합부만 골라 paired-end sequencing
 -   Read 한 쌍의 두 끝이 유전체의 서로 다른 두 위치에 정렬 → 두 위치가 핵 안에서 맞닿아 있었다는 증거 하나
--   출력 = 모든 유전체 bin(유전체 구간) 쌍 사이의 접촉 빈도 행렬
+-   출력 = 접촉 빈도 행렬. 유전체를 일정한 구간(bin)으로 나누고, 두 bin이 맞닿은 횟수를 행렬의 한 칸에 기록
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 더 알아보기 — 3C 계열 방법 비교
@@ -386,7 +386,7 @@ execute:
 ![Hi-C 분석 흐름. Read 양 끝을 따로 정렬 → 유효한 쌍을 bin으로 묶어 행렬 → 정규화 → ① QC → ② 통계 검정(compartment, TAD, loop)](/assets/img/w3/hic_pipeline.png){fig-align="center"}
 
 -   흐름: read의 두 끝을 따로 정렬 → 유효한 쌍(valid pair)만 남김 → 정해진 크기의 bin으로 묶어 행렬 → 정규화(ICE, KR balancing)
--   ⚠️ **해상도 = bin 크기** → sequencing 깊이가 정함. Compartment는 적은 read로도 보이지만, kb 단위 loop는 수십억 개의 read pair가 필요
+-   ⚠️ **해상도 = bin 크기**. Bin을 얼마나 작게 쪼갤 수 있는지는 sequencing 깊이가 정함. Compartment는 적은 read로도 보이지만, kb 단위 loop는 수십억 개의 read pair가 필요
 
 ### ① QC {#w3-s4-2-1}
 
@@ -409,7 +409,7 @@ execute:
 
 -   **A/B compartment** — Mb 규모. 활성(A) 염색질은 A끼리, 비활성(B) 염색질은 B끼리 접촉 → 행렬의 바둑판 무늬
 -   **TAD**(topologically associating domain) — 1 Mb보다 작은 블록. 내부 접촉이 빈번하고, CTCF가 결합한 경계가 날카로움. 경계는 **세포 유형 사이에서 대체로 보존됨**
--   **Loop** — 특정 두 위치(CTCF 쌍, enhancer–promoter) 사이의 점 접촉 → 대각선 밖의 밝은 점. Enhancer–promoter loop는 세포 유형 사이에 보존되지 **않음** → 변이 해석에 실제로 필요한 것은 이 loop
+-   **Loop** — 특정 두 위치(CTCF 쌍, enhancer–promoter) 사이의 점 접촉 → 대각선 밖의 밝은 점. Enhancer–promoter loop는 세포 유형 사이에 보존되지 **않음**. 그런데 변이 해석에 실제로 필요한 것은 바로 이 loop
 
 ::: {.callout-warning collapse="true"}
 ## 접촉이 곧 기능은 아님
@@ -423,11 +423,11 @@ execute:
 
 # 5. DNA 메틸화 🔵 {#w3-s5}
 
-> 🔑 **핵심** — genome-level, 임상·역학 연구에서 가장 많이 씀. 가장 큰 함정 = **세포 유형 조성**
+> 🔑 **핵심** — DNA 수준의 층이고, 임상·역학 연구에서 가장 많이 씀. 가장 큰 함정 = **세포 유형 조성**
 
 -   Cytosine의 5번 탄소에 methyl group이 붙음. 압도적으로 **CpG** dinucleotide(C 다음에 G)에서
 -   유전체 CpG의 약 70–80%가 메틸화
--   예외는 **CpG island**에 모여 있음 — 대부분의 promoter에 존재, 유전자가 활성일 때는 보통 메틸화 x
+-   메틸화되지 않은 예외는 **CpG island**에 모여 있음 — 대부분의 promoter에 존재, 유전자가 활성일 때는 보통 메틸화 x
 
 ## 1) 원리 {#w3-s5-1}
 
@@ -439,7 +439,7 @@ execute:
 
 -   Sodium bisulfite → 메틸화되지 않은 C를 U로 바꿈(sequencing에서는 T로 읽힘). 메틸화된 C는 보호되어 그대로 C
 -   → sequencing 후 참조서열과 비교: C로 남은 염기 = 메틸화된 것
--   **WGBS** — 모든 CpG, 단일 염기 해상도, 비쌈. **RRBS** — 효소 절단으로 CpG 밀집 영역만 농축, 훨씬 저렴하지만 편향된 일부
+-   **WGBS** — 모든 CpG, 단일 염기 해상도, 비쌈. **RRBS** — 효소 절단으로 CpG 밀집 영역만 농축, 훨씬 저렴하지만 CpG 일부만, 그것도 치우치게 봄
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 더 알아보기 — bisulfite의 한계와 대안
@@ -459,7 +459,7 @@ execute:
 ![Methylation array(Infinium)의 원리. Bisulfite 변환한 DNA가 CpG마다 정해진 probe에 붙음 → 한 염기 연장으로 C(메틸화)와 T(비메틸화)를 서로 다른 형광으로 읽음 → 두 신호로 β 계산](/assets/img/w3/array_principle.png){fig-align="center"}
 
 -   Illumina **EPIC** — 고정된 CpG 패널. v1은 약 850,000개(전체 CpG의 약 3%), promoter·enhancer·알려진 질병 locus에 치우침
--   원리: bisulfite 변환한 DNA를 CpG마다 정해진 probe에 붙임 → C로 남았는지(메틸화) T로 바뀌었는지(비메틸화)를 형광으로 구분 → 메틸화 신호 M, 비메틸화 신호 U → β
+-   원리: bisulfite 변환한 DNA를 CpG마다 정해진 probe에 붙임 → C로 남았는지(메틸화) T로 바뀌었는지(비메틸화)를 형광으로 구분 → 메틸화 신호 M, 비메틸화 신호 U → β (이 M은 신호 세기. 아래의 M value와는 다른 것)
 -   Genotyping array(🔗 [W2 §2.1](w2_genomics.qmd#w2-s2-1))와 같은 trade-off:
     -   ❌ 패널 밖에서는 아무것도 발견 불가
     -   ✅ 수천 개 시료에 적용할 만큼 저렴 → 대규모 역학 메틸화 연구는 거의 모두 array 사용
@@ -486,7 +486,7 @@ $$
 $$
 
 -   **M value** = $\log_2(\beta / (1-\beta))$
--   β는 0과 1 사이로 **경계가 정해져** 있음 → 양 극단에서 분산 압축 → 그런데 대부분의 CpG가 바로 이 극단에 있음
+-   β는 0과 1 사이로 **경계가 정해져** 있음 → 0이나 1 근처에서는 분산이 눌려 작아짐 → 그런데 대부분의 CpG가 바로 이 극단에 있음
 -   → 선형모형의 가정 위반
 -   M은 범위 제한 x, 대체로 등분산성
 -   ⚠️ β ≈ 0.02인 CpG에서 β value에 직접 t-test를 적용한 논문 → 통계적으로 의심할 만함
@@ -516,7 +516,7 @@ $$
 ![이 분야에서 가장 흔한 위양성이 생기는 기전](/assets/img/w3/cell_composition_confounder.png){fig-align="center"}
 
 -   메틸화는 **세포 유형 사이에서** 매우 크게 다름 — 같은 세포 유형 안에서 개인·질병 상태 사이의 차이보다 훨씬 큼
--   → 환자군과 대조군의 세포 혼합 비율이 조금만 달라도 → 수천 개의 CpG가 “차등 메틸화”된 것처럼 보임 → **개별 세포에서는 아무것도 변하지 않았는데도**
+-   → 환자군과 대조군의 세포 혼합 비율이 조금만 달라도 수천 개의 CpG가 “차등 메틸화”된 것처럼 보임. **개별 세포에서는 아무것도 변하지 않았는데도**
 -   ✅ 세포 조성을 측정하거나 추정한 뒤 보정
 
 ::: {.callout-warning collapse="true"}
@@ -549,7 +549,7 @@ $$
 
 **① 어떤 시계인가?**
 
--   **1세대**(Horvath, Hannum) — *실제 연령*을 예측하도록 학습 → 설계상 생물학적 노화를 탐지하면 **불이익**
+-   **1세대**(Horvath, Hannum) — *실제 연령*을 맞히도록 학습 → 생물학적 노화 신호는 실제 연령과의 차이, 즉 **오차로 취급되어** 학습 과정에서 줄어듦
 -   **2세대**(PhenoAge, GrimAge) — 임상 biomarker와 사망을 목표로 학습 → 건강 결과를 훨씬 더 잘 예측
 -   → 서로 바꾸어 쓸 수 없음. 한 시계의 결과가 다른 시계로 그대로 이전되지 않음
 
@@ -626,7 +626,7 @@ $$
 
 -   간세포에서 활성인 enhancer → lymphoblastoid cell line에서는 안 보임
 -   ⚠️ 어떤 ENCODE 세포 유형을 쓸지 = **기술적 기본값이 아니라 과학적 결정**
--   **분할 유전력(partitioned heritability)** 분석(LDSC-SEG, stratified LD score regression) = §6.3의 논리를 locus별이 아니라 유전체 전체 신호를 모아 적용
+-   **분할 유전력(partitioned heritability)** 분석(LDSC-SEG, stratified LD score regression) = §6.3의 논리를 locus 하나씩이 아니라 유전체 전체 신호에 한꺼번에 적용한 것
     -   어떤 세포 유형의 조절 annotation에 형질의 유전력이 농축되어 있는가?
     -   → 질병이 어느 조직에서 작동하는지에 관한 가장 강력한 근거가 되기도 함. 예: Alzheimer disease → microglia, autoimmune disease → 특정 T cell subset
 

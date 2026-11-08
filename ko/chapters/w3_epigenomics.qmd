@@ -25,7 +25,7 @@ execute:
 
 > 🤔 **출발 질문**\
 > 우리 몸의 모든 세포 = 같은 유전체\
-> → 그런데 왜 신경세포랑 간세포는 다르게 생겼을까? 그리고 GWAS hit의 90%가 유전자 밖에 있다는 사실을 해석할 때 이것이 왜 중요한가?
+> → 그런데 왜 신경세포랑 간세포는 다르게 생겼을까? 그리고 GWAS hit의 90%가 coding region 밖에 있다는 사실을 해석할 때 이것이 왜 중요한가?
 
 ![](../../chapters/images/clipboard-2383268863.png)
 
@@ -563,7 +563,7 @@ $$
 
 ![Teschendorff & Horvath et al., Nature Reviews Genetics, 2025](../../chapters/images/clipboard-3706154246.png){fig-align="center"}
 
--   나이에 따라 메틸화가 변하는 CpG 수백 개 선택 → 실제 연령에 대해 **penalised regression** 적합 → 수년 이내 오차의 연령 예측 모델
+-   수많은 CpG의 메틸화 값으로 실제 연령에 대해 **penalised regression** 적합 → 이 과정에서 나이와 관련된 CpG 수백 개만 골라짐 → 수년 이내 오차의 연령 예측 모델
 :::
 
 ------------------------------------------------------------------------

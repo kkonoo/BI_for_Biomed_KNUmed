@@ -25,7 +25,7 @@ By the end of this chapter you should be able to:
 
 > 🤔 **Motivating question**\
 > Every cell in your body carries the same genome\
-> → So why do a neuron and a hepatocyte look so different? And why does that matter for interpreting the 90% of GWAS hits that fall outside genes?
+> → So why do a neuron and a hepatocyte look so different? And why does that matter for interpreting the 90% of GWAS hits that fall outside coding regions?
 
 ![](images/clipboard-2383268863.png)
 
@@ -563,7 +563,7 @@ Not hypothetical. Disease, infection, medication, age, and smoking all shift blo
 
 ![Teschendorff & Horvath et al., Nature Reviews Genetics, 2025](images/clipboard-3706154246.png){fig-align="center"}
 
--   Take a few hundred CpGs whose methylation changes with age → fit a **penalised regression** against chronological age → a predictor accurate to within a few years
+-   Fit a **penalised regression** of chronological age on methylation at many CpGs → the penalty keeps only a few hundred age-related CpGs → a predictor accurate to within a few years
 :::
 
 ------------------------------------------------------------------------

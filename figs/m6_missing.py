@@ -57,10 +57,10 @@ b.text(0.98, 0.9, f"{hit.sum()} 'hits' (> 2-fold, p < 0.05)\n{(hit & imp).sum()}
        f"{(hit & (tl == 0)).sum()} have no true change at all",
        transform=b.transAxes, ha="right", va="top", fontsize=8.8, color=CRIMSON, fontweight="semibold",
        linespacing=1.25, bbox=dict(fc="white", ec="none", pad=1.5), zorder=5)
-b.scatter([], [], s=14, color=CRIMSON, label="protein with ≥ 1 imputed value")
-b.scatter([], [], s=14, color=GREYF, label="all values measured")
-b.legend(frameon=True, framealpha=1, edgecolor="none", fontsize=8.3, loc="upper left", bbox_to_anchor=(-0.02, 0.86),
-         labelcolor=TEXT, handletextpad=0.2).set_zorder(5)
+b.scatter([], [], s=14, color=CRIMSON, label="≥ 1 value imputed")
+b.scatter([], [], s=14, color=GREYF, label="all measured")
+b.legend(frameon=False, fontsize=8.3, loc="upper left", bbox_to_anchor=(-0.02, 1.0), labelcolor=TEXT,
+         handletextpad=0.2)
 b.set_xlabel("log₂ fold change (after imputation)", color=TEXT2, fontsize=9)
 b.set_ylabel("−log₁₀ p", color=TEXT2, fontsize=9)
 for sp in ("left", "bottom"): b.spines[sp].set_color(LINE)

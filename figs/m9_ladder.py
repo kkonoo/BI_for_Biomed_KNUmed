@@ -45,7 +45,7 @@ yh = {i: h for i, h in zip(range(1, L), (18, 30, 62, 55, 70, 100, 64, 52, 35))}
 bh_ = {i: h for i, h in zip(range(1, L), (0, 34, 22, 26, 14, 12, 9, 6, 4))}
 for i in range(2, L):
     s.vlines(b_ion[i], 0, bh_[i], color=DARK, lw=1.8)
-    off = -6 if i in (2, 8) else 0
+    off = -9 if i in (2, 8) else 0
     s.text(b_ion[i] + off, bh_[i] + 2, f"b{i}", ha="right" if off else "center", va="bottom", fontsize=8, color=DARK)
 for i in range(1, L):
     s.vlines(y_ion[i], 0, yh[i], color=CRIMSON, lw=2)
@@ -64,7 +64,7 @@ for sp in ("left", "top", "right"): s.spines[sp].set_visible(False)
 s.spines["bottom"].set_color(LINE); s.tick_params(colors=TEXT2, labelsize=8.3)
 s.text(100, 134, "gaps between y ions = one amino acid each →\nread right to left: …V N E V T E…", ha="left",
        va="top", fontsize=8.8, color=TEXT, linespacing=1.25)
-s.text(1100, 80, "red = y ions (C-terminal pieces)\ngrey = b ions (N-terminal pieces)\nintensities illustrative",
+s.text(1100, 100, "red = y ions (C-terminal pieces)\ngrey = b ions (N-terminal pieces)\nintensities illustrative",
        ha="right", va="top", fontsize=8.4, color=TEXT2, linespacing=1.3)
 header(t, "Proteomics · MS2 spectrum", "The sequence is in the gaps between fragment peaks", dy=8, x1=1)
 fig.savefig(OUT + "ms2_ladder.png")

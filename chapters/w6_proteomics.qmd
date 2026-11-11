@@ -264,7 +264,7 @@ Three ways to compare protein amounts between samples — they differ in **when 
 
 # 4. The Missing Value Problem 🕳️ {#w6-s4}
 
-> 🔑 **Core idea** — a gap in a proteomics table usually means "too little to detect". Filling the gaps carelessly manufactures false positives
+> 🔑 **Core idea** — a gap in a proteomics table usually means "too little to detect". Filling the gaps carelessly inflates fold changes and manufactures false positives
 
 ![Left: missingness depends on abundance. Right: what happens when you ignore that and fill the blanks (simulated).](/assets/img/w6/missing_values.png){fig-align="center"}
 
@@ -280,7 +280,7 @@ Three ways to compare protein amounts between samples — they differ in **when 
 ## 2) ⚠️ Why imputation is dangerous {#w6-s4-2}
 
 -   **Imputation** = filling in missing values with estimated numbers
--   ⚠️ Fill them with a small constant → proteins near the detection limit get large, "highly significant" fold changes = **false positives**
+-   ⚠️ Fill them with a small constant → every protein near the detection limit gets an **inflated fold change**: a small real change looks large, and some proteins with no change at all become "highly significant" hits = **false positives**
 -   ✅ Filter first, match the method to the kind of missingness, and check that top hits survive **without** imputation
 
 ![The same simulated data as the figure above](/assets/img/w6/imputation.png){fig-align="center"}
@@ -292,9 +292,10 @@ Three ways to compare protein amounts between samples — they differ in **when 
 
 -   Replace missing values with a small constant, or the minimum observed value
 -   → a protein detected in all controls and none of the cases now has a large, extremely significant fold change
+-   → the size of that fold change is set by the constant you chose, not by the data
 -   → **for every protein sitting near the detection limit**
 
-**The signature** — a volcano plot with a suspicious cloud of "highly significant" hits, all at large fold changes, all driven by imputed values rather than measurements
+**The signature** — a volcano plot with a suspicious cloud of "highly significant" hits, all at large fold changes, mostly driven by imputed values rather than measurements
 
 **Better practice:**
 

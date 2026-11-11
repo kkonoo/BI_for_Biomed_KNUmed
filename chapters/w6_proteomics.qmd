@@ -62,6 +62,8 @@ Steps between mRNA and protein that change the amount — or the activity:
 -   **Protein half-life** — minutes to days → a stable protein accumulates from a modest transcript
 -   **Post-translational modification** — changes activity with no change in abundance at all
 
+![](/assets/img/w6/mrna_protein_steps.png){fig-align="center"}
+
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — localisation and complex stoichiometry
 
@@ -85,7 +87,7 @@ Whenever a conclusion is *about protein* — a drug target, a biomarker, a signa
 
 ## 1) The bottom-up workflow {#w6-s2-1}
 
-![The workflow, and the spectrum at its heart.](/assets/img/w6/bottomup_msms.png){fig-align="center"}
+![The instrument records peptide and fragment masses; the protein is a conclusion drawn by software.](/assets/img/w6/bottomup_msms.png){fig-align="center"}
 
 -   Intact proteins are too large and heterogeneous to measure well → cut them into **peptides** with trypsin (cuts after lysine and arginine) = **bottom-up** proteomics
 -   Peptides separated by liquid chromatography → weighed (**MS1**) → broken into fragments and weighed again (**MS2**)
@@ -118,6 +120,8 @@ Every step from ④ onwards is **inference**
 -   Fragmentation breaks the peptide backbone at different positions → a **ladder** of fragments
 -   **Mass difference between neighbouring rungs = one amino acid** → this is how the sequence is read
 
+![LVNEVTEFAK, a tryptic peptide of albumin. m/z values are calculated; peak heights are illustrative.](/assets/img/w6/ms2_ladder.png){fig-align="center"}
+
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — b and y ions, and how search engines read spectra
 
@@ -129,7 +133,7 @@ Every step from ④ onwards is **inference**
 
 ## 3) Acquisition strategies {#w6-s2-3}
 
-![Left: how the instrument decides what to fragment. Right: the downstream consequence you will actually feel.](/assets/img/w6/dda_vs_dia.png){fig-align="center"}
+![Top: how the instrument decides what to fragment. Bottom: the missing values this leaves across runs (simulated).](/assets/img/w6/dda_vs_dia.png){fig-align="center"}
 
 Three rules for **which peptides to fragment**:
 
@@ -177,6 +181,8 @@ Three rules for **which peptides to fragment**:
 -   Convention: **1% FDR**
 -   ⚠️ 1% FDR at the *peptide* level ≠ 1% FDR at the *protein* level
 
+![Simulated data](/assets/img/w6/target_decoy.png){fig-align="center"}
+
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — why protein-level error is larger
 
@@ -208,7 +214,7 @@ Three rules for **which peptides to fragment**:
 
 ## 3) Quantification strategies {#w6-s3-3}
 
-![Left: when the samples are combined determines how much technical variation they share. Right: the artifact specific to TMT.](/assets/img/w6/quantification.png){fig-align="center"}
+![Top: when the samples are combined determines how much technical variation they share. Bottom: the artifact specific to TMT.](/assets/img/w6/quantification.png){fig-align="center"}
 
 Three ways to compare protein amounts between samples — they differ in **when samples are combined**:
 
@@ -250,6 +256,8 @@ Three ways to compare protein amounts between samples — they differ in **when 
 -   ⚠️ Cases and controls unevenly distributed across batches → 🔗 [W1 §4.3](w1_intro.qmd#w1-s4-3)'s confounding problem, reproduced exactly
 
 → Randomise, and include a **common reference channel** in every batch so batches can be aligned
+
+![Simulated: 2,000 proteins with batch effects and no true difference](/assets/img/w6/tmt_batches.png){fig-align="center"}
 :::
 
 ------------------------------------------------------------------------
@@ -258,7 +266,7 @@ Three ways to compare protein amounts between samples — they differ in **when 
 
 > 🔑 **Core idea** — a gap in a proteomics table usually means "too little to detect". Filling the gaps carelessly manufactures false positives
 
-![Left: missingness depends on abundance. Right: what happens when you ignore that.](/assets/img/w6/missing_values.png){fig-align="center"}
+![Left: missingness depends on abundance. Right: what happens when you ignore that and fill the blanks (simulated).](/assets/img/w6/missing_values.png){fig-align="center"}
 
 -   A proteomics matrix commonly has **20–50% missing entries** — shocking to RNA-seq analysts, normal to proteomics analysts
 -   **The difference** — sequencing counts a zero; MS simply fails to record anything
@@ -274,6 +282,8 @@ Three ways to compare protein amounts between samples — they differ in **when 
 -   **Imputation** = filling in missing values with estimated numbers
 -   ⚠️ Fill them with a small constant → proteins near the detection limit get large, "highly significant" fold changes = **false positives**
 -   ✅ Filter first, match the method to the kind of missingness, and check that top hits survive **without** imputation
+
+![The same simulated data as the figure above](/assets/img/w6/imputation.png){fig-align="center"}
 
 ::: {.callout-warning collapse="true"}
 ## The commonest way to manufacture a proteomics false positive
@@ -305,6 +315,8 @@ Much of 🔗 [W4 §5](w4_transcriptomics.qmd#w4-s5) transfers. Three differences
 -   **① Normalisation** — intensities are continuous, not counts → median or quantile normalisation on log intensities is standard
 -   **② Fewer features** — typically **3,000–9,000 proteins**, not 20,000 genes → FDR correction still essential, but the burden is lighter
 -   **③ Small n, high variability** → `limma` (moderated t-statistic) and **MSstats** are the standard tools
+
+![Simulated data](/assets/img/w6/prot_stats.png){fig-align="center"}
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — the three differences in detail
@@ -342,7 +354,7 @@ Much of 🔗 [W4 §5](w4_transcriptomics.qmd#w4-s5) transfers. Three differences
 ![Plasma spans more than ten orders of magnitude. No single method covers it.](/assets/img/w6/dynamic_range.png){fig-align="center"}
 
 -   Plasma — the most clinically desirable sample, and the hardest to analyse
--   The top 20 proteins ≈ **99%** of the protein mass (albumin and immunoglobulins alone ≈ half)
+-   The top 20 proteins ≈ **99%** of the protein mass (albumin alone ≈ half)
 -   The biomarkers you want (cytokines, tissue leakage proteins, tumour-derived proteins) sit **ten orders of magnitude below**
 -   → Unfractionated MS covers perhaps five to six orders → hence depletion of abundant proteins, fractionation or enrichment — all of which add variability and cost
 
@@ -354,6 +366,8 @@ Two technologies dominate large-cohort plasma proteomics — **neither uses mass
 -   **SomaScan** — modified DNA aptamers (SOMAmers) bind the targets
 -   ✅ Thousands of proteins (up to \~11,000), down to pg/mL, from a few µL, at biobank scale. ❌ Predefined panel only
 -   ⚠️ What is measured = **binding** to a reagent, not the peptide sequence
+
+![](/assets/img/w6/affinity.png){fig-align="center"}
 
 ::: {.callout-warning collapse="true"}
 ## Affinity assays measure binding, not identity
@@ -395,6 +409,8 @@ An Olink or SomaScan readout is a **binding signal** → binding can be affected
 -   Population-scale plasma proteomics on tens of thousands of biobank participants → pQTLs now available at scale
 -   💊 This closes a loop that runs through the whole course: GWAS hit → pQTL → which protein → causal? → a **genetically validated, druggable target**
 
+![](/assets/img/w6/pqtl.png){fig-align="center"}
+
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — from GWAS hit to drug target, step by step
 
@@ -429,6 +445,8 @@ a genetically validated, druggable target (🔗 W2 §6.3)
 -   Phosphopeptides are a small fraction of the total → the workflow adds an **enrichment step** (TiO₂, IMAC)
 -   ⚠️ A phosphopeptide can rise simply because the protein rose → interpreting phosphorylation as *signalling* requires knowing the protein level too
 
+![](/assets/img/w6/phospho.png){fig-align="center"}
+
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — which site? (site localisation)
 
@@ -440,6 +458,8 @@ a genetically validated, druggable target (🔗 W2 §6.3)
 
 -   Accurate structure prediction has changed what a protein list can support — variant effect interpretation, docking, cross-linking MS interpretation
 -   ⚠️ A prediction is a **model** — not evidence of a conformation *in vivo*
+
+![](/assets/img/w6/plddt.png){fig-align="center"}
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — reading a predicted structure
@@ -453,6 +473,8 @@ a genetically validated, druggable target (🔗 W2 §6.3)
 -   **Keratin contamination** — skin and hair keratins are the classic proteomics contaminant. Keratins in your top hits → the problem is at the bench
 -   **Dynamic range** — failing to deplete or fractionate plasma means **you measured albumin**
 -   **Storage and freeze–thaw** — plasma proteomes are sensitive to pre-analytical handling: collection tube, time to freezing, freeze–thaw cycles. ⚠️ In biobank studies, collection protocols that differed between groups → a **systematic confounder**
+
+![](/assets/img/w6/pitfalls.png){fig-align="center"}
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — digestion efficiency

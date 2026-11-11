@@ -1,50 +1,89 @@
-from style import *
-import matplotlib.patches as mp
-fig,axes=plt.subplots(1,2,figsize=(12.8,4.9),gridspec_kw={"wspace":0.26,"width_ratios":[1.3,1]})
+from gallery import *
 
-ax=axes[0]; ax.axis("off")
-ax.set_title("When are the samples combined?",loc="left",fontsize=12.5)
-X=[0.35,0.545,0.74,0.935]
-for x,s in zip(X,["cells","lysate","peptides","LC-MS run"]):
-    ax.text(x,0.99,s,ha="center",fontsize=9.4,color="#777")
-rows=[("SILAC",0,"#2E8B57","metabolic labelling — earliest mixing,\nso every later step is shared"),
-      ("TMT / iTRAQ",2,"#C9A227","chemical labelling after digestion;\nup to 18 samples in one run"),
-      ("Label-free (LFQ)",3,BLUE,"never mixed — every sample is its own\nrun, so every step can drift")]
-y=0.80
-for nm,mixat,c,note in rows:
-    ax.text(0.0,y,nm,fontsize=11,fontweight="bold",color=c,va="center")
-    ax.text(0.0,y-0.095,note,fontsize=9.1,color="#666",va="top",linespacing=1.45)
-    for j,x in enumerate(X):
-        if j<mixat:
-            ax.add_patch(mp.Circle((x-0.033,y),0.018,fc=c,ec="none"))
-            ax.add_patch(mp.Circle((x+0.033,y),0.018,fc="#9AA5B1",ec="none"))
-        else:
-            ax.add_patch(mp.Ellipse((x,y),0.086,0.046,fc="#EDEFF1",ec="#BFC7CE",lw=1.1))
-            ax.add_patch(mp.Circle((x-0.016,y),0.016,fc=c,ec="none"))
-            ax.add_patch(mp.Circle((x+0.016,y),0.016,fc="#9AA5B1",ec="none"))
-        if j<3: ax.annotate("",xy=(x+0.078,y),xytext=(x+0.058,y),
-                            arrowprops=dict(arrowstyle="-|>",color="#D5D5D5",lw=1.3))
-    xm=X[mixat]
-    ax.annotate("",xy=(xm,y+0.048),xytext=(xm,y+0.115),
-                arrowprops=dict(arrowstyle="-|>",color=c,lw=1.7))
-    ax.text(xm,y+0.125,"mix here",ha="center",fontsize=8.8,color=c,fontweight="bold")
-    y-=0.315
-ax.text(0.0,-0.10,"→  The earlier you mix, the less technical variation accumulates.",
-        fontsize=9.8,color="#2E5E4E",fontweight="bold",va="top")
-ax.set_xlim(-0.02,1.0); ax.set_ylim(-0.18,1.06)
+# Quantification: (a) when the samples are combined; (b) why TMT ratios are compressed; (c) by how much
+fig = plt.figure(figsize=(9.8, 7.0))
+gs = fig.add_gridspec(2, 2, height_ratios=[0.85, 1.05], width_ratios=[1, 1.15], hspace=0.48, wspace=0.3,
+                      left=0.03, right=0.97, top=0.86, bottom=0.08)
+DARK = "#5E6670"; GREYF = "#B8BEC7"
 
-ax=axes[1]
-true=np.logspace(0,np.log10(12),80)
-ax.plot(true,true,color="#999",ls="--",lw=1.6,label="no compression (ideal)")
-ax.plot(true,1+(true-1)*0.86,color=TEAL,lw=2.3,label="SPS-MS3 (largely corrected)")
-ax.plot(true,1+(true-1)/(1+0.34*(true-1)),color=RED,lw=2.5,label="MS2-based TMT (observed)")
-ax.set_xscale("log"); ax.set_yscale("log")
-ax.set_xlabel("true abundance ratio"); ax.set_ylabel("measured ratio")
-ax.set_xticks([1,2,4,8,12]); ax.set_xticklabels(["1","2","4","8","12"])
-ax.set_yticks([1,2,4,8,12]); ax.set_yticklabels(["1","2","4","8","12"])
-ax.set_title("⚠️ TMT ratio compression",loc="left",fontsize=12.5,color=RED)
-ax.legend(frameon=False,fontsize=9.2,loc="upper left")
-ax.text(0.985,0.06,"Peptides co-isolated with your target contribute\nto the same reporter ions, diluting the signal.\nA real 8× change can be reported as 3×.",
-        transform=ax.transAxes,ha="right",fontsize=9.2,color="#333",linespacing=1.5,
-        bbox=dict(boxstyle="round,pad=0.42",fc="#FDF3F2",ec="#E8C4C0"))
-fig.savefig(OUT+"quantification.png"); print("ok")
+# (a) mixing point
+a = fig.add_subplot(gs[0, :]); a.set_xlim(0, 10); a.set_ylim(0, 3.2); a.axis("off")
+stages = ["cells", "protein", "peptides", "LC-MS run"]
+SX = [2.6, 4.6, 6.6, 8.6]
+for x, s in zip(SX, stages):
+    a.text(x, 3.05, s, ha="center", va="center", fontsize=9.2, color=TEXT2)
+    a.plot([x, x], [0.15, 2.85], color=FAINT, lw=8, zorder=0, solid_capstyle="butt")
+rows = [("SILAC", 0, "heavy amino acids in culture"), ("TMT", 2.5, "chemical tag after digestion"),
+        ("LFQ", None, "never mixed: one run each")]
+for k, (nm, mix, sub) in enumerate(rows):
+    y = 2.35 - k * 0.95
+    a.text(0, y + 0.1, nm, ha="left", va="center", fontsize=11, fontweight="bold", color=TEXT)
+    a.text(0, y - 0.18, sub, ha="left", va="center", fontsize=8.3, color=TEXT2)
+    x0, x1 = 2.2, 9.2
+    xm = SX[0] if mix == 0 else (SX[2] + 1.0 if mix == 2.5 else None)
+    if xm is None:
+        a.plot([x0, x1], [y + 0.1, y + 0.1], color=tint(0.6), lw=2.5, solid_capstyle="round")
+        a.plot([x0, x1], [y - 0.1, y - 0.1], color=DARK, lw=2.5, solid_capstyle="round")
+        a.text(x1 + 0.12, y, "every step\ncan drift", ha="left", va="center", fontsize=8.3, color=TEXT2,
+               linespacing=1.15)
+    else:
+        if xm > x0:
+            a.plot([x0, xm - 0.25], [y + 0.1, y + 0.1], color=tint(0.6), lw=2.5, solid_capstyle="round")
+            a.plot([x0, xm - 0.25], [y - 0.1, y - 0.1], color=DARK, lw=2.5, solid_capstyle="round")
+            a.plot([xm - 0.25, xm], [y + 0.1, y], color=tint(0.6), lw=2.5)
+            a.plot([xm - 0.25, xm], [y - 0.1, y], color=DARK, lw=2.5)
+        a.plot([xm, x1], [y, y], color=CRIMSON, lw=6, solid_capstyle="round")
+        a.plot([xm, xm], [y + 0.28, y - 0.28], color=CRIMSON, lw=1)
+        a.text(xm, y + 0.38, "mix", ha="center", va="bottom", fontsize=8.5, color=CRIMSON, fontweight="semibold")
+        a.text(x1 + 0.12, y, "shared\nfrom here", ha="left", va="center", fontsize=8.3, color=CRIMSON,
+               linespacing=1.15)
+a.text(2.2, 0.05, "two samples (pink, grey) · thick red = both go through the same steps together", ha="left",
+       va="center", fontsize=8.5, color=TEXT2)
+a.set_title("(a) When are the samples combined?", loc="left", fontsize=12.3, fontweight="semibold", color=TEXT, pad=8)
+
+# (b) mechanism of ratio compression: reporter-ion intensities in two channels
+b = fig.add_subplot(gs[1, 0])
+t, bg, R = 1.0, 2.5, 8
+X = np.array([0, 1])
+b.bar(X, [R * t, t], color=CRIMSON, width=0.5, label="target peptide")
+b.bar(X, [bg, bg], bottom=[R * t, t], color=GREYF, width=0.5, label="co-isolated background")
+for x, tot, tg in zip(X, [R * t + bg, t + bg], [R * t, t]):
+    b.text(x, tot + 0.25, f"{tot:g}", ha="center", va="bottom", fontsize=10, fontweight="bold", color=TEXT)
+b.set_xticks(X); b.set_xticklabels(["channel 1", "channel 2"], fontsize=9, color=TEXT)
+b.tick_params(axis="x", length=0); b.set_yticks([])
+for sp in ("left", "top", "right"): b.spines[sp].set_visible(False)
+b.spines["bottom"].set_color(LINE)
+b.set_ylim(0, 13.5); b.set_xlim(-0.6, 2.6)
+b.text(1.55, 9.5, f"true  {R * t:g} : {t:g} = {R}×", ha="left", va="center", fontsize=9.5, color=CRIMSON,
+       fontweight="semibold")
+b.text(1.55, 8.1, f"seen  {R * t + bg:g} : {t + bg:g} = {(R * t + bg) / (t + bg):.0f}×", ha="left", va="center",
+       fontsize=9.5, color=TEXT, fontweight="semibold")
+b.legend(frameon=False, fontsize=8.4, loc="upper right", bbox_to_anchor=(1.02, 0.55), labelcolor=TEXT,
+         handlelength=1)
+b.set_title("(b) Why TMT ratios shrink", loc="left", fontsize=12.3, fontweight="semibold", color=TEXT, pad=22)
+b.text(0, 1.03, "background peptides add the same signal to every channel", transform=b.transAxes, fontsize=9,
+       color=TEXT2)
+
+# (c) true vs measured ratio
+c = fig.add_subplot(gs[1, 1])
+tr = np.logspace(0, np.log10(16), 100)
+for bgr, col, lab, lw in ((0, GREYF, "0  (ideal)", 1.4), (0.25, DARK, "0.25  (e.g. SPS-MS3)", 1.8),
+                          (2.5, CRIMSON, "2.5  (MS2, complex sample)", 2.4)):
+    c.plot(tr, (tr + bgr) / (1 + bgr), color=col, lw=lw, label=lab, ls=(0, (4, 2)) if bgr == 0 else "-")
+c.set_xscale("log"); c.set_yscale("log")
+ticks = [1, 2, 4, 8, 16]
+c.set_xticks(ticks); c.set_xticklabels([str(v) for v in ticks]); c.set_yticks(ticks); c.set_yticklabels([str(v) for v in ticks])
+c.minorticks_off()
+c.plot([8, 8], [1, 3], color=CRIMSON, lw=0.8, ls=":"); c.plot([1, 8], [3, 3], color=CRIMSON, lw=0.8, ls=":")
+c.text(8.4, 2.6, "8× reads as 3×", ha="left", va="center", fontsize=9, color=CRIMSON, fontweight="semibold")
+c.set_xlabel("true ratio", color=TEXT2, fontsize=9); c.set_ylabel("measured ratio", color=TEXT2, fontsize=9)
+for sp in ("left", "bottom"): c.spines[sp].set_color(LINE)
+c.tick_params(colors=TEXT2, labelsize=8.3)
+c.legend(frameon=False, fontsize=8.4, loc="upper left", labelcolor=TEXT, title="background : target",
+         title_fontsize=8.4, alignment="left")
+c.set_title("(c) The bigger the change, the more it shrinks", loc="left", fontsize=12.3, fontweight="semibold",
+            color=TEXT, pad=22)
+c.text(0, 1.03, "measured = (true + bg) / (1 + bg)", transform=c.transAxes, fontsize=9, color=TEXT2)
+header(a, "Proteomics · quantification", "Mix early to share the noise; TMT pays with compressed ratios",
+       dy=26)
+fig.savefig(OUT + "quantification.png"); print("ok m5 quant")

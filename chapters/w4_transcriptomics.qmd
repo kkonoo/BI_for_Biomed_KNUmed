@@ -42,6 +42,8 @@ By the end of this chapter you should be able to:
 -   That number = the balance of two rates: **transcription** (making) and **degradation** (breaking down)
 -   ⚠️ The assay cannot separate them → a gene whose transcription doubles and a gene whose mRNA half-life doubles look **identical**
 
+![What RNA-seq measures is the water level (steady-state abundance). Gene A, transcribed twice as fast, and gene B, degraded twice as slowly, reach the same level → RNA-seq alone cannot tell them apart.](/assets/img/w4/steady_state.png){fig-align="center"}
+
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — assays that separate synthesis and translation
 
@@ -57,6 +59,8 @@ If the distinction matters to your hypothesis, you need a different assay:
 -   Transcript and protein abundance correlate at **r ≈ 0.4** across genes
 -   A real correlation — but nowhere near enough to treat mRNA as a proxy for protein for any individual gene
 -   Missing from RNA-seq: translation efficiency, protein half-life, post-translational regulation (🔗 W6)
+
+![Across genes, mRNA and protein levels correlate at only r ≈ 0.4 (schematic). Two genes with the same mRNA level can differ tens of times in protein.](/assets/img/w4/rna_protein.png){fig-align="center"}
 
 ## 3) A snapshot, of a mixture {#w4-s1-3}
 
@@ -95,6 +99,8 @@ If the distinction matters to your hypothesis, you need a different assay:
 -   \~10–20% of the genome has overlapping transcription on both strands → without strand information those reads are assigned ambiguously or wrongly
 -   → **Stranded is now standard**; little reason not to use it
 
+![Where two genes on opposite strands overlap. In an unstranded library a read cannot be assigned to either gene; a stranded library tells them apart by the read's direction.](/assets/img/w4/stranded.png){fig-align="center"}
+
 ## 3) Read length, depth, and paired-end {#w4-s2-3}
 
 -   Plain gene-level DE → single-end is often sufficient; longer reads add little
@@ -116,6 +122,8 @@ If the distinction matters to your hypothesis, you need a different assay:
 -   **Technical replicate** — the same RNA sequenced twice
 -   **Biological replicate** — a different animal, patient, or independently cultured dish
 -   ⚠️ Technical variability in RNA-seq is small; biological variability is not → **n counts biological replicates only**
+
+![Biological replicates carry real variation between individuals (n = 3). Technical replicates — the same RNA read three times — give almost identical values → n = 1.](/assets/img/w4/replicates.png){fig-align="center"}
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — what really counts as a biological replicate
@@ -145,6 +153,8 @@ Before samples leave the bench (🔗 [W1 §5.3](w1_intro.qmd#w1-s5-3)):
 # 3. From Reads to Counts 🔢 {#w4-s3}
 
 > 🔑 **Core idea** — reads are matched to genes and counted → a genes × samples count matrix. Every count matrix carries invisible decisions made along the way
+
+![Four decisions hidden in every count matrix. (a) Spliced alignment. (b) Pseudo-alignment. (c) Summing transcripts to genes. (d) Handling multi-mapping reads.](/assets/img/w4/read_to_count.png){fig-align="center"}
 
 ## 1) Spliced alignment {#w4-s3-1}
 
@@ -204,7 +214,7 @@ A count depends on three things that have nothing to do with biology:
 2.  **Gene length** — a 10 kb transcript generates more fragments than a 1 kb transcript at the same molar concentration
 3.  **Library composition** — the subtle one (§4.2)
 
-![① and ② are the obvious problem. ③ is the one that motivates TMM and RLE.](/assets/img/w4/normalization.png){fig-align="center"}
+![Three things besides biology that change a raw count. ① Depth and ② gene length are the obvious ones; ③ composition is the one that motivates TMM and RLE. Bottom: what each unit corrects.](/assets/img/w4/normalization.png){fig-align="center"}
 
 ## 2) ⚠️ The composition effect {#w4-s4-2}
 
@@ -277,7 +287,7 @@ A common and quiet error
 -   **Biological replicates** → far more variable = **overdispersed**; the excess variance grows with expression level
 -   → a t-test on counts produces false positives; DE tools use a **negative binomial** model that allows for the extra variance
 
-![Left: the reason a t-test on counts produces false positives. Right: the reason n = 3 works at all.](/assets/img/w4/mean_variance.png){fig-align="center"}
+![(a) Counts vary across replicates far more than Poisson allows (overdispersion), so a negative binomial model is needed. (b) With n = 3 a single gene's dispersion is noisy, so it is pulled toward the trend fitted from all genes.](/assets/img/w4/mean_variance.png){fig-align="center"}
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — the negative binomial in one line
@@ -327,7 +337,7 @@ $$
 -   **Depth saturates, replicates do not** (right-hand panel) → 20–30 M reads per sample is enough for most DE questions
 -   → money spent beyond that would buy more power as **additional samples**
 
-![Left: power against replicates. Right: what extra sequencing depth actually buys you.](/assets/img/w4/power_replicates.png){fig-align="center"}
+![(a) Power depends strongly on the number of replicates; n = 3 catches only large changes. (b) Depth saturates at about 20–30 M reads, while adding replicates lifts every curve.](/assets/img/w4/power_replicates.png){fig-align="center"}
 
 ::: {.callout-warning collapse="true"}
 ## n = 3 is a convention, not a justification
@@ -343,7 +353,7 @@ Rough orientation:
 
 ## 5) Reading a results table {#w4-s5-5}
 
-![Two views of the same result. Most papers show only the first.](/assets/img/w4/volcano_ma.png){fig-align="center"}
+![Two views of the same result. Most papers show only the first. Both cut-off lines are conventions, and the MA plot reveals whether hits pile up at low counts.](/assets/img/w4/volcano_ma.png){fig-align="center"}
 
 -   **Adjusted p-value (padj)** — "FDR \< 0.05" → \~5% of the genes on this list are expected to be false (🔗 [W1 §4.2](w1_intro.qmd#w1-s4-2))
 -   **log₂ fold change** — 1 = a doubling, −1 = a halving
@@ -381,7 +391,7 @@ Rough orientation:
 
 ## 1) ORA vs. GSEA {#w4-s6-1}
 
-![Two ways to ask the same question. They are not equivalent.](/assets/img/w4/ora_vs_gsea.png){fig-align="center"}
+![Two ways to ask the same question. They are not equivalent. GSEA uses the whole ranked list; ORA keeps only the genes past a cut-off and runs Fisher's exact test on a 2×2 table.](/assets/img/w4/ora_vs_gsea.png){fig-align="center"}
 
 -   **ORA** (over-representation analysis) — take the significant gene list → is a pathway over-represented relative to a background set? (Fisher's exact test)
 -   **GSEA** — take *all* genes ranked by some statistic → do a pathway's members cluster toward one end? **No threshold applied**
@@ -408,6 +418,8 @@ Rough orientation:
 -   ① **Wrong background set** — the background = genes expressed in your tissue, not the full annotation
 -   ② **Threshold sensitivity** — a different padj cutoff can change the top pathway
 -   ③ **Enrichment ≠ mechanism** — it describes your gene list; no driver, no direction, no cause
+
+![The background is the set of genes that could have been detected. The same overlap of 14 genes gives p ≈ 0.09 against the 12,000 expressed genes, but p ≈ 0.003 against the full 20,000-gene annotation.](/assets/img/w4/ora_background.png){fig-align="center"}
 
 ::: {.callout-warning collapse="true"}
 ## Enrichment analysis is easy to do and easy to do wrong
@@ -441,6 +453,8 @@ Rough orientation:
 -   **WGCNA** clusters genes into modules of correlated expression, then relates module summaries to traits
 -   ⚠️ Needs many samples — 20 is a floor, 50+ is better
 
+![WGCNA. ① Group genes that move together into modules. ② Compare one summary per module (the eigengene) with the trait. ③ With few samples, chance correlations alone create fake modules.](/assets/img/w4/wgcna.png){fig-align="center"}
+
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — when WGCNA helps
 
@@ -455,7 +469,7 @@ Rough orientation:
 -   Disease changes the mixture (neuron loss, immune infiltration, fibrosis) → coherent, highly significant "differential expression" → **without a single cell changing what it transcribes**
 -   ✅ Estimate cell-type proportions computationally (deconvolution) and adjust for them — or measure single cells (🔗 W5)
 
-![The same logic as W3's cell composition confounder, in a different assay.](/assets/img/w4/deconvolution.png){fig-align="center"}
+![The same logic as W3's cell composition confounder, in a different assay. No cell changes its expression; only the proportions shift — and bulk data still shows it as differential expression.](/assets/img/w4/deconvolution.png){fig-align="center"}
 
 ::: {.callout-warning collapse="true"}
 ## "Neuronal genes down, microglial genes up"
@@ -475,6 +489,8 @@ Rough orientation:
 -   **Differential splicing** — did the *proportions* of its isoforms change?
 -   → the second can matter enormously with no change in the first
 
+![The gene's total read count stays the same (no differential expression), but the share of the exon-3-including isoform flips from 80% to 25% (differential splicing). Arcs = reads that jump an intron.](/assets/img/w4/diff_splicing.png){fig-align="center"}
+
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — splicing tools and what they need
 
@@ -488,6 +504,8 @@ Rough orientation:
 -   **GTEx** — eQTLs across 54 human tissues from hundreds of donors
 -   → the main bridge from a non-coding GWAS hit to a candidate gene (🔗 [W2 §4.4](w2_genomics.qmd#w2-s4-4))
 -   ⚠️ A caveat that connects all three chapters so far: **eQTLs are tissue- and cell-type-specific** → an eQTL measured in whole blood tells you little about what a variant does in neurons
+
+![eQTL. Expression of gene G differs across genotypes (AA · AB · BB) at the GWAS variant → the variant is an eQTL for gene G (the same figure as in W2 §4.4).](/assets/img/w2/eqtl.png){fig-align="center"}
 
 ------------------------------------------------------------------------
 

@@ -42,6 +42,8 @@ execute:
 -   그 수 = **전사**(만들기)와 **분해**(없애기), 두 속도의 균형
 -   ⚠️ 이 assay로는 두 과정 분리 불가 → 전사가 두 배 증가한 유전자와 mRNA 반감기가 두 배 늘어난 유전자가 **똑같이 보임**
 
+![RNA-seq이 재는 것 = 물높이(정상상태 존재량). 전사가 2배 빨라진 유전자 A와 분해가 2배 느려진 유전자 B는 같은 높이에 도달 → RNA-seq만으로는 구분 불가](/assets/img/w4/steady_state.png){fig-align="center"}
+
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 더 알아보기 — 합성·번역을 따로 재는 assay
 
@@ -57,6 +59,8 @@ execute:
 -   유전자 전체에서 transcript와 단백질 존재량의 상관 = **r ≈ 0.4**
 -   실제 상관은 있지만 → 개별 유전자에서 mRNA를 단백질의 대리값으로 쓰기엔 턱없이 부족
 -   RNA-seq으로 알 수 없는 것: 번역 효율, 단백질 반감기, 번역 후 조절 (🔗 W6)
+
+![유전자 전체에서 mRNA와 단백질 양의 상관은 r ≈ 0.4(도식). mRNA 양이 같아도 단백질 양은 수십 배 다를 수 있음](/assets/img/w4/rna_protein.png){fig-align="center"}
 
 ## 3) 혼합물의 한순간을 찍은 사진 {#w4-s1-3}
 
@@ -95,6 +99,8 @@ execute:
 -   유전체의 약 10–20%는 양쪽 strand의 전사가 겹침 → strand 정보가 없으면 이런 read를 모호하게 또는 잘못 배정
 -   → 이제 **stranded가 표준**. 쓰지 않을 이유가 거의 없음
 
+![반대 strand의 두 유전자가 겹치는 곳. Unstranded library에서는 read가 어느 유전자의 것인지 알 수 없음. Stranded library는 read의 방향으로 구분](/assets/img/w4/stranded.png){fig-align="center"}
+
 ## 3) Read 길이, 깊이, paired-end {#w4-s2-3}
 
 -   단순 gene-level DE → single-end로 충분한 경우가 많음, 긴 read의 이점도 적음
@@ -116,6 +122,8 @@ execute:
 -   **기술적 반복(technical replicate)** — 같은 RNA를 두 번 sequencing
 -   **생물학적 반복(biological replicate)** — 서로 다른 동물, 환자, 또는 독립적으로 배양한 dish
 -   ⚠️ RNA-seq의 기술적 변이는 작지만 생물학적 변이는 작지 않음 → **n은 생물학적 반복만 셈**
+
+![생물학적 반복은 개체 사이의 실제 변이를 담음(n = 3). 같은 RNA를 세 번 읽은 기술적 반복은 거의 같은 값 → n = 1](/assets/img/w4/replicates.png){fig-align="center"}
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 더 알아보기 — 무엇이 진짜 생물학적 반복인가
@@ -145,6 +153,8 @@ execute:
 # 3. Read에서 count까지 🔢 {#w4-s3}
 
 > 🔑 **핵심** — read를 유전자에 배정하고 셈 → 유전자 × 시료 count matrix. 모든 count matrix 안에는 그 과정의 보이지 않는 결정이 숨어 있음
+
+![Count matrix 안에 숨은 네 가지 결정. (a) Spliced alignment (b) Pseudo-alignment (c) Transcript를 gene으로 합산 (d) Multi-mapping read 처리](/assets/img/w4/read_to_count.png){fig-align="center"}
 
 ## 1) Spliced alignment {#w4-s3-1}
 
@@ -204,7 +214,7 @@ Count에 영향을 주는, 생물학과 무관한 세 가지 요인:
 2.  **유전자 길이** — 몰 농도가 같아도 10 kb transcript가 1 kb transcript보다 더 많은 절편 생성
 3.  **Library 조성** — 눈에 잘 띄지 않지만 중요한 문제 (§4.2)
 
-![①과 ②는 눈에 잘 보이는 문제. ③이 TMM과 RLE가 필요한 이유](/assets/img/w4/normalization.png){fig-align="center"}
+![Raw count를 바꾸는, 생물학과 무관한 세 요인. ① 깊이와 ② 유전자 길이는 눈에 잘 보이는 문제. ③ 조성이 TMM과 RLE가 필요한 이유. 아래 = 단위마다 무엇을 보정하는지](/assets/img/w4/normalization.png){fig-align="center"}
 
 ## 2) ⚠️ 조성 효과 {#w4-s4-2}
 
@@ -277,7 +287,7 @@ Count에 영향을 주는, 생물학과 무관한 세 가지 요인:
 -   **생물학적 반복** → 훨씬 큰 변이 = **과산포(overdispersion)**. 발현량이 클수록 추가 분산도 커짐
 -   → count에 t-test → 위양성. DE 도구는 추가 분산을 반영하는 **negative binomial** model 사용
 
-![왼쪽: count에 t-test를 적용하면 위양성이 생기는 이유. 오른쪽: n = 3으로도 분석이 가능한 이유](/assets/img/w4/mean_variance.png){fig-align="center"}
+![(a) 반복 사이 count의 분산은 Poisson이 예상하는 것보다 훨씬 큼(과산포) → negative binomial이 필요 (b) n = 3으로는 유전자 하나의 dispersion 추정이 잡음투성이 → 모든 유전자로 맞춘 추세 쪽으로 당겨서 씀](/assets/img/w4/mean_variance.png){fig-align="center"}
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 더 알아보기 — negative binomial 한 줄 요약
@@ -327,7 +337,7 @@ $$
 -   **깊이는 포화되지만 반복 수는 포화되지 않음** (오른쪽 패널) → 대부분의 DE 질문에는 시료당 20–30 M read로 충분
 -   → 그 이상 깊게 읽는 비용은 **시료 추가**에 쓸 때 검정력이 더 높아짐
 
-![왼쪽: 반복 수에 따른 검정력. 오른쪽: sequencing 깊이를 더 늘렸을 때 실제로 얻는 효과](/assets/img/w4/power_replicates.png){fig-align="center"}
+![(a) 검정력은 반복 수에 따라 크게 달라짐. n = 3은 큰 변화만 잡음 (b) Sequencing 깊이는 약 20–30 M read에서 포화되지만, 반복 수를 늘리면 모든 곡선이 올라감](/assets/img/w4/power_replicates.png){fig-align="center"}
 
 ::: {.callout-warning collapse="true"}
 ## n = 3은 관례일 뿐, 정당화 x
@@ -343,7 +353,7 @@ $$
 
 ## 5) 결과표 읽기 {#w4-s5-5}
 
-![같은 결과를 보는 두 가지 방법. 대부분의 논문은 첫 번째만 보여줌](/assets/img/w4/volcano_ma.png){fig-align="center"}
+![같은 결과를 보는 두 가지 방법. 대부분의 논문은 첫 번째만 보여줌. 두 기준선은 관례일 뿐이고, hit가 낮은 count에 몰려 있는지는 MA plot에서 드러남](/assets/img/w4/volcano_ma.png){fig-align="center"}
 
 -   **보정 p-value(padj)** — "FDR < 0.05" → 이 목록에 있는 유전자의 약 5%가 거짓일 것으로 예상 (🔗 [W1 §4.2](w1_intro.qmd#w1-s4-2))
 -   **log₂ fold change** — 1 = 두 배 증가, −1 = 절반으로 감소
@@ -381,7 +391,7 @@ $$
 
 ## 1) ORA vs GSEA {#w4-s6-1}
 
-![같은 질문을 던지는 두 가지 방법. 서로 동등하지 않음](/assets/img/w4/ora_vs_gsea.png){fig-align="center"}
+![같은 질문을 던지는 두 가지 방법. 서로 동등하지 않음. GSEA는 순위를 매긴 전체 목록을 쓰고, ORA는 threshold를 넘은 유전자만 남겨 2×2 표로 Fisher's exact test](/assets/img/w4/ora_vs_gsea.png){fig-align="center"}
 
 -   **ORA**(over-representation analysis) — 유의한 유전자 목록 선택 → 배경 집합에 비해 특정 pathway가 과대표현되었는가? (Fisher's exact test)
 -   **GSEA** — 어떤 통계량으로 순위를 매긴 *모든* 유전자 사용 → pathway 구성원이 한쪽 끝에 몰려 있는가? **Threshold 적용 x**
@@ -408,6 +418,8 @@ $$
 -   ① **잘못된 배경 집합** — 배경 = 전체 annotation이 아니라 내 조직에서 발현된 유전자
 -   ② **Threshold 민감도** — padj 기준을 바꾸면 최상위 pathway가 달라질 수 있음
 -   ③ **Enrichment ≠ 기전** — 유전자 목록을 설명할 뿐. Driver, 방향, 원인 식별 x
+
+![배경 집합 = 검출될 수 있었던 유전자. 같은 겹침 14개도 발현 유전자 12,000개를 배경으로 쓰면 p ≈ 0.09이지만, 전체 annotation 20,000개를 쓰면 p ≈ 0.003으로 부풀려짐](/assets/img/w4/ora_background.png){fig-align="center"}
 
 ::: {.callout-warning collapse="true"}
 ## Enrichment analysis = 하기도 쉽고 잘못하기도 쉬움
@@ -441,6 +453,8 @@ $$
 -   **WGCNA** — 발현 상관에 따라 유전자를 module로 묶고, module 요약값을 형질과 연결
 -   ⚠️ 많은 시료 필요 — 20개가 최소선, 50개 이상이 더 좋음
 
+![WGCNA. ① 함께 움직이는 유전자를 module로 묶음 ② Module마다 요약값(eigengene) 하나를 형질과 비교 ③ 시료가 적으면 우연한 상관만으로도 가짜 module이 생김](/assets/img/w4/wgcna.png){fig-align="center"}
+
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 더 알아보기 — WGCNA가 유용한 경우
 
@@ -455,7 +469,7 @@ $$
 -   질병이 세포 혼합 비율을 바꿈(신경세포 소실, 면역세포 침윤, 섬유화) → 일관되고 매우 유의한 "차등 발현" → **개별 세포의 전사는 아무것도 변하지 않았는데도**
 -   ✅ 세포 유형 비율을 계산으로 추정(deconvolution)해 보정, 또는 단일세포를 직접 측정 (🔗 W5)
 
-![W3의 세포 조성 교란과 같은 논리가 다른 assay에서 나타난 것](/assets/img/w4/deconvolution.png){fig-align="center"}
+![W3의 세포 조성 교란과 같은 논리가 다른 assay에서 나타난 것. 세포 하나하나의 발현은 그대로인데 비율만 바뀌어도 bulk에서는 차등 발현처럼 보임](/assets/img/w4/deconvolution.png){fig-align="center"}
 
 ::: {.callout-warning collapse="true"}
 ## "신경세포 유전자 감소, microglia 유전자 증가"
@@ -475,6 +489,8 @@ $$
 -   **차등 splicing** — isoform의 *비율*이 변했는가?
 -   → 첫 번째가 변하지 않아도 두 번째는 매우 중요할 수 있음
 
+![유전자 전체 read 수는 그대로인데(차등 발현 x) exon 3을 포함하는 isoform의 비율은 80% → 25%로 뒤집힘(차등 splicing o). Arc = intron을 건너뛰는 read](/assets/img/w4/diff_splicing.png){fig-align="center"}
+
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 더 알아보기 — splicing 분석 도구와 필요 조건
 
@@ -488,6 +504,8 @@ $$
 -   **GTEx** — 수백 명의 기증자에게서 얻은 54개 사람 조직의 eQTL 자료
 -   → 비암호화 GWAS hit에서 후보 유전자로 가는 주된 다리 (🔗 [W2 §4.4](w2_genomics.qmd#w2-s4-4))
 -   ⚠️ 지금까지 세 장을 연결하는 주의점: **eQTL은 조직 및 세포 유형에 특이적** → 전혈에서 측정한 eQTL만으로는 변이가 신경세포에서 무엇을 하는지 거의 알 수 없음
+
+![eQTL. GWAS 변이의 genotype(AA·AB·BB)에 따라 유전자 G의 발현이 달라짐 → 이 변이 = 유전자 G의 eQTL (W2 §4.4와 같은 그림)](/assets/img/w2/eqtl.png){fig-align="center"}
 
 ------------------------------------------------------------------------
 

@@ -481,7 +481,7 @@ Rarefaction (모든 시료를 같은 깊이로 subsampling)
 
 -   이 assay가 실제로 측정하는 것은? **볼 수 없는** 것은? ([W2 §1.1](w2_genomics.qmd#w2-s1-1), [W6 §1](w6_proteomics.qmd#w6-s1))
 -   어떤 참조, 어떤 annotation, **어떤 version**? ([W1 §2.3](w1_intro.qmd#w1-s2-3))
--   QC 수치는? 제시되어 있나? ([W3 §2.2①](w3_epigenomics.qmd#w3-s2-2-1), [W5 §3.3](w5_singlecell.qmd#w5-s3-3))
+-   QC 수치는? 제시되어 있나? ([W3 §3.2①](w3_epigenomics.qmd#w3-s3-2-1), [W5 §3.3](w5_singlecell.qmd#w5-s3-3))
 
 **분석**
 

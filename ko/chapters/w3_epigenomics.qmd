@@ -13,6 +13,7 @@ execute:
 
 이 장을 마치면:
 
+-   Promoter, enhancer, TF, loop가 함께 유전자를 켜는 방식 설명
 -   후성유전체의 네 가지 층과 각 층을 측정하는 assay 짝짓기
 -   ⚠️ 이 층들 사이에 정해진 순서가 없는 이유 설명
 -   각 assay를 원리 → pre-processing(QC, 통계 검정) → 결과 순서로 설명
@@ -33,25 +34,40 @@ execute:
 
 ------------------------------------------------------------------------
 
-# 1. 후성유전체란 무엇인가 🎛️ {#w3-s1}
+# 1. Epigenome이란 무엇인가 🎛️ {#w3-s1}
 
 > 🔑 **핵심** — 유전체는 모든 세포에서 동일. 후성유전체가 그중 어느 부분을 읽을지 결정 → 세포 유형마다 다르고, 그 차이가 신경세포를 신경세포로 만듦
 
 -   **유전체(genome)** — 고정된 텍스트
--   **후성유전체(epigenome)** — 바로 지금, 이 세포에서 그 텍스트의 어느 부분을 읽을지 결정하는 모든 것
+-   **후성유전체(epigenome)** — 바로 지금, 이 세포에서 그 텍스트의 어느 부분을 읽을지 결정하는 모든 것. 비유하면 유전자마다 달린 **스위치**가 켜져 있는지 꺼져 있는지의 기록
+
+## 1) 유전자 스위치: promoter, enhancer, TF {#w3-s1-1}
+
+![유전자 스위치. ① TF는 자신의 motif가 있는 곳에만 붙음 ② Promoter는 유전자 바로 앞, enhancer는 멀리 떨어져 있을 수 있음 ③ 멀리 있어도 같은 loop 안의 enhancer는 그 유전자에 닿고, 가까이 있어도 loop 밖의 enhancer는 닿지 못함](/assets/img/w3/gene_switch.png){fig-align="center"}
+
+-   **Promoter** — 유전자가 시작되는 곳(TSS, transcription start site, 전사 시작점) 주변. 전사를 시작하는 스위치. 항상 **유전자 바로 앞**에 있음
+-   **Enhancer** — 유전자의 전사를 높이는 원격 조절 부위. 유전자에서 수 kb~1 Mb **멀리 떨어져** 있을 수 있음. 유전자의 앞(upstream)이나 뒤(downstream), 심지어 다른 유전자의 intron 안에도 있음
+-   **TF**(transcription factor, 전사인자) — DNA에 붙어 유전자를 켜거나 끄는 단백질
+    -   아무 데나 붙지 않음 → 자신이 알아보는 짧은 DNA 서열, **motif**(보통 6–12 bp)가 있어야 붙음. 예: AP-1 → `TGACTCA`
+    -   TF가 enhancer와 promoter에 붙고, 둘이 3차원 공간에서 만나면 → 유전자가 켜짐
+-   **Loop** — 멀리 있는 enhancer는 어떻게 promoter를 만나나? → DNA가 고리(loop) 모양으로 접힘. Loop의 밑동은 CTCF와 cohesin이 붙잡음
+    -   멀리 있어도 **같은 loop 안**이면 → 그 loop 안의 유전자에 작용 ✓
+    -   가까이 있어도 **loop 밖**이면 → 그 유전자에 닿지 못함 ✕ (단순화한 설명. 실제로 loop 경계는 접촉을 완전히 막는 대신 크게 줄임)
+    -   → 어느 enhancer가 어느 유전자를 조절하는지는 직선 거리가 아니라 **3차원 구조**가 정함(🔗 [§4](#w3-s4))
+-   💡 후성유전체의 네 층 = 이 스위치들의 상태를 서로 다른 각도에서 읽는 방법
+
+## 2) 네 가지 층, 네 가지 assay {#w3-s1-2}
 
 ![양쪽의 DNA 서열은 동일. 서로 다른 모든 것 = 후성유전적 차이](/assets/img/w3/epigenome_layers.png){fig-align="center"}
 
-## 1) 네 가지 층, 네 가지 assay {#w3-s1-1}
-
 | 층 | 무엇인가 | 표준 assay | 절 |
 |------------------|------------------|------------------|------------------|
-| **염색질 접근성** | DNA가 물리적으로 얼마나 열려 있는가 | ATAC-seq | [§2](#w3-s2) |
-| **히스톤 변형** | 히스톤 꼬리의 화학적 마크 | ChIP-seq, CUT&RUN | [§3](#w3-s3) |
-| **3차원 구조** | 어떤 영역끼리 물리적으로 접촉하는가 | Hi-C, Micro-C | [§4](#w3-s4) |
-| **DNA 메틸화** | 보통 CpG의 cytosine에 붙는 methyl group | Bisulfite sequencing, EPIC array | [§5](#w3-s5) |
+| **Histone modification** | 히스톤 꼬리의 화학적 마크 | ChIP-seq, CUT&RUN | [§2](#w3-s2) |
+| **Chromatin accessibility** | DNA가 물리적으로 얼마나 열려 있는가 | ATAC-seq | [§3](#w3-s3) |
+| **3D genome** | 어떤 영역끼리 물리적으로 접촉하는가 | Hi-C, Micro-C | [§4](#w3-s4) |
+| **DNA methylation** | 보통 CpG의 cytosine에 붙는 methyl group | Bisulfite sequencing, EPIC array | [§5](#w3-s5) |
 
-## 2) 같은 유전체, 다른 세포 {#w3-s1-2}
+## 3) 같은 유전체, 다른 세포 {#w3-s1-3}
 
 -   신경세포와 간세포 → 이 층 거의 모두에서 서로 다름
 -   → 바로 그 차이가 두 세포를 서로 다른 세포로 만듦
@@ -69,7 +85,7 @@ execute:
 [§5.3](#w3-s5-3)의 세포 조성 문제, 그리고 이 분야에서 결과가 재현되지 않는 문제의 대부분이 이 한 가지 사실에서 생김
 :::
 
-## 3) ⚠️ 네 가지 층에 순서는 없음 {#w3-s1-3}
+## 4) ⚠️ 네 가지 층에 순서는 없음 {#w3-s1-4}
 
 -   어느 층이 먼저인가? 메틸화가 염색질을 닫나, 닫힌 염색질이 메틸화되나?
 -   **정직한 답 — 각 층이 서로를 강화. 인과관계는 양방향**
@@ -90,10 +106,10 @@ execute:
 ```
 
 -   “TF 결합은 접근성의 원인인가, 결과인가?” = **이 분야의 미해결 질문**, 확립된 사실 x
--   **이 장의 배열 원리 = 조절 논리** — 열린 곳 찾기(§2) → 그곳이 어떤 요소인지(§3) → 그 요소가 어느 promoter에 닿는지(§4) → 마지막으로 DNA 수준의 층인 메틸화(§5). 메틸화는 측정 방법에 따로 따질 문제가 많아 마지막에 둠
+-   **이 장의 배열 원리** — 공통 원리를 먼저 익히는 순서. 가장 먼저 나온 ChIP-seq(2007)에서 input 대조군·peak calling·QC를 배움(§2) → 같은 원리를 항체 없이 쓰는 ATAC-seq(2013, §3) → 찾은 요소가 어느 promoter에 닿는지(§4) → 마지막으로 DNA 수준의 층인 메틸화(§5). 메틸화는 측정 방법에 따로 따질 문제가 많아 마지막에 둠
 :::
 
-## 4) 무엇이 유전되고 무엇이 유전되지 않는가 {#w3-s1-4}
+## 5) 무엇이 유전되고 무엇이 유전되지 않는가 {#w3-s1-5}
 
 “후성유전적(epigenetic)”이라는 말에 따라붙는 여러 의미 — 서로 매우 다른 두 주장이 흔히 뒤섞임
 
@@ -116,105 +132,13 @@ execute:
 
 ------------------------------------------------------------------------
 
-# 2. 염색질 접근성: ATAC-seq 🔓 {#w3-s2}
+# 2. Histone modification: ChIP-seq과 CUT&RUN 🧵 {#w3-s2}
 
-> 🔑 **핵심** — ATAC-seq = DNA가 **열려 있는** 곳을 찾는 방법. 항체 x, 표적을 미리 고를 필요 x → 세포 유형의 조절 영역을 그리는 자연스러운 첫 지도
+> 🔑 **핵심** — 이 자리는 promoter인가 enhancer인가, 켜져 있나 꺼져 있나? → 여러 histone mark의 **조합**으로 알 수 있음
 
-## 1) 원리 {#w3-s2-1}
+## 1) Histone mark의 종류 {#w3-s2-1}
 
-![ATAC-seq의 원리. Adapter를 실은 Tn5가 열린 DNA만 자르고 adapter를 붙임 → 그 절편만 sequencing → read가 쌓인 곳 = 열린 염색질](/assets/img/w3/atac_principle.png){fig-align="center"}
-
--   **ATAC-seq** — Tn5 transposase(DNA를 자르는 효소) 사용. 활성을 높인 Tn5에 sequencing adapter를 미리 실어 둠
--   Nucleosome = DNA가 감기는 히스톤 덩어리. Tn5는 DNA가 **nucleosome에 감겨 있지 않은** 곳에 우선 삽입됨. 조절 단백질이 염색질을 활발히 열어 둔 곳이 바로 이런 곳
--   절편화와 adapter 부착이 **한 단계**(tagmentation)에서 → 실험이 빠르고 적은 세포로도 가능
--   → 열린 곳에서 나온 절편만 sequencing됨 → read가 쌓인 곳 = 열린 염색질
-
-::: {.callout-important collapse="true"}
-## 접근성 = 이 assay에서만 실제 선행 조건
-
--   ATAC은 **온전한 핵**에서 수행. Tn5가 *in situ* 상태의 DNA에 물리적으로 도달해야 함
--   → 닫힌 염색질은 ATAC의 원리상 보이지 않음
-
-ChIP([§3.2](#w3-s3-2))은 항체가 염색질을 만나기 **전에 절편화**함. 이 순서 차이 때문에 ATAC과 ChIP은 서로 다른 것을 봄. 꼭 기억할 것 — 다른 자료에서 이 설명이 반대로 나오는 경우도 많음
-:::
-
-::: {.callout-tip collapse="true"}
-## 실험적으로 가장 만만한 epigenomic assay
-
--   **항체 불필요** → 항체 품질 문제 x, 표적을 미리 고를 필요 x
--   적은 세포(수백~5만 개)와 짧은 protocol로 가능
--   한 번의 실험 → promoter, 활성 enhancer, TF 결합 부위를 한꺼번에. 어떤 factor를 pull-down할지 사전 가설 없이 세포 유형의 조절 지도를 먼저 그림
-:::
-
-## 2) Pre-processing과 분석 {#w3-s2-2}
-
-![ATAC-seq 분석 흐름. Read 정렬과 필터링(pre-processing) → ① QC → ② 통계 검정(peak calling, 차등 접근성)](/assets/img/w3/atac_pipeline.png){fig-align="center"}
-
--   흐름 = read 정렬 → 필터링 → peak calling → 시료 × peak의 count 행렬 → 집단 비교
--   ATAC에 특이한 단계 두 가지:
-    -   **chrM read 제거** — mtDNA에는 nucleosome x → Tn5가 매우 많이 공격(🔗 ①)
-    -   **Tn5 위치 보정(+4 / −5 bp)** — Tn5는 두 가닥에 9 bp 엇갈리게 삽입 → read 끝을 그만큼 옮겨야 실제 삽입 위치가 됨. Footprint 분석([§2.3②](#w3-s2-3-2))에 필요
--   **ENCODE blacklist** 제거 — 어떤 실험에서든 신호가 비정상적으로 높게 나오는 영역. ChIP-seq에서도 똑같이 적용(🔗 [§3.3①](#w3-s3-3-1))
-
-### ① QC {#w3-s2-2-1}
-
-![ATAC-seq의 기본 QC 두 가지. 왼쪽: 절편 크기 분포 / 오른쪽: TSS 농축도](/assets/img/w3/atac_qc.png){fig-align="center"}
-
--   **절편 크기 분포(fragment size distribution)** — ✅ 사다리 모양: nucleosome-free peak, 이후 약 200 bp 간격의 계단. ❌ 특징 없이 매끈한 곡선 → 실패
--   **TSS 농축도(TSS enrichment)** — ✅ 전사 시작점(TSS)에서 peak. ❌ 평평함 → assay 실패
--   **FRiP**(fraction of reads in peaks) — peak 안에 들어간 read의 비율. 낮으면 배경이 많음
-
-::: {.callout-note collapse="true" icon=false}
-## 🔍 더 알아보기 — QC 수치 자세히 읽기
-
--   **절편 크기 분포**
-    -   ✅ 약 100 bp 아래의 nucleosome-free peak + mono-, di-, tri-nucleosome에서 오는 약 200 bp 주기성
-    -   ❌ 특징 없이 매끈한 곡선 → transposition 실패
--   **TSS 농축도**
-    -   Promoter는 거의 모든 세포 유형에서 열려 있음 → TSS의 peak = 새로운 발견이 아니라 **최소 기대 조건**
-    -   ❌ 평평한 TSS profile → 특이한 생물학이 아니라 assay 실패
--   **미토콘드리아 분율(mitochondrial fraction)**
-    -   mtDNA에는 nucleosome x → Tn5가 매우 적극적으로 공격
-    -   mtDNA를 줄이는 처리가 없는 protocol은 read의 절반 이상을 chrM에 낭비할 수 있음. Omni-ATAC 등 개선법으로 줄일 수 있음
-:::
-
-### ② 통계 검정 {#w3-s2-2-2}
-
--   **Peak calling** — 이 구간의 read가 주변 배경보다 유의하게 많은가? → MACS2/MACS3. 원리는 ChIP-seq과 같음(🔗 [§3.3②](#w3-s3-3-2)), 다만 ATAC에는 input이 없어 주변 배경만으로 판단
--   **차등 접근성(differential accessibility)** — 모든 시료의 peak를 합친 consensus peak 집합 → 시료 × peak count 행렬 → RNA-seq과 같은 count 모형(DESeq2, edgeR, DiffBind; 🔗 [W4 §5](w4_transcriptomics.qmd#w4-s5))
--   ⚠️ 집단 사이에 **peak 개수**를 비교 x → peak 개수는 sequencing 깊이와 QC에 따라 달라짐. 같은 peak 집합 위의 count로 비교
-
-## 3) 결과: 열린 염색질과 footprint {#w3-s2-3}
-
-![ATAC-seq에서 얻는 두 가지. (a) Peak = 열린 염색질 (b) Footprint = 결합한 전사인자가 Tn5로부터 보호한 작은 골짜기](/assets/img/w3/atac_results.png){fig-align="center"}
-
-### ① 열린 염색질 {#w3-s2-3-1}
-
--   Peak = Tn5가 들어갈 수 있었던 곳 → promoter, 활성 enhancer, TF 결합 부위, insulator
--   ⚠️ 다만 발견한 요소가 *어떤 종류*인지는 모름 — promoter, enhancer, insulator, 또는 억제되어 있지만 준비된 요소? → [§3](#w3-s3)
-
-### ② Footprint {#w3-s2-3-2}
-
--   전사인자가 결합한 자리는 Tn5가 자르지 못함 → 열린 영역 안에 read가 적은 작은 골짜기(**footprint**)가 생김
--   원리상 ChIP 없이도 특정 factor의 위치를 찾을 수 있음
--   ⚠️ 실제로는 많은 factor에서 신뢰하기 어려움 → footprint 기반 factor 판정은 **가설**로 취급
-
-::: {.callout-note collapse="true" icon=false}
-## 🔍 더 알아보기 — footprint가 오해를 부르는 이유
-
--   Tn5 자체의 **서열 삽입 편향** → footprint와 비슷한 모양을 만듦
--   체류 시간이 짧은 factor → 보호 흔적을 전혀 남기지 않음
-:::
-
-------------------------------------------------------------------------
-
-# 3. 히스톤 변형: ChIP-seq과 CUT&RUN 🧵 {#w3-s3}
-
-> 🔑 **핵심** — 열린 영역을 찾음. 어떤 종류의 요소인가? → 여러 histone mark의 **조합**으로 알 수 있음
-
-## 1) Histone mark의 종류 {#w3-s3-1}
-
-수십 가지가 있지만 유전체학에서 주로 쓰는 것은 여섯 가지
+수십 가지가 있지만 유전체학에서 주로 쓰는 것은 여섯 가지. 더 많은 종류는 🔗 [Wikipedia — Histone code](https://en.wikipedia.org/wiki/Histone_code)의 표에서 확인
 
 ![마크마다 놓이는 자리와 신호 모양이 다름. 활성 마크(위 네 개)와 억제 마크(아래 두 개)](/assets/img/w3/histone_marks.png){fig-align="center"}
 
@@ -227,36 +151,26 @@ ChIP([§3.2](#w3-s3-2))은 항체가 염색질을 만나기 **전에 절편화**
 | **H3K27me3** | Polycomb에 의해 억제됨 | 유전자를 덮는 넓은 domain |
 | **H3K9me3** | 구성적 이질염색질(constitutive heterochromatin) | 반복서열을 덮는 매우 넓은 domain |
 
--   ⚠️ 마크 하나로는 요소를 식별할 수 없음 → 조합으로 읽기([§3.4](#w3-s3-4))
+-   ⚠️ 마크 하나로는 요소를 식별할 수 없음 → 조합으로 읽기([§2.4](#w3-s2-4))
 
-## 2) 원리 {#w3-s3-2}
+## 2) 원리 {#w3-s2-2}
 
-### ① 핵심 아이디어 {#w3-s3-2-1}
+### ① 핵심 아이디어 {#w3-s2-2-1}
 
 ![ChIP-seq의 원리. 항체가 특정 마크가 있는 절편만 끌어내림 → 그 마크가 있는 곳에 read가 쌓임. Input = 같은 염색질을 항체 없이 sequencing한 배경](/assets/img/w3/chip_principle.png){fig-align="center"}
 
 -   **ChIP-seq**(chromatin immunoprecipitation sequencing) — 특정 histone mark(또는 단백질)에 대한 항체로 그 마크가 있는 DNA 절편만 골라 sequencing
 -   순서: crosslink(formaldehyde) → 염색질 절편화(sonication 또는 MNase) → 항체로 면역침강(IP) → crosslink 해제, DNA 정제 → sequencing
 -   → read가 쌓인 곳 = 그 마크가 있는 곳
+-   💡 염색질을 **먼저 잘게 자른 뒤** 항체가 용액 속 절편을 만남 → 닫힌 염색질의 마크(H3K9me3, H3K27me3)도 볼 수 있음. ATAC과 가장 크게 다른 점(🔗 [§3.1](#w3-s3-1))
 -   ⚠️ **항체 품질** — ChIP-seq = 항체 실험. 항체가 히스톤 변형을 얼마나 특이적으로 알아보는지는 일정하지 않고 **lot마다 다름** → 분석으로는 바로잡을 수 없는 wet-lab 문제
 
-::: {.callout-important collapse="true"}
-## ChIP에는 접근성이 필요 없음
-
-![ATAC은 온전한 핵에서 Tn5가 DNA에 닿아야 함 → 닫힌 염색질은 안 보임. ChIP은 먼저 절편화 → 항체가 용액 속 절편을 만남 → 닫힌 염색질의 마크도 보임](/assets/img/w3/atac_vs_chip.png){fig-align="center"}
-
--   **ATAC** — 온전한 핵에서 Tn5가 *in situ* 상태의 DNA에 도달해야 함 → 접근성이 필요함
--   **ChIP** — crosslink 후 염색질을 먼저 절편화 → 항체는 용액 속 절편을 만남 → 접근성이 필요하지 않음
--   → 바로 이 때문에 ChIP은 **H3K9me3와 H3K27me3**도 지도화 가능. 두 마크는 핵에서 가장 단단히 닫힌 염색질의 표지 → ATAC으로는 전혀 볼 수 없는 영역
--   💡 두 assay = 중복이 아니라 상호보완. 흔히 반대로 설명되니 주의
-:::
-
-### ② Input / IgG 대조군 {#w3-s3-2-2}
+### ② Input / IgG control {#w3-s2-2-2}
 
 -   **Input** — 같은 염색질을 같은 방식으로 절편화한 뒤 항체 없이 바로 sequencing
 -   **IgG** — 표적이 없는 비특이 항체로 똑같이 IP
 -   ⚠️ 대조군이 없으면 → 농축 신호와 artifact 구분 불가
--   → Peak = ChIP이 **대조군보다** 유의하게 많은 곳([§3.3②](#w3-s3-3-2))
+-   → Peak = ChIP이 **대조군보다** 유의하게 많은 곳([§2.3②](#w3-s2-3-2))
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 더 알아보기 — 대조군이 필요한 이유
@@ -264,21 +178,23 @@ ChIP([§3.2](#w3-s3-2))은 항체가 염색질을 만나기 **전에 절편화**
 -   염색질은 균일하게 절편화되지 않음:
     -   열린 영역이 더 쉽게 잘림
     -   Copy number가 다름
--   ChIP-seq에서는 input이 표준. IgG는 read가 적게 나와 배경 추정이 불안정 → 배경이 낮은 CUT&RUN·CUT&Tag([§3.5](#w3-s3-5))에서 주로 사용
+-   ChIP-seq에서는 input이 표준. IgG는 read가 적게 나와 배경 추정이 불안정 → 배경이 낮은 CUT&RUN·CUT&Tag([§2.5](#w3-s2-5))에서 주로 사용
 :::
 
-## 3) Pre-processing과 분석 {#w3-s3-3}
+## 3) Pre-processing과 분석 {#w3-s2-3}
 
 ![ChIP-seq 분석 흐름. ChIP과 input을 똑같이 정렬·필터링 → ① QC → ② 통계 검정(peak calling, 집단 비교)](/assets/img/w3/chip_pipeline.png){fig-align="center"}
 
 -   ChIP과 input을 똑같이 처리 → peak calling에서 둘을 비교
--   CUT&RUN·CUT&Tag([§3.5](#w3-s3-5))도 거의 같은 흐름
+-   CUT&RUN·CUT&Tag([§2.5](#w3-s2-5))도 거의 같은 흐름
 
-### ① QC {#w3-s3-3-1}
+### ① QC {#w3-s2-3-1}
+
+![ChIP-seq QC 네 가지. (a) FRiP — read가 peak 안에 모였나 (b) Cross-correlation — 두 가닥의 read가 절편 길이만큼 떨어져 쌓이나 (c) Library complexity — 서로 다른 절편이 충분한가 (d) Blacklist — input에서도 튀는 영역은 제거](/assets/img/w3/chip_qc.png){fig-align="center"}
 
 -   **FRiP**(fraction of reads in peaks) — 전체 read 중 peak 안에 들어간 비율. 낮으면 IP가 약함
 -   **Cross-correlation**(NSC / RSC) — 두 가닥의 read가 절편 길이만큼 떨어져 쌓이는 구조가 보이는지
--   **Library complexity** — 서로 다른 절편 vs PCR duplicate의 비율
+-   **Library complexity** — 서로 다른 절편 vs PCR duplicate의 비율(NRF = 서로 다른 절편 수 / 전체 read 수)
 -   ⚠️ **ENCODE blacklist** 제거 — 어떤 실험·어떤 세포에서든 신호가 비정상적으로 높게 나오는 영역 → 실제 농축과 무관한 가짜 peak의 단골 출처
 
 ::: {.callout-note collapse="true" icon=false}
@@ -286,10 +202,10 @@ ChIP([§3.2](#w3-s3-2))은 항체가 염색질을 만나기 **전에 절편화**
 
 -   Centromere, telomere, satellite 반복, rDNA 같은 영역 — 참조 유전체에는 copy가 적게 들어 있지만 실제로는 copy가 훨씬 많은 반복서열 → read가 한곳에 몰림
 -   ENCODE가 수많은 input·ChIP 자료에서 공통으로 신호가 튀는 영역을 모아 공개 → 분석 전에 이 영역의 read나 peak를 제거
--   ATAC-seq([§2.2](#w3-s2-2)), CUT&RUN에도 똑같이 적용
+-   ATAC-seq([§3.2](#w3-s3-2)), CUT&RUN에도 똑같이 적용
 :::
 
-### ② 통계 검정: peak calling {#w3-s3-3-2}
+### ② 통계 검정: peak calling {#w3-s2-3-2}
 
 ![Peak calling의 원리. Input으로 그 근처의 배경 수준을 추정 → ChIP read가 배경으로 설명할 수 없을 만큼 많은 곳 = peak. 마크 모양에 따라 narrow 또는 broad mode](/assets/img/w3/peak_calling.png){fig-align="center"}
 
@@ -299,7 +215,7 @@ ChIP([§3.2](#w3-s3-2))은 항체가 염색질을 만나기 **전에 절편화**
 -   Parameter 선택이 중요: H3K4me3처럼 점 형태의 마크 → **narrow** mode, H3K27me3처럼 domain을 이루는 마크 → **broad** mode
 -   **집단 비교** — differential binding(DiffBind, csaw): 시료 × peak count 행렬 → RNA-seq과 같은 count 모형(🔗 [W4 §5](w4_transcriptomics.qmd#w4-s5))
 
-## 4) 결과: histone code — 조합으로 읽기 {#w3-s3-4}
+## 4) 결과: histone code — 조합으로 읽기 {#w3-s2-4}
 
 -   **Histone code** — 마크 하나가 아니라 여러 마크의 **조합**이 그 자리 요소의 종류와 상태를 나타낸다는 개념(Strahl & Allis, 2000)
 
@@ -323,7 +239,7 @@ ChIP([§3.2](#w3-s3-2))은 항체가 염색질을 만나기 **전에 절편화**
 
 후성유전체학 논문에서 가장 흔히 보는 그림. 위에서 아래로 읽은 뒤 가로로 비교:
 
-1.  **ATAC peak가 있는가?** → 이곳에 열린 무언가가 있음([§2](#w3-s2))
+1.  **ATAC peak가 있는가?** → 이곳에 열린 무언가가 있음([§3](#w3-s3))
 2.  **H3K4me3가 우세한가?** → promoter. **H3K4me1이 우세한가?** → enhancer
 3.  그 위에 **H3K27ac가 있는가?** → 단순히 존재하는 것이 아니라 **이 세포 유형에서 활성화된** 요소
 4.  **H3K27me3 domain이 있는가?** → 다른 신호와 관계없이 억제된 상태
@@ -331,7 +247,7 @@ ChIP([§3.2](#w3-s3-2))은 항체가 염색질을 만나기 **전에 절편화**
 
 💡 이 조합 읽기를 유전체 전체에 자동으로 적용한 것 = 염색질 상태(chromatin state, 🔗 [§6.2](#w3-s6-2))
 
-## 5) CUT&RUN과 CUT&Tag {#w3-s3-5}
+## 5) CUT&RUN과 CUT&Tag {#w3-s2-5}
 
 -   ChIP의 문제: 많은 세포 필요, 배경 신호 많음
 -   **해결책** — 절단 효소(MNase 또는 Tn5)를 항체에 직접 연결 → 표적 영역만 방출하거나 tag
@@ -349,11 +265,106 @@ ChIP([§3.2](#w3-s3-2))은 항체가 염색질을 만나기 **전에 절편화**
 | 대조군 | Input 필수 | IgG(배경이 낮아 생략하기도) | IgG(배경이 낮아 생략하기도) |
 | 주의할 점 | 배경 높음, 항체 품질 | MNase 과다 절단 | Tn5의 열린 염색질 선호 → 고염 세척으로 억제 |
 
--   분석은 ChIP-seq 흐름([§3.3](#w3-s3-3))과 거의 같음. 배경이 매우 낮아 SEACR 같은 전용 peak caller도 사용
+-   분석은 ChIP-seq 흐름([§2.3](#w3-s2-3))과 거의 같음. 배경이 매우 낮아 SEACR 같은 전용 peak caller도 사용
+-   💡 CUT&Tag에서 항체를 빼고 Tn5만 넣으면? → Tn5가 열린 곳 어디에나 들어감 → 바로 다음 절의 ATAC-seq([§3](#w3-s3))
 
 ------------------------------------------------------------------------
 
-# 4. 3차원 유전체: Hi-C 🔗 {#w3-s4}
+# 3. Chromatin accessibility: ATAC-seq 🔓 {#w3-s3}
+
+> 🔑 **핵심** — ATAC-seq = DNA가 **열려 있는** 곳을 찾는 방법. 항체 x, 표적을 미리 고를 필요 x → 세포 유형의 조절 영역을 그리는 자연스러운 첫 지도
+
+## 1) 원리 {#w3-s3-1}
+
+![ATAC-seq의 원리. Adapter를 실은 Tn5가 열린 DNA만 자르고 adapter를 붙임 → 그 절편만 sequencing → read가 쌓인 곳 = 열린 염색질](/assets/img/w3/atac_principle.png){fig-align="center"}
+
+-   **ATAC-seq** — Tn5 transposase(DNA를 자르는 효소) 사용. CUT&Tag와 같은 효소지만 항체 없이 씀. 활성을 높인 Tn5에 sequencing adapter를 미리 실어 둠
+-   Nucleosome = DNA가 감기는 히스톤 덩어리. Tn5는 DNA가 **nucleosome에 감겨 있지 않은** 곳에 우선 삽입됨. 조절 단백질이 염색질을 활발히 열어 둔 곳이 바로 이런 곳
+-   절편화와 adapter 부착이 **한 단계**(tagmentation)에서 → 실험이 빠르고 적은 세포로도 가능
+-   → 열린 곳에서 나온 절편만 sequencing됨 → read가 쌓인 곳 = 열린 염색질
+
+::: {.callout-important collapse="true"}
+## 접근성 = 이 assay에서만 실제 선행 조건
+
+![ATAC은 온전한 핵에서 Tn5가 DNA에 닿아야 함 → 닫힌 염색질은 안 보임. ChIP은 먼저 절편화 → 항체가 용액 속 절편을 만남 → 닫힌 염색질의 마크도 보임](/assets/img/w3/atac_vs_chip.png){fig-align="center"}
+
+-   **ATAC** — **온전한 핵**에서 수행. Tn5가 *in situ* 상태의 DNA에 물리적으로 도달해야 함 → 닫힌 염색질은 원리상 보이지 않음
+-   **ChIP**([§2.2](#w3-s2-2)) — crosslink 후 염색질을 먼저 절편화 → 항체는 용액 속 절편을 만남 → 접근성이 필요하지 않음
+-   → 바로 이 때문에 ChIP은 **H3K9me3와 H3K27me3**도 지도화 가능. 두 마크는 핵에서 가장 단단히 닫힌 염색질의 표지 → ATAC으로는 전혀 볼 수 없는 영역
+-   💡 두 assay = 중복이 아니라 상호보완. 다른 자료에서 이 설명이 반대로 나오는 경우도 많으니 주의
+:::
+
+::: {.callout-tip collapse="true"}
+## 실험적으로 가장 만만한 epigenomic assay
+
+-   **항체 불필요** → 항체 품질 문제 x, 표적을 미리 고를 필요 x
+-   적은 세포(수백~5만 개)와 짧은 protocol로 가능
+-   한 번의 실험 → promoter, 활성 enhancer, TF 결합 부위를 한꺼번에. 어떤 factor를 pull-down할지 사전 가설 없이 세포 유형의 조절 지도를 먼저 그림
+:::
+
+## 2) Pre-processing과 분석 {#w3-s3-2}
+
+![ATAC-seq 분석 흐름. Read 정렬과 필터링(pre-processing) → ① QC → ② 통계 검정(peak calling, 차등 접근성)](/assets/img/w3/atac_pipeline.png){fig-align="center"}
+
+-   흐름 = read 정렬 → 필터링 → peak calling → 시료 × peak의 count 행렬 → 집단 비교
+-   ATAC에 특이한 단계 두 가지:
+    -   **chrM read 제거** — mtDNA에는 nucleosome x → Tn5가 매우 많이 공격(🔗 ①)
+    -   **Tn5 위치 보정(+4 / −5 bp)** — Tn5는 두 가닥에 9 bp 엇갈리게 삽입 → read 끝을 그만큼 옮겨야 실제 삽입 위치가 됨. Footprint 분석([§3.3②](#w3-s3-3-2))에 필요
+-   **ENCODE blacklist** 제거 — 어떤 실험에서든 신호가 비정상적으로 높게 나오는 영역. ChIP-seq과 같음(🔗 [§2.3①](#w3-s2-3-1))
+
+### ① QC {#w3-s3-2-1}
+
+![ATAC-seq의 기본 QC 두 가지. 왼쪽: 절편 크기 분포 / 오른쪽: TSS 농축도](/assets/img/w3/atac_qc.png){fig-align="center"}
+
+-   **절편 크기 분포(fragment size distribution)** — ✅ 사다리 모양: nucleosome-free peak, 이후 약 200 bp 간격의 계단. ❌ 특징 없이 매끈한 곡선 → 실패
+-   **TSS 농축도(TSS enrichment)** — ✅ 전사 시작점(TSS)에서 peak. ❌ 평평함 → assay 실패
+-   **FRiP**(fraction of reads in peaks) — peak 안에 들어간 read의 비율. 낮으면 배경이 많음(🔗 [§2.3①](#w3-s2-3-1) 그림 (a))
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 더 알아보기 — QC 수치 자세히 읽기
+
+-   **절편 크기 분포**
+    -   ✅ 약 100 bp 아래의 nucleosome-free peak + mono-, di-, tri-nucleosome에서 오는 약 200 bp 주기성
+    -   ❌ 특징 없이 매끈한 곡선 → transposition 실패
+-   **TSS 농축도**
+    -   Promoter는 거의 모든 세포 유형에서 열려 있음 → TSS의 peak = 새로운 발견이 아니라 **최소 기대 조건**
+    -   ❌ 평평한 TSS profile → 특이한 생물학이 아니라 assay 실패
+-   **미토콘드리아 분율(mitochondrial fraction)**
+    -   mtDNA에는 nucleosome x → Tn5가 매우 적극적으로 공격
+    -   mtDNA를 줄이는 처리가 없는 protocol은 read의 절반 이상을 chrM에 낭비할 수 있음. Omni-ATAC 등 개선법으로 줄일 수 있음
+:::
+
+### ② 통계 검정 {#w3-s3-2-2}
+
+-   **Peak calling** — 이 구간의 read가 주변 배경보다 유의하게 많은가? → MACS2/MACS3. 원리는 ChIP-seq과 같음(🔗 [§2.3②](#w3-s2-3-2)), 다만 ATAC에는 input이 없어 주변 배경만으로 판단
+-   **차등 접근성(differential accessibility)** — 모든 시료의 peak를 합친 consensus peak 집합 → 시료 × peak count 행렬 → RNA-seq과 같은 count 모형(DESeq2, edgeR, DiffBind; 🔗 [W4 §5](w4_transcriptomics.qmd#w4-s5))
+-   ⚠️ 집단 사이에 **peak 개수**를 비교 x → peak 개수는 sequencing 깊이와 QC에 따라 달라짐. 같은 peak 집합 위의 count로 비교
+
+## 3) 결과: open chromatin과 footprint {#w3-s3-3}
+
+![ATAC-seq에서 얻는 두 가지. (a) Peak = 열린 염색질 (b) Footprint = 결합한 전사인자가 Tn5로부터 보호한 작은 골짜기](/assets/img/w3/atac_results.png){fig-align="center"}
+
+### ① Open chromatin {#w3-s3-3-1}
+
+-   Peak = Tn5가 들어갈 수 있었던 곳 → promoter, 활성 enhancer, TF 결합 부위, insulator
+-   ⚠️ 다만 발견한 요소가 *어떤 종류*인지는 모름 — promoter, enhancer, insulator, 또는 억제되어 있지만 준비된 요소? → histone mark 조합과 함께 읽어야 앎(🔗 [§2.4](#w3-s2-4))
+
+### ② Footprint {#w3-s3-3-2}
+
+-   전사인자가 결합한 자리는 Tn5가 자르지 못함 → 열린 영역 안에 read가 적은 작은 골짜기(**footprint**)가 생김
+-   원리상 ChIP 없이도 특정 factor의 위치를 찾을 수 있음
+-   ⚠️ 실제로는 많은 factor에서 신뢰하기 어려움 → footprint 기반 factor 판정은 **가설**로 취급
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 더 알아보기 — footprint가 오해를 부르는 이유
+
+-   Tn5 자체의 **서열 삽입 편향** → footprint와 비슷한 모양을 만듦
+-   체류 시간이 짧은 factor → 보호 흔적을 전혀 남기지 않음
+:::
+
+------------------------------------------------------------------------
+
+# 4. 3D genome: Hi-C 🔗 {#w3-s4}
 
 > 🔑 **핵심** — 활성 enhancer를 찾음. 실제로 어느 promoter를 조절하나? → Hi-C가 물리적으로 맞닿은 영역을 보여줌. ⚠️ 단, 접촉 ≠ 기능
 
@@ -369,6 +380,8 @@ ChIP([§3.2](#w3-s3-2))은 항체가 염색질을 만나기 **전에 절편화**
 ## 🔍 더 알아보기 — 3C 계열 방법 비교
 
 모두 proximity ligation이라는 같은 원리. 차이 = **어떤 접촉을 묻는가**
+
+![3C 계열은 모두 proximity ligation을 씀. 다른 것은 contact matrix의 어느 부분을 읽어 내는가. 색칠된 칸 = 그 방법이 측정하는 부분](/assets/img/w3/hic_3c_family.png){fig-align="center"}
 
 | 방법 | 묻는 질문 | 범위 |
 |------------------|------------------------------------|------------------|
@@ -389,6 +402,8 @@ ChIP([§3.2](#w3-s3-2))은 항체가 염색질을 만나기 **전에 절편화**
 -   ⚠️ **해상도 = bin 크기**. Bin을 얼마나 작게 쪼갤 수 있는지는 sequencing 깊이가 정함. Compartment는 적은 read로도 보이지만, kb 단위 loop는 수십억 개의 read pair가 필요
 
 ### ① QC {#w3-s4-2-1}
+
+![Hi-C QC 네 가지. (a) 서로 다른 두 절편이 이어진 valid pair만 남김 (b) 접촉 대부분이 같은 염색체 안(cis)이어야 함 (c) 20 kb보다 먼 cis 접촉이 3차원 정보를 담음 (d) 접촉 확률이 거리에 따라 매끄럽게 감소해야 함](/assets/img/w3/hic_qc.png){fig-align="center"}
 
 -   **Valid pair 비율** — self-ligation, dangling end, 같은 절편 안의 쌍을 뺀 나머지
 -   **Cis/trans 비율** — 같은 염색체 안의 접촉이 대부분이어야 함. Trans가 많으면 무작위 ligation 의심
@@ -421,7 +436,7 @@ ChIP([§3.2](#w3-s3-2))은 항체가 염색질을 만나기 **전에 절편화**
 
 ------------------------------------------------------------------------
 
-# 5. DNA 메틸화 🔵 {#w3-s5}
+# 5. DNA methylation 🔵 {#w3-s5}
 
 > 🔑 **핵심** — DNA 수준의 층이고, 임상·역학 연구에서 가장 많이 씀. 가장 큰 함정 = **세포 유형 조성**
 
@@ -494,6 +509,8 @@ $$
 
 ### ① QC {#w3-s5-2-1}
 
+![DNA 메틸화 QC 네 가지. (a) CpG 밖의 C가 모두 T로 바뀌었나(변환 효율) (b) CpG마다 신호가 충분한가(coverage, detection p-value) (c) 메틸화가 아닌 것을 재는 probe 제거 (d) 시료 뒤바뀜·불량 시료·batch 확인](/assets/img/w3/methylation_qc.png){fig-align="center"}
+
 -   **Bisulfite 변환 효율** — CpG가 아닌 C는 거의 메틸화되지 않음 → 변환 후에도 C로 남아 있으면 변환 실패. 보통 99% 이상이어야 함
 -   **Coverage**(sequencing) / **detection p-value**(array) — 신호가 충분한 CpG만 사용
 -   **Probe 필터**(array) — SNP가 겹친 probe, 여러 곳에 붙는 cross-reactive probe, 성염색체 probe 제거
@@ -503,13 +520,15 @@ $$
 
 집단 사이에 어느 CpG가 다른가? → 단위(DMP vs DMR)와 세포 구성([§5.3](#w3-s5-3))을 확인
 
+![DMP와 DMR. 왼쪽: CpG 하나만 집단 사이에 다름(DMP) / 오른쪽: 이웃한 여러 CpG가 함께 움직임(DMR). 점 하나 = 시료 하나](/assets/img/w3/dmp_dmr.png){fig-align="center"}
+
 -   **DMP**(differentially methylated position) — 집단 사이에 차이가 있는 단일 CpG. CpG마다 M value로 회귀(limma)
 -   **DMR**(differentially methylated region) — 서로 인접한 여러 CpG가 함께 변하는 영역. DMRcate, bumphunter, dmrseq
 -   ✅ DMR이 더 신뢰할 만함 — 인접 CpG는 생물학적으로 상관 → 일관된 영역 변화는 우연이나 불량 probe 하나로 생기기 어려움
 -   ⚠️ 주변 영역은 평평한데 CpG 하나만 유의 → 의심할 것
 -   ⚠️ 공변량: 세포 조성([§5.3](#w3-s5-3)), batch, 나이, 성별
 
-## 3) ⚠️ 세포 유형 조성 {#w3-s5-3}
+## 3) ⚠️ Cell-type composition {#w3-s5-3}
 
 이 장에서 가장 중요한 소절
 
@@ -536,7 +555,7 @@ $$
 🔗 [W1 §4.3](w1_intro.qmd#w1-s4-3)에서 다룬 교란의 흐름이 이 장 전체에 걸쳐 나타난 형태. [W4 §7.2](w4_transcriptomics.qmd#w4-s7-2)에서는 bulk 조직 deconvolution으로, [W5 §6.3](w5_singlecell.qmd#w5-s6-3)에서는 differential abundance로 다시 등장
 :::
 
-## 4) 후성유전 시계 ⏳ {#w3-s5-4}
+## 4) Epigenetic clock ⏳ {#w3-s5-4}
 
 -   **후성유전 시계** — 나이에 따라 메틸화가 변하는 CpG 수백 개 → 수년 이내의 오차로 나이 예측
 -   **연령 가속(age acceleration)** — 잔차: 예측 연령 − 실제 연령. 출생증명서의 나이보다 후성유전적으로 얼마나 더 늙거나 젊어 보이는지
@@ -572,7 +591,7 @@ $$
 
 > 🔑 **핵심** — 후성유전체학 = 비암호화 GWAS hit를 검증 가능한 기전으로 이어 주는 다리. 단, **올바른 세포 유형의 자료**가 있어야 함
 
-## 1) 전사인자 motif 분석 {#w3-s6-1}
+## 1) Transcription factor motif 분석 {#w3-s6-1}
 
 ![Motif 분석의 핵심 아이디어. Peak 집합에서 어떤 motif가 배경 집합보다 훨씬 자주 나오나? → 그 motif를 알아보는 TF가 이 영역들을 조절한다는 가설](/assets/img/w3/motif_enrichment.png){fig-align="center"}
 
@@ -587,7 +606,7 @@ $$
 -   **Motif 유사성** — 같은 family 구성원은 구분 불가. “AP-1 motif”라는 결과만으로는 FOS, JUN 또는 그 밖의 여러 친척 중 누구인지 알 수 없음
 :::
 
-## 2) 염색질 상태와 참조 atlas {#w3-s6-2}
+## 2) Chromatin state와 참조 atlas {#w3-s6-2}
 
 ![Roadmap Epigenomics의 15-state 모델(도식). 왼쪽: 상태마다 다섯 마크가 나타날 확률 / 오른쪽: 잡음이 많은 다섯 트랙이 한 줄의 상태 annotation으로 바뀜](/assets/img/w3/chromatin_states.png){fig-align="center"}
 
@@ -615,7 +634,7 @@ $$
 ```
 ① GWAS 신호를 fine-mapping하여 credible set 구성         (W2 §4.2)
 ② 질병 관련 세포 유형의 ATAC / H3K27ac peak와
-   credible-set 변이가 겹치는지 확인                     (§2, §3)
+   credible-set 변이가 겹치는지 확인                     (§3, §2)
 ③ 위험 대립유전자가 어느 TF motif를 방해하는가?          (§6.1)
 ④ 해당 enhancer는 어느 promoter와 접촉하는가?            (§4)
 ⑤ 표적 유전자의 발현이 변하는가?                          (eQTL, W4)
@@ -660,12 +679,13 @@ $$
 # 📝 요약
 
 -   유전체는 모든 세포에서 동일, 후성유전체는 **세포 유형마다 다름** — 측정 가능한 네 가지 층
+-   **유전자 스위치** — TF가 motif를 읽고 promoter(유전자 바로 앞)와 enhancer(멀리)에 붙음. 어느 enhancer가 어느 유전자에 닿는지는 직선 거리가 아니라 **loop**가 정함
 -   ⚠️ **네 가지 층에 순서는 없음.** 각 층이 서로를 강화. 이 장의 배열 = 교육용
 -   각 assay = **원리 → pre-processing(① QC ② 통계 검정) → 결과** 순서로 읽기
--   **ATAC-seq** — 온전한 핵에서 Tn5 → 접근성이 실제 선행 조건. 항체 불필요. 결과 = 열린 염색질(peak)과 footprint
 -   ⚠️ **ChIP-seq은 절편화된 염색질에서 작동** → 접근성 불필요 → 닫힌 염색질의 마크도 지도화. Input 대조군, 검증된 항체, blacklist 제거 필요
 -   **Histone code** — 단일 마크로는 요소 식별 불가, **조합으로 식별**: H3K4me3 + H3K27ac = 활성 promoter, H3K4me1 + H3K27ac = 활성 enhancer
 -   CUT&RUN·CUT&Tag — 항체에 효소를 연결 → 적은 세포, 낮은 배경
+-   **ATAC-seq** — 온전한 핵에서 Tn5 → 접근성이 실제 선행 조건. 항체 불필요. 결과 = 열린 염색질(peak)과 footprint
 -   Hi-C = 접촉 행렬 → A/B compartment, TAD, loop. ⚠️ 접촉 ≠ 기능
 -   메틸화: β value로 보고, M value로 검정. DMR이 단일 DMP보다 믿을 만함
 -   ⚠️ 조직 메틸화 연구에서 **세포 유형 조성 = 가장 큰 교란요인** → 측정하거나 추정한 뒤 보정
@@ -678,8 +698,12 @@ $$
 
 | 용어 | 한 줄 설명 |
 |------------------------------------|------------------------------------|
-| ATAC-seq | Tn5를 이용해 열린 염색질을 지도화하는 방법 |
+| Promoter | 유전자 시작점(TSS) 바로 앞에서 전사를 시작시키는 부위 |
+| Enhancer | 유전자에서 멀리 떨어져 있을 수 있는, 전사를 높이는 조절 부위 |
+| Transcription factor (TF) | 특정 DNA 서열에 붙어 유전자를 켜거나 끄는 단백질 |
+| Motif | TF가 알아보는 짧은 DNA 서열(보통 6–12 bp) |
 | ChIP-seq | 단백질 또는 마크가 DNA의 어디에 있는지 지도화하는 방법 |
+| ATAC-seq | Tn5를 이용해 열린 염색질을 지도화하는 방법 |
 | Input control | 항체 없이 sonication한 염색질 대조군 |
 | Peak calling | 대조군보다 농축된 영역을 찾는 과정 |
 | Blacklist | 어떤 실험에서든 신호가 비정상적으로 높아 분석 전에 제거하는 영역 |
@@ -724,13 +748,7 @@ Klemm SL, Shipony Z, Greenleaf WJ. [*Chromatin accessibility and the regulatory 
 Zhu H, Wang G, Qian J. [*Transcription factors as readers and effectors of DNA methylation.*](https://pubmed.ncbi.nlm.nih.gov/?term=Transcription+factors+as+readers+and+effectors+of+DNA+methylation) Nat Rev Genet. 2016.\
 Reik W, Dean W, Walter J. [*Epigenetic reprogramming in mammalian development.*](https://pubmed.ncbi.nlm.nih.gov/?term=Epigenetic+reprogramming+in+mammalian+development+Reik) Science. 2001.
 
-### 염색질 접근성
-
-Buenrostro JD, et al. [*Transposition of native chromatin for fast and sensitive epigenomic profiling.*](https://doi.org/10.1038/nmeth.2688) Nat Methods. 2013.\
-Corces MR, et al. [*An improved ATAC-seq protocol reduces background and enables interrogation of frozen tissues.*](https://doi.org/10.1038/nmeth.4396) Nat Methods. 2017. (Omni-ATAC)\
-Grandi FC, et al. [*Chromatin accessibility profiling by ATAC-seq.*](https://doi.org/10.1038/s41596-022-00692-9) Nat Protoc. 2022.
-
-### 히스톤 변형
+### Histone modification
 
 Strahl BD, Allis CD. [*The language of covalent histone modifications.*](https://pubmed.ncbi.nlm.nih.gov/?term=The+language+of+covalent+histone+modifications) Nature. 2000. (histone code)\
 Park PJ. [*ChIP-seq: advantages and challenges of a maturing technology.*](https://doi.org/10.1038/nrg2641) Nat Rev Genet. 2009.\
@@ -740,13 +758,19 @@ Amemiya HM, Kundaje A, Boyle AP. [*The ENCODE Blacklist: identification of probl
 Skene PJ, Henikoff S. [*An efficient targeted nuclease strategy for high-resolution mapping of DNA binding sites.*](https://pubmed.ncbi.nlm.nih.gov/?term=An+efficient+targeted+nuclease+strategy+for+high-resolution+mapping+of+DNA+binding+sites) eLife. 2017. (CUT&RUN)\
 Kaya-Okur HS, et al. [*CUT&Tag for efficient epigenomic profiling of small samples and single cells.*](https://pubmed.ncbi.nlm.nih.gov/?term=CUT%26Tag+for+efficient+epigenomic+profiling+of+small+samples+and+single+cells) Nat Commun. 2019. (CUT&Tag)
 
-### 3차원 유전체
+### Chromatin accessibility
+
+Buenrostro JD, et al. [*Transposition of native chromatin for fast and sensitive epigenomic profiling.*](https://doi.org/10.1038/nmeth.2688) Nat Methods. 2013.\
+Corces MR, et al. [*An improved ATAC-seq protocol reduces background and enables interrogation of frozen tissues.*](https://doi.org/10.1038/nmeth.4396) Nat Methods. 2017. (Omni-ATAC)\
+Grandi FC, et al. [*Chromatin accessibility profiling by ATAC-seq.*](https://doi.org/10.1038/s41596-022-00692-9) Nat Protoc. 2022.
+
+### 3D genome
 
 Lieberman-Aiden E, et al. [*Comprehensive mapping of long-range interactions reveals folding principles of the human genome.*](https://pubmed.ncbi.nlm.nih.gov/?term=Comprehensive+mapping+of+long-range+interactions+reveals+folding+principles+of+the+human+genome) Science. 2009. (Hi-C)\
 Rao SSP, et al. [*A 3D map of the human genome at kilobase resolution reveals principles of chromatin looping.*](https://pubmed.ncbi.nlm.nih.gov/?term=A+3D+map+of+the+human+genome+at+kilobase+resolution+reveals+principles+of+chromatin+looping) Cell. 2014.\
 Dekker J, Mirny L. [*The 3D genome as moderator of chromosomal communication.*](https://pubmed.ncbi.nlm.nih.gov/?term=The+3D+genome+as+moderator+of+chromosomal+communication) Cell. 2016.
 
-### DNA 메틸화
+### DNA methylation
 
 Michels KB, et al. [*Recommendations for the design and analysis of epigenome-wide association studies.*](https://pubmed.ncbi.nlm.nih.gov/?term=Recommendations+for+the+design+and+analysis+of+epigenome-wide+association+studies) Nat Methods. 2013.\
 Houseman EA, et al. [*DNA methylation arrays as surrogate measures of cell mixture distribution.*](https://pubmed.ncbi.nlm.nih.gov/?term=DNA+methylation+arrays+as+surrogate+measures+of+cell+mixture+distribution) BMC Bioinformatics. 2012.\

@@ -2,6 +2,7 @@ from gallery import *
 
 fig,ax=plt.subplots(figsize=(11.5,6.6))
 MONO="DejaVu Sans Mono"; GREY="#8A8F98"
+GREEN="#23854B"; RED="#D9363E"          # the two Infinium colour channels
 
 def base(x,y,ch,fc,tc="white",w=0.36,h=0.34,ec="none"):
     ax.add_patch(mp.FancyBboxPatch((x-w/2,y-h/2),w,h,boxstyle="round,pad=0.0,rounding_size=0.06",
@@ -19,20 +20,19 @@ def scenario(y,title,sub,target,ext,col,channel):
     ax.plot([1.15,6.4],[y+0.32,y+0.32],color=TEXT,lw=1.6,zorder=3)                        # target DNA
     ax.text(6.5,y+0.32,"bisulfite-converted DNA",ha="left",va="center",fontsize=8.8,color=TEXT2)
     for xx in np.arange(1.25,4.9,0.22): ax.plot([xx,xx],[y-0.06,y+0.28],color=LINE,lw=0.8,zorder=1)
-    base(5.25,y+0.32,target,col if target=="C" else "white",tc="white" if target=="C" else TEXT,
-         ec="none" if target=="C" else GREY)
+    base(5.25,y+0.32,target,"white",tc=TEXT,ec=GREY)
     ax.text(5.25,y+0.62,"target",ha="center",va="bottom",fontsize=8.5,color=TEXT2)
-    base(5.25,y-0.1,ext,col if ext=="G" else GREY)
+    base(5.25,y-0.1,ext,col)
     ax.plot([5.25,5.25],[y+0.08,y+0.15],color=LINE,lw=0.8)
-    ax.add_patch(mp.RegularPolygon((5.25,y-0.52),5,radius=0.13,fc=col if ext=="G" else GREY,ec="none",zorder=4))
+    ax.add_patch(mp.RegularPolygon((5.25,y-0.52),5,radius=0.13,fc=col,ec="none",zorder=4))
     ax.annotate(f"labelled {ext} added → {channel} channel",(5.42,y-0.52),(5.75,y-0.52),fontsize=9.8,
-                fontweight="semibold",color=col if ext=="G" else TEXT,ha="left",va="center",
+                fontweight="semibold",color=col,ha="left",va="center",
                 arrowprops=dict(arrowstyle="-",color=LINE,lw=0.9))
 
 ax.text(0.0,5.25,"① Infinium II: one probe per CpG, one extra base",ha="left",va="center",fontsize=12,
         fontweight="semibold",color=TEXT)
-scenario(3.75,"Methylated CpG","5mC was protected → target is still C","C","G",CRIMSON,"green")
-scenario(1.55,"Unmethylated CpG","C became U → T after bisulfite","T","A",GREY,"red")
+scenario(3.75,"Methylated CpG","5mC was protected → target is still C","C","G",GREEN,"green")
+scenario(1.55,"Unmethylated CpG","C became U → T after bisulfite","T","A",RED,"red")
 
 # ② intensities → β
 RX=9.35
@@ -40,11 +40,11 @@ ax.plot([RX-0.35,RX-0.35],[0.25,5.45],color="#E3E6EB",lw=0.9)
 ax.text(RX,5.25,"② Intensities → β",ha="left",va="center",fontsize=12,fontweight="semibold",color=TEXT)
 ax.text(RX,4.85,"each bead carries many probe copies;\neach copy reports one DNA molecule",ha="left",va="center",
         fontsize=8.8,color=TEXT2,linespacing=1.4)
-for k,(lab,v,c) in enumerate([("M  (methylated)",0.8,CRIMSON),("U  (unmethylated)",0.2,GREY)]):
+for k,(lab,v,c) in enumerate([("M  (methylated, green)",0.8,GREEN),("U  (unmethylated, red)",0.2,RED)]):
     y=4.05-k*0.62
     ax.text(RX,y+0.2,lab,ha="left",va="center",fontsize=9.5,color=TEXT)
     ax.add_patch(mp.Rectangle((RX,y-0.17),2.2*v,0.2,fc=c,ec="none"))
-ax.text(RX,2.45,"β = M / (M + U + 100)",ha="left",va="center",fontsize=12.5,fontweight="bold",color=CRIMSON)
+ax.text(RX,2.45,"β = M / (M + U + 100)",ha="left",va="center",fontsize=12.5,fontweight="bold",color=TEXT)
 ax.text(RX,2.08,"≈ 0.8 for this CpG",ha="left",va="center",fontsize=9.5,color=TEXT)
 ax.text(RX,1.65,"+100 keeps β stable when\nboth signals are weak",ha="left",va="center",fontsize=8.8,color=TEXT2,
         linespacing=1.4)

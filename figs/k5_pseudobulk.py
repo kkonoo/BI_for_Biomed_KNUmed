@@ -1,57 +1,62 @@
-from style import *
-from scipy.stats import norm
-rng=np.random.default_rng(66)
-fig,axes=plt.subplots(1,3,figsize=(13.4,4.5),gridspec_kw={"wspace":0.32,"width_ratios":[1.1,1,1]})
+from gallery import *
+from scipy import stats
+rng = np.random.default_rng(5)
 
-ND=6
-donor_eff=rng.normal(0,0.55,ND)
-grp=np.array([0,0,0,1,1,1])
-true=0.10
-ax=axes[0]
-allv=[];cols=[]
-for d in range(ND):
-    n=900
-    v=rng.normal(3.0+donor_eff[d]+true*grp[d],0.75,n)
-    allv.append(v); cols.append(GREY if grp[d]==0 else RED)
-    ax.scatter(np.full(n,d)+rng.normal(0,0.10,n),v,s=3,color=cols[-1],alpha=0.28,lw=0)
-    ax.plot([d-0.30,d+0.30],[v.mean()]*2,color="#222",lw=2.4,zorder=5)
-ax.set_xticks(range(ND)); ax.set_xticklabels([f"C{i+1}" for i in range(3)]+[f"T{i+1}" for i in range(3)])
-ax.set_ylabel("expression of GENE-Y per cell")
-ax.set_title("5,400 cells from 6 donors",loc="left",fontsize=12)
-ax.text(0.02,0.97,"black bars = donor means\n(they differ a lot)",transform=ax.transAxes,va="top",
-        fontsize=9.3,color="#333",linespacing=1.4)
+# Per-cell tests vs pseudobulk under the null (no condition effect, real donor-to-donor variation):
+# the per-cell false-positive rate climbs with the number of cells; pseudobulk stays at 5%
+fig = plt.figure(figsize=(9.8, 4.7))
+gs = fig.add_gridspec(1, 2, width_ratios=[1, 1.05], wspace=0.25, left=0.02, right=0.98, top=0.8, bottom=0.14)
+DARK = "#5E6670"; GREYF = "#B8BEC7"
 
-ax=axes[1]
-cells=np.concatenate(allv); g=np.repeat(grp,900)
-from scipy.stats import ttest_ind
-t1=ttest_ind(cells[g==1],cells[g==0])
-pb=np.array([v.mean() for v in allv])
-t2=ttest_ind(pb[grp==1],pb[grp==0])
-labs=["per-cell t-test\n(n = 5,400)","pseudobulk\n(n = 6 donors)"]
-ps=[t1.pvalue,t2.pvalue]
-b=ax.bar([0,1],[-np.log10(p) for p in ps],color=[RED,TEAL],width=0.5,edgecolor="white")
-ax.axhline(-np.log10(0.05),color="#888",ls="--",lw=1.2)
-ax.text(-0.42,-np.log10(0.05)+3.0,"p = 0.05",ha="left",fontsize=9,color="#777")
-ax.set_xticks([0,1]); ax.set_xticklabels(labs,fontsize=9.5)
-ax.set_ylabel(r"$-\log_{10}(p)$")
-ax.set_title("Same data, two tests",loc="left",fontsize=12)
-for i,p in enumerate(ps):
-    ax.text(i,-np.log10(p)+4.5,f"p = {p:.0e}" if p<0.01 else f"p = {p:.2f}",
-            ha="center",fontsize=10.5,fontweight="bold",color=[RED,TEAL][i])
-ax.set_ylim(0,max(-np.log10(ps[0])*1.28,4))
+# (a) the data structure
+a = fig.add_subplot(gs[0]); a.set_xlim(0, 10); a.set_ylim(0, 10); a.axis("off")
+a.set_title("(a) Who is the replicate?", loc="left", fontsize=12.3, fontweight="semibold", color=TEXT, pad=22)
+a.text(0, 1.03, "3 patients vs 3 controls, 900 cells each", transform=a.transAxes, fontsize=9, color=TEXT2)
+dm = [0.5, -0.2, 0.25, -0.35, 0.1, -0.15]
+for k in range(6):
+    x = 0.9 + k * 1.55 + (0.35 if k >= 3 else 0)
+    c = CRIMSON if k < 3 else DARK
+    pts = rng.normal([x, 6.6 + dm[k]], [0.28, 0.55], (40, 2))
+    a.scatter(pts[:, 0], pts[:, 1], s=6, color=tint(0.45) if k < 3 else GREYF, lw=0)
+    a.add_patch(mp.Rectangle((x - 0.38, 2.6), 0.76, 0.55, fc=c, ec="none"))
+    a.text(x, 2.875, f"{'P' if k < 3 else 'C'}{k % 3 + 1}", ha="center", va="center", fontsize=8.6,
+           color="white", fontweight="bold")
+    a.annotate("", (x, 3.25), (x, 4.6), arrowprops=dict(arrowstyle="-|>", color=LINE, lw=0.9, mutation_scale=7))
+a.text(0.1, 9.25, "per-cell test: every dot counts as a sample", ha="left", fontsize=9, color=TEXT)
+a.text(9.9, 9.25, "n = 5,400", ha="right", fontsize=9.5, color=CRIMSON, fontweight="bold")
+a.text(0.1, 3.95, "sum counts per donor", ha="left", va="center", fontsize=8.5, color=TEXT2, zorder=5,
+       bbox=dict(fc="white", ec="none", pad=2))
+a.text(0.1, 1.75, "pseudobulk: one sample per donor → DESeq2 / edgeR", ha="left", fontsize=9, color=TEXT)
+a.text(9.9, 1.75, "n = 6", ha="right", fontsize=9.5, color=TEXT, fontweight="bold")
+a.text(0.1, 0.65, "cells from one person share genetics, drugs,\nbatch and handling → they are not independent",
+       ha="left", va="center", fontsize=8.5, color=TEXT2, linespacing=1.25)
 
-ax=axes[2]
-ax.axis("off")
-ax.set_title("Why the left-hand test is wrong",loc="left",fontsize=12)
-ax.text(0,0.86,"Cells from one donor are NOT\nindependent observations.",fontsize=10.6,color="#333",
-        linespacing=1.5,va="top")
-ax.text(0,0.66,"A per-cell test treats 900 cells from\none person as 900 independent\nsamples. It is measuring how many\ncells you loaded, not how many\npeople you studied.",
-        fontsize=10,color="#444",linespacing=1.55,va="top")
-ax.text(0,0.29,"→  The unit of replication is the\n     DONOR, not the cell.",
-        fontsize=10.8,color="#2E5E4E",fontweight="bold",linespacing=1.55,va="top")
-ax.text(0,0.10,"Sum counts within each donor × cell type,\nthen use DESeq2 / edgeR exactly as in W4.",
-        fontsize=9.6,color="#555",style="italic",linespacing=1.5,va="top")
-ax.set_xlim(0,1); ax.set_ylim(0,1)
-fig.suptitle("⚠️  Pseudobulk: the single most important statistical point in single-cell analysis",
-             x=0.065,ha="left",fontsize=13,fontweight="bold",y=1.03)
-fig.savefig(OUT+"pseudobulk.png"); print("ok k5")
+# (b) false-positive rate vs cells per donor, simulated with no true difference
+b = fig.add_subplot(gs[1])
+ns = [10, 30, 100, 300, 1000]; R = 400; fp_cell, fp_pb = [], []
+for n in ns:
+    hc = hp = 0
+    for _ in range(R):
+        mu = rng.normal(0, 0.25, 6)                       # donor effects; no patient-vs-control effect
+        x = [rng.normal(m, 1.0, n) for m in mu]
+        p1 = stats.mannwhitneyu(np.concatenate(x[:3]), np.concatenate(x[3:])).pvalue
+        p2 = stats.ttest_ind([v.mean() for v in x[:3]], [v.mean() for v in x[3:]]).pvalue
+        hc += p1 < 0.05; hp += p2 < 0.05
+    fp_cell.append(hc / R); fp_pb.append(hp / R)
+b.plot(ns, fp_cell, "o-", color=CRIMSON, lw=2, ms=5)
+b.plot(ns, fp_pb, "o-", color=DARK, lw=2, ms=5)
+b.axhline(0.05, color=LINE, lw=0.9, ls=(0, (4, 3)))
+b.text(ns[-1], fp_cell[-1] + 0.05, f"per-cell Wilcoxon  {100 * fp_cell[-1]:.0f}%", ha="right", fontsize=9,
+       color=CRIMSON, fontweight="semibold")
+b.text(ns[-1], fp_pb[-1] + 0.05, f"pseudobulk  {100 * fp_pb[-1]:.0f}%  (= the nominal 5%)", ha="right", fontsize=9, color=DARK,
+       fontweight="semibold")
+b.set_xscale("log"); b.set_ylim(0, 1); b.set_xticks(ns); b.set_xticklabels([str(n) for n in ns])
+b.set_yticks([0, 0.25, 0.5, 0.75, 1]); b.set_yticklabels(["0", "25%", "50%", "75%", "100%"])
+b.set_xlabel("cells per donor", color=TEXT2, fontsize=9.3); b.set_ylabel("false-positive rate", color=TEXT2, fontsize=9.3)
+for sp in ("left", "bottom"): b.spines[sp].set_color(LINE)
+b.tick_params(colors=TEXT2, labelsize=8.3); b.minorticks_off()
+b.set_title("(b) Simulated: no real difference", loc="left", fontsize=12.3, fontweight="semibold", color=TEXT, pad=22)
+b.text(0, 1.03, f"share of {R} runs called significant at p < 0.05", transform=b.transAxes, fontsize=9, color=TEXT2)
+header(a, "Single-cell RNA-seq · statistics", "More cells make a per-cell test more wrong, not more powerful",
+       dy=40, x1=2.2)
+fig.savefig(OUT + "pseudobulk.png"); print("ok k5 pseudobulk", fp_cell, fp_pb)

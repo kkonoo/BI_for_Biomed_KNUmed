@@ -37,7 +37,7 @@ By the end of this chapter you should be able to:
 
 ## 1) What averaging destroys {#w5-s1-1}
 
-![](/assets/img/w5/bulk_vs_singlecell.svg){fig-align="center"}
+![](/assets/img/w5/bulk_vs_singlecell.png){fig-align="center"}
 
 -   **① Every cell changes a little** — the case everyone implicitly assumes
 -   **② A few cells change a lot** — usually the interesting case. In bulk it can be diluted to nothing
@@ -83,6 +83,8 @@ By the end of this chapter you should be able to:
 -   Thousands to tens of thousands of cells per run — but only part of each cell's genes is detected
 -   Every platform trades **number of cells vs. depth per cell**
 
+![](/assets/img/w5/droplet_loading.png){fig-align="center"}
+
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — comparing platforms
 
@@ -103,7 +105,7 @@ By the end of this chapter you should be able to:
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — why only one end is read
 
-![](/assets/img/w5/three_vs_five_prime.svg){fig-align="center"}
+![](/assets/img/w5/three_vs_five_prime.png){fig-align="center"}
 
 -   The end that carries the barcode = the end that gets read
 -   ✅ **3′** — most public atlases. ✅ **5′** — when you need clonotypes: tumour immunology, autoimmunity, vaccine responses
@@ -118,7 +120,7 @@ By the end of this chapter you should be able to:
 -   **scRNA-seq** — needs **fresh** tissue broken into intact cells with enzymes (dissociation)
 -   **snRNA-seq** — reads **nuclei** instead of cells. Works on frozen tissue, and on cells that are hard to dissociate (neurons, adipocytes, cardiomyocytes)
 
-![](/assets/img/w5/dissociation_bias.svg){fig-align="center"}
+![](/assets/img/w5/dissociation_bias.png){fig-align="center"}
 
 ⚠️ Dissociation itself changes the result: stress genes are induced and fragile cells are lost → the composition you measure = **the composition that survived**
 
@@ -156,6 +158,8 @@ By the end of this chapter you should be able to:
 -   💡 With a fixed budget → **more donors** beats more cells per donor
 -   ⚠️ Patients processed one day, controls another → cannot be rescued by analysis (§5)
 
+![](/assets/img/w5/donor_design.png){fig-align="center"}
+
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — running several donors at once (pooling)
 
@@ -187,6 +191,8 @@ Every read carries two tags:
 
 → Count matrix = number of **molecules** per cell × gene
 
+![](/assets/img/w5/barcode_umi.png){fig-align="center"}
+
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — the bead, and what UMIs cannot fix
 
@@ -202,6 +208,8 @@ Every read carries two tags:
 -   Each cell shows only 1,000–5,000 of \~20,000 genes
 -   A zero means either **not expressed**, or **there but not captured (dropout)** — droplet capture efficiency is \~10–30%
 -   ⚠️ **A single zero in one cell does not mean the gene is off**
+
+![](/assets/img/w5/sparsity.png){fig-align="center"}
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — "zero inflation"?
@@ -220,7 +228,7 @@ Four things QC removes:
 | **Doublets** | two cells in one droplet → look like one cell |
 | **Dying cells** | broken membrane → high fraction of mitochondrial reads (mito %) |
 
-![Left: separating cells from empty droplets. Right: the cells a single threshold deletes.](/assets/img/w5/qc_thresholds.svg){fig-align="center"}
+![Left: what the gene-count cutoffs remove. Right: what the mito % cutoff removes. Red = real cells removed along with the artifacts.](/assets/img/w5/qc_thresholds.png){fig-align="center"}
 
 ⚠️ **Every QC threshold also removes a real cell population** → set thresholds per tissue, and report them
 
@@ -240,7 +248,7 @@ Four things QC removes:
 -   Droplet systems load cells dilute on purpose → most droplets get a bead and no cell (and still get a barcode)
 -   **Knee plot (barcode rank plot)** — rank every barcode by total UMI count and plot on log–log axes
 
-![](/assets/img/w5/knee_plot.svg){fig-align="center"}
+![](/assets/img/w5/knee_plot.png){fig-align="center"}
 
 -   ① **High, flat plateau** — real cells / ② **Steep drop (the knee)** — the transition / ③ **Long low tail** — empty droplets
 -   ⚠️ A hard cut at the knee deletes real cells that simply have little RNA (small or quiescent cells, neutrophils)
@@ -253,7 +261,7 @@ Four things QC removes:
 
 Cells that burst during dissociation and loading release their mRNA into the suspension. This **"soup"** gets into every droplet → every cell's profile = its own RNA + a little soup
 
-![](/assets/img/w5/ambient_rna.svg){fig-align="center"}
+![](/assets/img/w5/ambient_rna.png){fig-align="center"}
 
 -   **What it looks like** — markers of the most abundant or most fragile cell type at low level in **every** cluster. E.g. haemoglobin genes in every cell of a bloody sample, *ALB* in the immune cells of a liver
 -   **Why it matters** — false co-expression, blurred cluster boundaries, and ⚠️ false DE when one condition releases more soup (diseased, necrotic tissue usually does)
@@ -271,6 +279,8 @@ Cells that burst during dissociation and loading release their mRNA into the sus
 | Mitochondrial % (mito %) | — | dying cell — or a genuinely mitochondria-rich one |
 
 **Why does a high mito % mean a dying cell?** When the membrane breaks, cytoplasmic mRNA leaks out, but transcripts inside mitochondria are protected by the mitochondrial membrane and stay → the **fraction** rises (the cell did not make more)
+
+![](/assets/img/w5/mito_fraction.png){fig-align="center"}
 
 -   ⚠️ **Read them together.** High mito **and** few genes = broken cell. With a normal gene count it may be a genuinely mitochondria-rich cell (cardiomyocyte, hepatocyte, renal tubule)
 -   ⚠️ **snRNA-seq**: nuclei contain no mitochondria → mito reads near zero is normal
@@ -291,7 +301,7 @@ Cells that burst during dissociation and loading release their mRNA into the sus
 
 **The core idea** — we never see which barcodes are doublets → instead we **make** fake doublets, then ask which real cells look like them
 
-![](/assets/img/w5/doublet_detection.svg){fig-align="center"}
+![](/assets/img/w5/doublet_detection.png){fig-align="center"}
 
 1.  **Simulate** — mix the profiles of random pairs of real cells into thousands of artificial doublets
 2.  **Embed together** — real + artificial cells in the same space
@@ -308,6 +318,8 @@ Cells that burst during dissociation and loading release their mRNA into the sus
 -   Each cell yields a different total amount of RNA → **normalisation** evens this out
 -   Keep \~2,000 highly variable genes → **PCA** summarises them into a few dozen axes
 -   Each PC = a group of genes that move together (a program) → every later step runs on these summaries
+
+![Computed on simulated UMI counts (5 cell types)](/assets/img/w5/norm_pca.png){fig-align="center"}
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — what each step does
@@ -343,6 +355,8 @@ Cells that burst during dissociation and loading release their mRNA into the sus
 
 ⚠️ UMAP is only a picture for display. Clustering is done on the data from the earlier step, not on the UMAP
 
+![Computed on toy data](/assets/img/w5/celltype_workflow.png){fig-align="center"}
+
 ## 1) The neighbour graph {#w5-s4-1}
 
 -   For each cell, find the few (*k*) cells with the most similar expression and link them → a "neighbour map" of cells
@@ -351,7 +365,7 @@ Cells that burst during dissociation and loading release their mRNA into the sus
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — building the neighbour graph
 
-![](/assets/img/w5/knn_graph.svg){fig-align="center"}
+![](/assets/img/w5/knn_graph.png){fig-align="center"}
 
 -   **kNN graph** — cells are nodes; each cell is linked to its *k* nearest neighbours in PC space. Seurat reweights each link by how many neighbours the two cells **share** (SNN graph) → damps outliers
 -   **Why a graph?** — cell populations are rarely round blobs. A graph follows the shape of the data, including elongated, branching and continuous populations
@@ -363,7 +377,7 @@ Cells that burst during dissociation and loading release their mRNA into the sus
 -   Clustering = finding groups of cells densely linked in the neighbour graph
 -   The **resolution** value changes how many clusters you get
 
-![](/assets/img/w5/umap_resolution.svg){fig-align="center"}
+![Leiden run at two resolutions on toy data](/assets/img/w5/umap_resolution.png){fig-align="center"}
 
 ⚠️ **There is no correct resolution** → check against marker genes and known biology, and report the value you used
 
@@ -384,7 +398,7 @@ Clusters can equally reflect:
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — clustering algorithms and choosing a resolution
 
-![](/assets/img/w5/clustering.svg){fig-align="center"}
+![](/assets/img/w5/clustering.png){fig-align="center"}
 
 -   **Community detection** — cut the graph into groups more densely linked to each other than chance predicts
 -   **Louvain vs. Leiden** — Leiden fixes Louvain's flaw (internally disconnected clusters). The biological conclusion rarely changes
@@ -402,10 +416,12 @@ Clusters can equally reflect:
 -   ❌ **Distances** between clusters, cluster **sizes**, and thin **bridges** between them — not interpretable
 -   → A claim that matters needs a number, not a UMAP
 
+![](/assets/img/w5/umap_reading.png){fig-align="center"}
+
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — why UMAP became the default, and PCA / t-SNE
 
-![](/assets/img/w5/dimred_compare.svg){fig-align="center"}
+![The same toy data (50 genes) flattened three ways](/assets/img/w5/dimred_compare.png){fig-align="center"}
 
 -   UMAP lays out **the same kNN graph** used for clustering → islands usually match clusters. Fast
 -   **PCA** — linear, distances are meaningful. The input to everything downstream, but too coarse to *see* clusters
@@ -419,6 +435,8 @@ Clusters can equally reflect:
 -   **Marker-based** — name clusters by known marker genes
 -   **Reference-based** — map onto an atlas that is already labelled (Azimuth, SingleR)
 -   💡 Use both. Where they disagree → a new population, or an artifact
+
+![](/assets/img/w5/annotation.png){fig-align="center"}
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — strengths and weaknesses
@@ -438,7 +456,7 @@ Clusters can equally reflect:
 -   **Integration** (Harmony, scVI, …) = aligning samples so the same cell type from different patients sits together
 -   ⚠️ Align too hard and you **erase real differences (disease-specific cells)** → always colour by batch **and** by cell type to check
 
-![](/assets/img/w5/integration_overcorrection.svg){fig-align="center"}
+![](/assets/img/w5/integration_overcorrection.png){fig-align="center"}
 
 ⚠️ Patients processed one day, controls another → **no integration method can separate them** (🔗 [W1 §4.3](w1_intro.qmd#w1-s4-3))
 
@@ -489,7 +507,7 @@ Clusters can equally reflect:
 
 ## 1) ⚠️ Why per-cell tests are wrong {#w5-s6-1}
 
-![](/assets/img/w5/pseudobulk.svg){fig-align="center"}
+![](/assets/img/w5/pseudobulk.png){fig-align="center"}
 
 -   Testing thousands of cells as independent samples → cells from one person are not independent → p-values become unrealistically small
 -   Add more cells and the p-value keeps shrinking → you are measuring **how many cells you loaded**, not how many people you studied
@@ -537,6 +555,8 @@ Unit of replication = the donor → **the number of donors is your n** (§2.4)
 -   ⚠️ Proportions are linked — one goes up, the others go down automatically → needs dedicated methods (not a χ² test on cell counts)
 -   ⚠️ It may be a difference in dissociation efficiency, not a real change (§2.3)
 
+![](/assets/img/w5/composition.png){fig-align="center"}
+
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — compositional data
 
@@ -558,7 +578,7 @@ Unit of replication = the donor → **the number of donors is your n** (§2.4)
 -   ⚠️ **Pseudotime ≠ real time**
 -   ⚠️ The algorithm draws a trajectory even when there is no underlying process
 
-![](/assets/img/w5/trajectory_caveats.svg){fig-align="center"}
+![](/assets/img/w5/trajectory_caveats.png){fig-align="center"}
 
 ::: {.callout-warning collapse="true"}
 ## Three caveats worth stating plainly
@@ -577,7 +597,7 @@ Unit of replication = the donor → **the number of donors is your n** (§2.4)
 -   Tools: Monocle3, Slingshot, PAGA
 -   **RNA velocity** (scVelo) — adds **direction** by comparing unspliced (new) to spliced (mature) reads per gene
 
-![](/assets/img/w5/rna_velocity.svg){fig-align="center"}
+![](/assets/img/w5/rna_velocity.png){fig-align="center"}
 
 -   ⚠️ Its assumptions about splicing and degradation rates are **contested**, and known to fail for some genes and systems
 -   ⚠️ The arrows are drawn on a UMAP → they inherit every distortion from §4.3
@@ -615,7 +635,7 @@ Unit of replication = the donor → **the number of donors is your n** (§2.4)
 
 CellPhoneDB, CellChat, NicheNet score ligand–receptor pairs co-expressed between cluster pairs. Is the ligand's mRNA high in cluster A and the receptor's mRNA high in cluster B? → that is all
 
-![](/assets/img/w5/ccc_fallacy.svg){fig-align="center"}
+![](/assets/img/w5/ccc_fallacy.png){fig-align="center"}
 
 ⚠️ Co-expression of a ligand and a receptor ≠ **evidence that the cells interact**
 
@@ -637,6 +657,8 @@ CellPhoneDB, CellChat, NicheNet score ligand–receptor pairs co-expressed betwe
 -   **Imaging-based (MERFISH, Xenium, CosMx)** — subcellular resolution, but only a fixed gene panel
 
 → The same trade-off as everything else in this chapter: **resolution vs. breadth**
+
+![](/assets/img/w5/spatial.png){fig-align="center"}
 
 ## 4) Reference atlases {#w5-s7-4}
 
@@ -666,6 +688,8 @@ CellPhoneDB, CellChat, NicheNet score ligand–receptor pairs co-expressed betwe
 
 -   ✅ **Solid results** — clusters confirmed by markers, pseudobulk DE across donors
 -   ⚠️ **Hypotheses** — pseudotime, RNA velocity, regulons, cell–cell communication → write "consistent with", and pair them with a validation experiment
+
+![](/assets/img/w5/evidence.png){fig-align="center"}
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — where each result belongs

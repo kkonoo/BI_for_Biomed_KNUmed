@@ -1,52 +1,52 @@
-from style import *
-rng=np.random.default_rng(12)
-fig,axes=plt.subplots(1,2,figsize=(11.8,4.8),gridspec_kw={"wspace":0.28})
+from gallery import *
+rng = np.random.default_rng(2)
 
-# knee plot
-nreal=5000; namb=60000
-real=rng.lognormal(8.4,0.45,nreal)
-amb=rng.lognormal(3.6,0.75,namb)
-allc=np.sort(np.concatenate([real,amb]))[::-1]
-ax=axes[0]
-ax.plot(np.arange(1,len(allc)+1),allc,color=NAVY,lw=2.0)
-ax.set_xscale("log"); ax.set_yscale("log")
-ax.set_xlabel("barcode rank"); ax.set_ylabel("UMI count per barcode")
-ax.set_title("Knee plot — where do the cells stop?",loc="left",fontsize=12)
-ax.axvline(nreal,color=RED,ls="--",lw=1.5)
-ax.text(nreal*1.25,allc.max()*0.55,"the 'knee'",color=RED,fontsize=10,fontweight="bold")
-ax.axvspan(1,nreal,color=TEAL,alpha=0.10,lw=0)
-ax.axvspan(nreal,len(allc),color=GREY,alpha=0.18,lw=0)
-ax.text(70,allc.max()*0.12,"real cells",color="#2E5E4E",fontsize=10.5,fontweight="bold")
-ax.text(2.2e4,allc.max()*0.0025,"empty droplets\ncontaining ambient RNA",color="#666",
-        fontsize=9.5,ha="center",linespacing=1.4)
-ax.text(0.985,0.055,"⚠️  A hard cutoff here throws away real\nlow-RNA cells. EmptyDrops tests each\nbarcode against the ambient profile instead.",
-        transform=ax.transAxes,ha="right",fontsize=9,color="#333",linespacing=1.5,
-        bbox=dict(boxstyle="round,pad=0.4",fc="#FAFAFA",ec="#DDD"))
-
-# QC scatter
-ax=axes[1]
-n=3000
-umi=rng.lognormal(8.4,0.42,n)
-genes=np.clip(umi**0.62*rng.lognormal(0,0.10,n),0,None)
-mito=np.clip(rng.beta(1.6,26,n)*100,0,None)
-dying=rng.choice(n,220,replace=False)
-mito[dying]=rng.uniform(18,52,220); genes[dying]*=0.55
-dbl=rng.choice(np.setdiff1d(np.arange(n),dying),150,replace=False)
-umi[dbl]*=2.05; genes[dbl]*=1.55
-sc=ax.scatter(umi,genes,c=mito,s=9,cmap="YlOrRd",vmin=0,vmax=40,lw=0,alpha=0.75)
-cb=fig.colorbar(sc,ax=ax,pad=0.02); cb.set_label("mitochondrial %",fontsize=9.5)
-ax.set_xscale("log"); ax.set_yscale("log")
-ax.set_xlabel("UMIs per cell"); ax.set_ylabel("genes detected per cell")
-ax.set_title("The standard QC plot",loc="left",fontsize=12)
-ax.set_ylim(30,900)
-ax.annotate("high mito % =\ndying / lysed cells",
-            xy=(float(np.median(umi[dying])),float(np.median(genes[dying]))),
-            xytext=(1.35e3,42),fontsize=9.3,color="#B04A42",ha="center",linespacing=1.4,
-            arrowprops=dict(arrowstyle="-|>",color="#C1544B",lw=1.2,
-                            connectionstyle="arc3,rad=-0.25"))
-ax.annotate("high UMI + high genes\n= likely doublets",
-            xy=(float(np.median(umi[dbl])),float(np.median(genes[dbl]))),
-            xytext=(1.9e3,660),fontsize=9.3,color=NAVY,ha="center",linespacing=1.4,
-            arrowprops=dict(arrowstyle="-|>",color=NAVY,lw=1.2,
-                            connectionstyle="arc3,rad=0.2"))
-fig.savefig(OUT+"knee_qc.png"); print("ok k2")
+# QC: each threshold that removes an artefact also removes a real population
+fig, axes = plt.subplots(1, 2, figsize=(9.8, 4.6), gridspec_kw={"wspace": 0.22})
+DARK = "#5E6670"; GREYF = "#C3C8CF"
+def pop(n, umi, sd, gexp, mito, msd):
+    u = np.exp(rng.normal(np.log(umi), sd, n)); g = 0.9 * u ** gexp * np.exp(rng.normal(0, 0.08, n))
+    m = np.clip(rng.normal(mito, msd, n), 0.2, 60); return u, g, m
+# (data, colour in panel a, colour in panel b): red = a real population that this panel's cutoff removes
+P = {"ordinary cells": (pop(1400, 5000, 0.45, 0.82, 2.8, 1.1), GREYF, GREYF),
+     "doublets": (pop(70, 15000, 0.2, 0.82, 2.8, 1.0), DARK, DARK),
+     "large, active cells": (pop(45, 16000, 0.18, 0.82, 3.0, 1.0), CRIMSON, GREYF),
+     "debris / broken cells": (pop(170, 700, 0.45, 0.85, 21, 6), DARK, DARK),
+     "platelets, small cells": (pop(90, 650, 0.25, 0.84, 2.5, 1.0), CRIMSON, GREYF),
+     "mito-rich cells": (pop(110, 5000, 0.4, 0.82, 14, 3.5), GREYF, CRIMSON)}
+a, b = axes
+for nm, ((u, g, m), ca, cb) in P.items():
+    for ax_, xx, yy, c in ((a, u, g, ca), (b, g, m, cb)):
+        ax_.scatter(xx, yy, s=15 if c != GREYF else 9, color=c, lw=0, alpha=0.85 if c != GREYF else 0.7,
+                    zorder=3 if c == CRIMSON else 2)
+for x in (a, b):
+    for sp in ("left", "bottom"): x.spines[sp].set_color(LINE)
+    x.tick_params(colors=TEXT2, labelsize=8.3); x.minorticks_off()
+a.set_xscale("log"); a.set_yscale("log"); b.set_xscale("log")
+a.set_xlabel("total UMI per barcode", color=TEXT2, fontsize=9.3)
+a.set_ylabel("genes detected", color=TEXT2, fontsize=9.3)
+b.set_xlabel("genes detected", color=TEXT2, fontsize=9.3); b.set_ylabel("mitochondrial reads (%)", color=TEXT2, fontsize=9.3)
+a.set_xlim(150, 4e4); a.set_ylim(90, 6e3); b.set_xlim(90, 6e3); b.set_ylim(0, 45)
+lo, hi = 500, 2000
+for yv in (lo, hi): a.axhline(yv, color=CRIMSON, lw=0.9, ls=(0, (4, 3)))
+a.text(160, lo * 0.86, "min genes = 500", ha="left", va="top", fontsize=8.2, color=CRIMSON)
+a.text(160, hi * 1.08, "max genes", ha="left", va="bottom", fontsize=8.2, color=CRIMSON)
+b.axhline(5, color=CRIMSON, lw=0.9, ls=(0, (4, 3)))
+b.text(95, 5.6, "mito cutoff 5%", ha="left", va="bottom", fontsize=8.2, color=CRIMSON)
+def lab(ax, x, y, t, c, ha="left"):
+    ax.text(x, y, t, ha=ha, va="center", fontsize=8.5, color=c, fontweight="semibold", linespacing=1.15)
+lab(a, 3.6e4, 4300, "doublets\n+ large real cells", TEXT, "right")
+lab(a, 1300, 190, "← debris + platelets,\n    small cells", TEXT, "left")
+lab(b, 600, 38, "broken cells:\nhigh mito, few genes", DARK)
+lab(b, 2300, 24, "mito-rich cells\n(cardiomyocytes)", CRIMSON, "center")
+a.set_title("(a) Gene-count cutoffs", loc="left", fontsize=12.3, fontweight="semibold", color=TEXT, pad=22)
+a.text(0, 1.03, "each line removes an artefact and a real cell type", transform=a.transAxes, fontsize=9, color=TEXT2)
+b.set_title("(b) Mito % cutoff", loc="left", fontsize=12.3, fontweight="semibold", color=TEXT, pad=22)
+b.text(0, 1.03, "read it together with the gene count", transform=b.transAxes, fontsize=9, color=TEXT2)
+# legend
+from matplotlib.lines import Line2D
+hs = [Line2D([], [], marker="o", ls="", color=c, ms=6) for c in (GREYF, DARK, CRIMSON)]
+fig.legend(hs, ["ordinary cells", "artefacts (should go)", "real cells the cutoff also removes"], loc="lower center",
+           ncol=3, frameon=False, fontsize=8.8, bbox_to_anchor=(0.5, -0.07), labelcolor=TEXT, handletextpad=0.3)
+header(a, "Single-cell RNA-seq · QC", "Every QC threshold also deletes a real population", dy=40, x1=2.22)
+fig.savefig(OUT + "qc_thresholds.png"); print("ok k2 qc")

@@ -37,7 +37,7 @@ execute:
 
 ## 1) 평균을 내면 사라지는 것 {#w5-s1-1}
 
-![](/assets/img/w5/bulk_vs_singlecell.svg){fig-align="center"}
+![](/assets/img/w5/bulk_vs_singlecell.png){fig-align="center"}
 
 -   **① 모든 세포가 조금씩 변함** — 모두가 암묵적으로 가정하는 경우
 -   **② 일부 세포만 크게 변함** — 보통 가장 흥미로운 경우. Bulk에서는 희석되어 안 보일 수도
@@ -83,6 +83,8 @@ execute:
 -   한 번에 세포 수천~수만 개. 대신 세포당 유전자의 일부만 검출
 -   모든 platform = **세포 수 vs 세포당 깊이**의 맞교환
 
+![](/assets/img/w5/droplet_loading.png){fig-align="center"}
+
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 더 알아보기 — platform 비교
 
@@ -103,7 +105,7 @@ execute:
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 더 알아보기 — 왜 한쪽 끝만 읽히나
 
-![](/assets/img/w5/three_vs_five_prime.svg){fig-align="center"}
+![](/assets/img/w5/three_vs_five_prime.png){fig-align="center"}
 
 -   Barcode가 붙는 쪽 끝 = 읽히는 쪽 끝
 -   ✅ **3′** — 공개 atlas 대부분. ✅ **5′** — 종양면역, 자가면역, 백신 반응처럼 clonotype이 필요할 때
@@ -118,7 +120,7 @@ execute:
 -   **scRNA-seq** — **신선한** 조직을 효소로 풀어 온전한 세포로 만들어야 함 (해리, dissociation)
 -   **snRNA-seq** — 세포 대신 **핵**을 분석. 냉동 조직도 가능, 신경세포·지방세포·심근세포처럼 해리가 어려운 세포도 가능
 
-![](/assets/img/w5/dissociation_bias.svg){fig-align="center"}
+![](/assets/img/w5/dissociation_bias.png){fig-align="center"}
 
 ⚠️ 해리 과정 자체가 결과를 바꿈: 스트레스 유전자 유도, 약한 세포는 소실 → 측정한 조성 = **살아남은 세포의 조성**
 
@@ -156,6 +158,8 @@ execute:
 -   💡 예산이 고정이라면 → 세포를 많이 읽기보다 **기증자를 많이**
 -   ⚠️ 환자 시료는 하루, 대조군은 다른 날 처리 → 분석으로 복구 불가 (§5)
 
+![](/assets/img/w5/donor_design.png){fig-align="center"}
+
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 더 알아보기 — 여러 기증자를 한 번에 돌리기 (pooling)
 
@@ -187,6 +191,8 @@ execute:
 
 → Count matrix = 세포 × 유전자별 **분자 수**
 
+![](/assets/img/w5/barcode_umi.png){fig-align="center"}
+
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 더 알아보기 — bead 구조와 UMI의 한계
 
@@ -202,6 +208,8 @@ execute:
 -   세포 하나에서 약 20,000개 유전자 중 1,000–5,000개만 검출
 -   0의 두 가지 의미: **실제로 발현 x**, 또는 **있었지만 못 잡음(dropout)** — droplet 포획 효율 약 10–30%
 -   ⚠️ **한 세포에서 0 하나 → 유전자가 꺼졌다는 결론 x**
+
+![](/assets/img/w5/sparsity.png){fig-align="center"}
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 더 알아보기 — "zero inflation"이라는 말
@@ -220,7 +228,7 @@ QC로 걸러내는 네 가지:
 | **Doublet** | 한 droplet에 세포 둘 → 세포 하나처럼 보임 |
 | **죽어가는 세포** | 세포막이 깨져 미토콘드리아 유전자 비율(mito %)이 높아짐 |
 
-![왼쪽: 세포와 빈 droplet 구분. 오른쪽: threshold 하나가 지우는 세포](/assets/img/w5/qc_thresholds.svg){fig-align="center"}
+![왼쪽: 유전자 수 cutoff가 지우는 것. 오른쪽: mito % cutoff가 지우는 것. 빨간 점 = artifact와 함께 지워지는 실제 세포](/assets/img/w5/qc_thresholds.png){fig-align="center"}
 
 ⚠️ **모든 QC threshold는 실제 세포 집단도 함께 지움** → 기준값은 조직마다 다르게, 사용한 값은 보고
 
@@ -240,7 +248,7 @@ QC로 걸러내는 네 가지:
 -   Droplet 방식은 세포를 일부러 묽게 loading → 대부분의 droplet = bead만 있고 세포는 없음 (그래도 barcode는 붙음)
 -   **Knee plot (barcode rank plot)** — 모든 barcode를 총 UMI 순으로 줄 세워 log–log로 그린 그림
 
-![](/assets/img/w5/knee_plot.svg){fig-align="center"}
+![](/assets/img/w5/knee_plot.png){fig-align="center"}
 
 -   ① **높고 평평한 plateau** — 진짜 세포 / ② **급경사 (knee)** — 전이 구간 / ③ **길고 낮은 꼬리** — 빈 droplet
 -   ⚠️ Knee에서 단순 cutoff → RNA가 적을 뿐인 진짜 세포까지 삭제 (작거나 휴지기인 세포, neutrophil)
@@ -253,7 +261,7 @@ QC로 걸러내는 네 가지:
 
 해리·loading 중 터진 세포 → mRNA가 용액으로 흘러나옴. 이 **"soup"**이 모든 droplet에 들어감 → 모든 세포의 profile = 자기 RNA + soup 약간
 
-![](/assets/img/w5/ambient_rna.svg){fig-align="center"}
+![](/assets/img/w5/ambient_rna.png){fig-align="center"}
 
 -   **어떻게 보이나** — 가장 많거나 가장 약한 세포 유형의 marker가 **모든** cluster에서 낮게 검출. 예: 혈액이 많은 시료 → 모든 세포에 hemoglobin 유전자, 간 → 면역세포에 *ALB*
 -   **왜 문제** — 가짜 co-expression, 흐려진 cluster 경계, ⚠️ 한 조건에 soup이 더 많으면 가짜 DE (질환·괴사 조직이 보통 더 많음)
@@ -271,6 +279,8 @@ QC로 걸러내는 네 가지:
 | 미토콘드리아 비율(mito %) | — | 죽어가는 세포 — 또는 원래 미토콘드리아가 많은 세포 |
 
 **Mito %가 높으면 왜 죽어가는 세포?** 세포막이 깨지면 세포질 mRNA는 새어 나가지만, 미토콘드리아 안의 transcript는 미토콘드리아 막에 보호되어 남음 → **비율**이 올라감 (더 많이 만든 게 아님)
+
+![](/assets/img/w5/mito_fraction.png){fig-align="center"}
 
 -   ⚠️ **함께 볼 것.** Mito 높음 **+** 유전자 수 적음 = 깨진 세포. 유전자 수가 정상이면 원래 미토콘드리아가 많은 세포일 수 있음 (심근세포, 간세포, 신세뇨관)
 -   ⚠️ **snRNA-seq**: 핵에는 미토콘드리아 x → mito read ≈ 0이 정상
@@ -291,7 +301,7 @@ QC로 걸러내는 네 가지:
 
 **핵심 아이디어** — 어떤 barcode가 doublet인지 직접 볼 방법은 없음 → 가짜 doublet을 **만들어 놓고**, 진짜 세포 중 누가 그걸 닮았는지 확인
 
-![](/assets/img/w5/doublet_detection.svg){fig-align="center"}
+![](/assets/img/w5/doublet_detection.png){fig-align="center"}
 
 1.  **만들기** — 진짜 세포 두 개의 profile을 무작위로 섞어 가짜 doublet 수천 개 생성
 2.  **함께 배치** — 진짜 + 가짜 세포를 같은 공간에
@@ -308,6 +318,8 @@ QC로 걸러내는 네 가지:
 -   세포마다 잡힌 RNA 총량이 다름 → **정규화**로 맞춤
 -   변이가 큰 유전자 약 2,000개만 골라 → **PCA**로 수십 개 축으로 요약
 -   PC 하나 = 함께 움직이는 유전자 묶음(program) → 이후 모든 단계가 이 요약값 위에서 진행
+
+![시뮬레이션한 UMI count(세포 유형 5개)로 계산](/assets/img/w5/norm_pca.png){fig-align="center"}
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 더 알아보기 — 단계별로 하는 일
@@ -343,6 +355,8 @@ QC로 걸러내는 네 가지:
 
 ⚠️ UMAP은 보여주기용 그림일 뿐. Clustering은 UMAP 그림이 아니라 그 전 단계의 데이터에서 수행
 
+![Toy 데이터로 계산](/assets/img/w5/celltype_workflow.png){fig-align="center"}
+
 ## 1) 이웃 graph {#w5-s4-1}
 
 -   세포마다 발현이 가장 비슷한 세포 몇 개(*k*개)를 찾아 연결 → 세포 간 "이웃 지도"
@@ -351,7 +365,7 @@ QC로 걸러내는 네 가지:
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 더 알아보기 — 이웃 graph 만들기
 
-![](/assets/img/w5/knn_graph.svg){fig-align="center"}
+![](/assets/img/w5/knn_graph.png){fig-align="center"}
 
 -   **kNN graph** — 세포 = 점, 각 세포를 PC 공간에서 가장 가까운 *k*개 이웃과 연결. Seurat은 두 세포가 이웃을 얼마나 **공유**하는지로 연결 강도를 다시 매김(SNN graph) → outlier 영향 감소
 -   **왜 graph?** — 세포 집단은 동그란 덩어리인 경우가 드묾. Graph는 길쭉하거나 갈라지거나 연속적인 모양을 그대로 따라감
@@ -363,7 +377,7 @@ QC로 걸러내는 네 가지:
 -   Clustering = 이웃 graph에서 서로 촘촘히 연결된 세포 덩어리 찾기
 -   **Resolution** 값에 따라 cluster 수가 달라짐
 
-![](/assets/img/w5/umap_resolution.svg){fig-align="center"}
+![Toy 데이터에 Leiden을 resolution 두 값으로 실행한 결과](/assets/img/w5/umap_resolution.png){fig-align="center"}
 
 ⚠️ **정답 resolution은 없음** → marker 유전자와 알려진 생물학으로 확인, 사용한 값 보고
 
@@ -384,7 +398,7 @@ Cluster에 반영될 수 있는 것:
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 더 알아보기 — Clustering algorithm과 resolution 고르기
 
-![](/assets/img/w5/clustering.svg){fig-align="center"}
+![](/assets/img/w5/clustering.png){fig-align="center"}
 
 -   **Community detection** — 우연히 기대되는 것보다 서로 더 촘촘히 연결된 그룹으로 graph를 자름
 -   **Louvain vs Leiden** — Leiden = Louvain의 결함(내부가 끊긴 cluster)을 고친 개선판. 생물학적 결론은 거의 안 바뀜
@@ -402,10 +416,12 @@ Cluster에 반영될 수 있는 것:
 -   ❌ Cluster 사이 **거리**, cluster **크기**, 사이를 잇는 가느다란 **다리**는 해석 x
 -   → 중요한 주장은 UMAP 그림이 아니라 숫자로
 
+![](/assets/img/w5/umap_reading.png){fig-align="center"}
+
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 더 알아보기 — UMAP이 기본이 된 이유, PCA·t-SNE와 비교
 
-![](/assets/img/w5/dimred_compare.svg){fig-align="center"}
+![같은 toy 데이터(유전자 50개)를 세 방법으로 2D에 펼침](/assets/img/w5/dimred_compare.png){fig-align="center"}
 
 -   UMAP은 clustering과 **같은 kNN graph를 펼침** → island가 대개 cluster와 일치. 빠름
 -   **PCA** — 선형, 거리에 의미 있음. 이후 모든 단계의 input이지만 cluster를 *보기*엔 너무 거침
@@ -419,6 +435,8 @@ Cluster에 반영될 수 있는 것:
 -   **Marker 기반** — 알려진 marker 유전자로 cluster에 이름 붙임
 -   **참조 기반** — 이미 이름이 붙은 atlas에 맞춰 봄 (Azimuth, SingleR)
 -   💡 두 방법을 함께. 둘이 다르면 → 새로운 집단이거나 artifact
+
+![](/assets/img/w5/annotation.png){fig-align="center"}
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 더 알아보기 — 두 방법의 장단점
@@ -438,7 +456,7 @@ Cluster에 반영될 수 있는 것:
 -   **Integration**(Harmony, scVI 등) = 환자가 달라도 같은 세포 유형끼리 모이도록 맞추는 과정
 -   ⚠️ 너무 세게 맞추면 **진짜 차이(질환 특이적 세포)까지 지움** → 항상 batch와 세포 유형으로 **각각** 색칠해 확인
 
-![](/assets/img/w5/integration_overcorrection.svg){fig-align="center"}
+![](/assets/img/w5/integration_overcorrection.png){fig-align="center"}
 
 ⚠️ 환자는 하루, 대조군은 다른 날 처리 → **어떤 integration 방법으로도 분리 불가** (🔗 [W1 §4.3](w1_intro.qmd#w1-s4-3))
 
@@ -489,7 +507,7 @@ Cluster에 반영될 수 있는 것:
 
 ## 1) ⚠️ 세포별 검정이 잘못된 이유 {#w5-s6-1}
 
-![](/assets/img/w5/pseudobulk.svg){fig-align="center"}
+![](/assets/img/w5/pseudobulk.png){fig-align="center"}
 
 -   세포 수천 개를 각각 독립 시료로 검정 → 같은 사람의 세포는 독립 x → p-value가 비현실적으로 작아짐
 -   세포를 더 넣을수록 p-value가 계속 작아짐 → 사람 수가 아니라 **loading한 세포 수**를 측정한 셈
@@ -537,6 +555,8 @@ Cluster에 반영될 수 있는 것:
 -   ⚠️ 비율은 서로 연결됨 — 하나가 늘면 나머지는 저절로 줄어듦 → 전용 방법 필요 (세포 수에 χ² test x)
 -   ⚠️ 실제 변화가 아니라 해리 효율 차이일 수도 (§2.3)
 
+![](/assets/img/w5/composition.png){fig-align="center"}
+
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 더 알아보기 — 조성 자료(compositional data)
 
@@ -558,7 +578,7 @@ Cluster에 반영될 수 있는 것:
 -   ⚠️ **Pseudotime ≠ 실제 시간**
 -   ⚠️ 실제 과정이 없는 데이터에서도 algorithm은 항상 trajectory를 그려냄
 
-![](/assets/img/w5/trajectory_caveats.svg){fig-align="center"}
+![](/assets/img/w5/trajectory_caveats.png){fig-align="center"}
 
 ::: {.callout-warning collapse="true"}
 ## 분명히 짚고 갈 세 가지
@@ -577,7 +597,7 @@ Cluster에 반영될 수 있는 것:
 -   도구: Monocle3, Slingshot, PAGA
 -   **RNA velocity** (scVelo) — 유전자별로 unspliced(새로 만든) vs spliced(성숙) read를 비교해 **방향** 추가
 
-![](/assets/img/w5/rna_velocity.svg){fig-align="center"}
+![](/assets/img/w5/rna_velocity.png){fig-align="center"}
 
 -   ⚠️ Splicing·분해 속도에 대한 가정은 **논쟁 중**, 일부 유전자·system에서는 안 맞음
 -   ⚠️ 화살표가 UMAP 위에 그려짐 → §4.3의 왜곡을 전부 물려받음
@@ -615,7 +635,7 @@ Cluster에 반영될 수 있는 것:
 
 CellPhoneDB, CellChat, NicheNet = cluster 쌍 사이에서 함께 발현되는 ligand–receptor 쌍에 점수. Cluster A에서 ligand mRNA가 높고 cluster B에서 receptor mRNA가 높은가? → 그게 전부
 
-![](/assets/img/w5/ccc_fallacy.svg){fig-align="center"}
+![](/assets/img/w5/ccc_fallacy.png){fig-align="center"}
 
 ⚠️ Ligand와 receptor가 함께 발현 ≠ **두 세포가 상호작용한다는 증거**
 
@@ -637,6 +657,8 @@ CellPhoneDB, CellChat, NicheNet = cluster 쌍 사이에서 함께 발현되는 l
 -   **Imaging 기반 (MERFISH, Xenium, CosMx)** — 세포 이하 해상도, 대신 정해진 유전자 panel만
 
 → 이 장의 다른 모든 방법과 같은 trade-off: **해상도 vs 범위**
+
+![](/assets/img/w5/spatial.png){fig-align="center"}
 
 ## 4) 참조 atlas {#w5-s7-4}
 
@@ -666,6 +688,8 @@ CellPhoneDB, CellChat, NicheNet = cluster 쌍 사이에서 함께 발현되는 l
 
 -   ✅ **견고한 결과** — marker로 확인한 cluster, 기증자 단위 pseudobulk DE
 -   ⚠️ **가설** — pseudotime, RNA velocity, regulon, 세포 간 소통 → "consistent with"로 쓰고, 검증 실험과 함께
+
+![](/assets/img/w5/evidence.png){fig-align="center"}
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 더 알아보기 — 결과별로 어디에 쓰나

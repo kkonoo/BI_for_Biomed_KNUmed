@@ -136,6 +136,14 @@ execute:
 
 > 🔑 **핵심** — 이 자리는 promoter인가 enhancer인가, 켜져 있나 꺼져 있나? → 여러 histone mark의 **조합**으로 알 수 있음
 
+-   사람 DNA 한 벌(약 30억 bp) × 0.34 nm(이웃한 염기쌍 사이 간격) ≈ **1 m**. 이배체 세포 하나에는 약 **2 m**
+-   이걸 지름 약 5 µm의 핵에 넣어야 함 → 핵보다 약 **40만 배** 긴 실. 핵을 테니스공(약 6.5 cm)만 하게 키우면 DNA는 약 25 km
+-   첫 번째 포장 = **nucleosome** — 히스톤 단백질 8개(H2A, H2B, H3, H4 각 2개) 덩어리에 DNA 약 147 bp가 감김. 실패에 실을 감은 모양이 염주처럼 이어짐(beads on a string)
+    -   Nucleosome 하나 + 다음 nucleosome까지의 linker DNA ≈ 200 bp → ATAC 절편 크기가 약 200 bp 간격의 계단을 이루는 이유(🔗 [§3.2①](#w3-s3-2-1))
+-   히스톤마다 **꼬리**가 nucleosome 바깥으로 삐져나와 있음 → 이 꼬리에 acetyl기, methyl기 같은 화학 표지가 붙음 = **histone modification**(histone mark)
+-   → 어떤 표지가 붙었는지 보면 그 자리가 켜진 promoter·enhancer인지, 꺼진 곳인지 알 수 있음 → 이 절의 주제
+-   Nucleosome 위로 더 높은 단계의 접힘(loop, TAD 등)은 🔗 [§4](#w3-s4)
+
 ## 1) Histone mark의 종류 {#w3-s2-1}
 
 수십 가지가 있지만 유전체학에서 주로 쓰는 것은 여섯 가지. 더 많은 종류는 🔗 [Wikipedia — Histone code](https://en.wikipedia.org/wiki/Histone_code)의 표에서 확인
@@ -279,7 +287,7 @@ execute:
 ![ATAC-seq의 원리. Adapter를 실은 Tn5가 열린 DNA만 자르고 adapter를 붙임 → 그 절편만 sequencing → read가 쌓인 곳 = 열린 염색질](/assets/img/w3/atac_principle.png){fig-align="center"}
 
 -   **ATAC-seq** — Tn5 transposase(DNA를 자르는 효소) 사용. CUT&Tag와 같은 효소지만 항체 없이 씀. 활성을 높인 Tn5에 sequencing adapter를 미리 실어 둠
--   Nucleosome = DNA가 감기는 히스톤 덩어리. Tn5는 DNA가 **nucleosome에 감겨 있지 않은** 곳에 우선 삽입됨. 조절 단백질이 염색질을 활발히 열어 둔 곳이 바로 이런 곳
+-   Nucleosome(🔗 [§2](#w3-s2)) = DNA가 감기는 히스톤 덩어리. Tn5는 DNA가 **nucleosome에 감겨 있지 않은** 곳에 우선 삽입됨. 조절 단백질이 염색질을 활발히 열어 둔 곳이 바로 이런 곳
 -   절편화와 adapter 부착이 **한 단계**(tagmentation)에서 → 실험이 빠르고 적은 세포로도 가능
 -   → 열린 곳에서 나온 절편만 sequencing됨 → read가 쌓인 곳 = 열린 염색질
 
@@ -367,6 +375,16 @@ execute:
 # 4. 3D genome: Hi-C 🔗 {#w3-s4}
 
 > 🔑 **핵심** — 활성 enhancer를 찾음. 실제로 어느 promoter를 조절하나? → Hi-C가 물리적으로 맞닿은 영역을 보여줌. ⚠️ 단, 접촉 ≠ 기능
+
+![DNA가 핵에 들어가기까지의 접힘 단계와 Hi-C에서 보이는 모습. Nucleosome은 첫 단계일 뿐. Loop부터 위쪽 단계는 Hi-C contact matrix에 서로 다른 무늬로 나타남](/assets/img/w3/genome_folding.png){fig-align="center"}
+
+-   §2의 nucleosome = 1 m DNA를 5 µm 핵에 넣는 **첫 단계**일 뿐. 그 위로 여러 단계가 더 접힘:
+    -   **Loop**(수십~수백 kb) — CTCF와 cohesin이 밑동을 붙잡은 고리. Enhancer와 promoter가 만나는 단위(🔗 [§1.1](#w3-s1-1))
+    -   **TAD**(약 0.1–1 Mb) — 내부끼리 자주 접촉하는 구역. Loop 여러 개가 모인 동네
+    -   **A/B compartment**(수 Mb) — 활성(A) 염색질은 A끼리, 비활성(B) 염색질은 B끼리 모임
+    -   **Chromosome territory**(염색체 하나 전체) — 염색체마다 핵 안에서 자기 구역을 차지
+-   → Hi-C가 재는 것 = 바로 이 접힘. 단계마다 contact matrix에 다른 무늬로 나타남(🔗 [§4.3](#w3-s4-3))
+-   ⚠️ 교과서에 나오는 규칙적인 "30 nm 섬유"는 주로 시험관 속 정제 염색질에서 본 모양. 살아 있는 세포의 핵에서는 거의 보이지 않고, nucleosome 줄이 불규칙하게 뭉친 상태에 가까움
 
 ## 1) 원리 {#w3-s4-1}
 
@@ -702,6 +720,7 @@ $$
 | Enhancer | 유전자에서 멀리 떨어져 있을 수 있는, 전사를 높이는 조절 부위 |
 | Transcription factor (TF) | 특정 DNA 서열에 붙어 유전자를 켜거나 끄는 단백질 |
 | Motif | TF가 알아보는 짧은 DNA 서열(보통 6–12 bp) |
+| Nucleosome | 히스톤 8개 덩어리에 DNA 약 147 bp가 감긴 기본 포장 단위 |
 | ChIP-seq | 단백질 또는 마크가 DNA의 어디에 있는지 지도화하는 방법 |
 | ATAC-seq | Tn5를 이용해 열린 염색질을 지도화하는 방법 |
 | Input control | 항체 없이 sonication한 염색질 대조군 |
@@ -733,6 +752,7 @@ $$
 | FRiP | Peak 안에 포함되는 read의 비율 |
 | Bivalent domain | H3K4me3 + H3K27me3 조합, 준비 상태의 발달 유전자 |
 | Proximity ligation | 공간적으로 가까운 DNA 끝끼리 잇는 Hi-C의 핵심 단계 |
+| Chromosome territory | 염색체마다 핵 안에서 차지하는 자기 구역 |
 | ChromHMM | 유전체를 염색질 상태로 구획하는 도구 |
 | Partitioned heritability | 어떤 annotation이 형질의 유전 신호를 담는지 평가하는 방법 |
 :::
@@ -768,7 +788,8 @@ Grandi FC, et al. [*Chromatin accessibility profiling by ATAC-seq.*](https://doi
 
 Lieberman-Aiden E, et al. [*Comprehensive mapping of long-range interactions reveals folding principles of the human genome.*](https://pubmed.ncbi.nlm.nih.gov/?term=Comprehensive+mapping+of+long-range+interactions+reveals+folding+principles+of+the+human+genome) Science. 2009. (Hi-C)\
 Rao SSP, et al. [*A 3D map of the human genome at kilobase resolution reveals principles of chromatin looping.*](https://pubmed.ncbi.nlm.nih.gov/?term=A+3D+map+of+the+human+genome+at+kilobase+resolution+reveals+principles+of+chromatin+looping) Cell. 2014.\
-Dekker J, Mirny L. [*The 3D genome as moderator of chromosomal communication.*](https://pubmed.ncbi.nlm.nih.gov/?term=The+3D+genome+as+moderator+of+chromosomal+communication) Cell. 2016.
+Dekker J, Mirny L. [*The 3D genome as moderator of chromosomal communication.*](https://pubmed.ncbi.nlm.nih.gov/?term=The+3D+genome+as+moderator+of+chromosomal+communication) Cell. 2016.\
+Ou HD, et al. [*ChromEMT: visualizing 3D chromatin structure and compaction in interphase and mitotic cells.*](https://pubmed.ncbi.nlm.nih.gov/?term=ChromEMT+visualizing+3D+chromatin+structure+and+compaction+in+interphase+and+mitotic+cells) Science. 2017.
 
 ### DNA methylation
 

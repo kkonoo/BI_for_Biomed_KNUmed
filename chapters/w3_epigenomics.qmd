@@ -136,6 +136,14 @@ This single fact is behind the cell-composition problem in [§5.3](#w3-s5-3) and
 
 > 🔑 **Core idea** — is this a promoter or an enhancer, and is it on or off? → a **combination** of histone marks tells you
 
+-   One copy of the human genome (about 3 billion bp) × 0.34 nm (the spacing between neighbouring base pairs) ≈ **1 m**. A diploid cell holds about **2 m**
+-   That has to fit in a nucleus about 5 µm across → a thread some **400,000 times** longer than the nucleus. Scale the nucleus up to a tennis ball (about 6.5 cm) and the DNA becomes about 25 km
+-   The first level of packing = the **nucleosome** — about 147 bp of DNA wound around a core of eight histone proteins (two each of H2A, H2B, H3, H4). The spools line up like beads on a string
+    -   One nucleosome plus the linker DNA to the next ≈ 200 bp → why ATAC fragment sizes step up in ~200 bp rungs (🔗 [§3.2①](#w3-s3-2-1))
+-   Each histone has a **tail** sticking out of the nucleosome → chemical tags such as acetyl and methyl groups attach to these tails = **histone modifications** (histone marks)
+-   → Which tags sit there tells you whether the spot is an active promoter or enhancer, or switched off → the subject of this section
+-   Higher levels of folding above the nucleosome (loops, TADs, ...) → 🔗 [§4](#w3-s4)
+
 ## 1) Kinds of histone mark {#w3-s2-1}
 
 Dozens exist. Six do most of the work in genomics. For many more, see the table in 🔗 [Wikipedia — Histone code](https://en.wikipedia.org/wiki/Histone_code)
@@ -279,7 +287,7 @@ The single most common figure in the epigenomics literature. Work top to bottom,
 ![How ATAC-seq works. Tn5 loaded with adapters cuts only open DNA and attaches adapters → only those fragments are sequenced → where reads pile up = open chromatin.](/assets/img/w3/atac_principle.png){fig-align="center"}
 
 -   **ATAC-seq** — a hyperactive Tn5 transposase (a DNA-cutting enzyme), preloaded with sequencing adapters. The same enzyme as in CUT&Tag, but used without an antibody
--   Tn5 inserts preferentially where DNA is **not wrapped in nucleosomes** (the histone spools) — i.e. where regulatory proteins are actively holding chromatin open
+-   Tn5 inserts preferentially where DNA is **not wrapped in nucleosomes** (the histone spools, 🔗 [§2](#w3-s2)) — i.e. where regulatory proteins are actively holding chromatin open
 -   Fragmentation and adapter attachment in **one step** (tagmentation) → fast protocol, works from few cells
 -   → only fragments from open regions get sequenced → where reads pile up = open chromatin
 
@@ -367,6 +375,16 @@ The single most common figure in the epigenomics literature. Work top to bottom,
 # 4. The 3D Genome: Hi-C 🔗 {#w3-s4}
 
 > 🔑 **Core idea** — you have an active enhancer. Which promoter does it actually regulate? Hi-C shows which regions physically touch — ⚠️ but contact ≠ function
+
+![The levels of folding that fit DNA into the nucleus, and how each looks in Hi-C. The nucleosome is only the first fold. From loops upward, each level leaves its own pattern in the Hi-C contact matrix.](/assets/img/w3/genome_folding.png){fig-align="center"}
+
+-   The nucleosome from §2 is only the **first step** in fitting 1 m of DNA into a 5 µm nucleus. Several more levels of folding sit above it:
+    -   **Loop** (tens to hundreds of kb) — a loop held at its base by CTCF and cohesin. The unit in which enhancers meet promoters (🔗 [§1.1](#w3-s1-1))
+    -   **TAD** (about 0.1–1 Mb) — a region whose parts contact each other often. A neighbourhood of loops
+    -   **A/B compartment** (several Mb) — active (A) chromatin gathers with A, inactive (B) with B
+    -   **Chromosome territory** (a whole chromosome) — each chromosome occupies its own zone in the nucleus
+-   → This folding is what Hi-C measures. Each level leaves a different pattern in the contact matrix (🔗 [§4.3](#w3-s4-3))
+-   ⚠️ The regular "30 nm fibre" of textbooks was seen mostly in purified chromatin in the test tube. In the nuclei of living cells it is rarely seen; chromatin looks more like an irregularly packed string of nucleosomes
 
 ## 1) The principle {#w3-s4-1}
 
@@ -702,6 +720,7 @@ This is why the field pushed so hard toward single-cell chromatin profiling (�
 | Enhancer | A regulatory region, often far from its gene, that boosts transcription |
 | Transcription factor (TF) | A protein that binds a specific DNA sequence and switches genes on or off |
 | Motif | The short DNA sequence a TF recognises (usually 6–12 bp) |
+| Nucleosome | The basic packing unit: about 147 bp of DNA wound around eight histones |
 | ChIP-seq | Mapping where a protein or mark sits on DNA |
 | ATAC-seq | Tn5-based map of open chromatin |
 | Input control | Sonicated chromatin without antibody |
@@ -733,6 +752,7 @@ This is why the field pushed so hard toward single-cell chromatin profiling (�
 | FRiP | Fraction of reads falling in peaks |
 | Bivalent domain | H3K4me3 + H3K27me3; poised developmental gene |
 | Proximity ligation | Joining DNA ends that are close in space — the key step of Hi-C |
+| Chromosome territory | The zone of the nucleus that each chromosome occupies |
 | ChromHMM | Segments the genome into chromatin states |
 | Partitioned heritability | Which annotations carry a trait's genetic signal |
 :::
@@ -768,7 +788,8 @@ Grandi FC, et al. [*Chromatin accessibility profiling by ATAC-seq.*](https://doi
 
 Lieberman-Aiden E, et al. [*Comprehensive mapping of long-range interactions reveals folding principles of the human genome.*](https://pubmed.ncbi.nlm.nih.gov/?term=Comprehensive+mapping+of+long-range+interactions+reveals+folding+principles+of+the+human+genome) Science. 2009. (Hi-C)\
 Rao SSP, et al. [*A 3D map of the human genome at kilobase resolution reveals principles of chromatin looping.*](https://pubmed.ncbi.nlm.nih.gov/?term=A+3D+map+of+the+human+genome+at+kilobase+resolution+reveals+principles+of+chromatin+looping) Cell. 2014.\
-Dekker J, Mirny L. [*The 3D genome as moderator of chromosomal communication.*](https://pubmed.ncbi.nlm.nih.gov/?term=The+3D+genome+as+moderator+of+chromosomal+communication) Cell. 2016.
+Dekker J, Mirny L. [*The 3D genome as moderator of chromosomal communication.*](https://pubmed.ncbi.nlm.nih.gov/?term=The+3D+genome+as+moderator+of+chromosomal+communication) Cell. 2016.\
+Ou HD, et al. [*ChromEMT: visualizing 3D chromatin structure and compaction in interphase and mitotic cells.*](https://pubmed.ncbi.nlm.nih.gov/?term=ChromEMT+visualizing+3D+chromatin+structure+and+compaction+in+interphase+and+mitotic+cells) Science. 2017.
 
 ### DNA methylation
 

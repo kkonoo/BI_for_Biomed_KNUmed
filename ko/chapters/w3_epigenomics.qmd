@@ -570,7 +570,7 @@ $$
 -   ✅ 참조 패널이 없는 조직 → reference-free 방법(RefFreeEWAS, ReFACTor, SVA). 단, 실제 신호까지 제거할 위험
 -   ✅ **정확히 무엇을 했는지 명시.** 구체적인 설명 없이 “세포 조성을 보정했다”만으로는 불충분
 
-🔗 [W1 §4.3](w1_intro.qmd#w1-s4-3)에서 다룬 교란의 흐름이 이 장 전체에 걸쳐 나타난 형태. [W4 §6.2](w4_transcriptomics.qmd#w4-s6-2)에서는 bulk 조직 deconvolution으로, [W5 §6.3](w5_singlecell.qmd#w5-s6-3)에서는 differential abundance로 다시 등장
+🔗 [W1 §4.3](w1_intro.qmd#w1-s4-3)에서 다룬 교란의 흐름이 이 장 전체에 걸쳐 나타난 형태. [W4 §6.2](w4_transcriptomics.qmd#w4-s6-2)에서는 bulk 조직 deconvolution으로, [W5 §5.3](w5_singlecell.qmd#w5-s5-3)에서는 differential abundance로 다시 등장
 :::
 
 ## 4) Epigenetic clock ⏳ {#w3-s5-4}

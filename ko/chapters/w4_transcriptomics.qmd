@@ -110,7 +110,7 @@ execute:
 
 ------------------------------------------------------------------------
 
-# 2. 시퀀싱 전 고려할 점 ⚙️ {#w4-s2}
+# 2. Sequencing 전 고려할 점 ⚙️ {#w4-s2}
 
 > 🔑 **핵심** — 실험실에서 내린 선택(library 종류, 반복, batch 배치)이 이후 모든 분석의 한계를 정함. 분석 단계에서 되돌리기 x
 
@@ -144,9 +144,13 @@ execute:
 
 ## 3) Read 길이, 깊이, paired-end {#w4-s2-3}
 
+-   **Single-end** = 조각의 한쪽 끝만 읽음, **paired-end** = 양쪽 끝을 읽음 (🔗 [W1 §2.1②](w1_intro.qmd#w1-s2-1-2))
 -   단순 gene-level DE → single-end로 충분한 경우가 많음, 긴 read의 이점도 적음
 -   Isoform, splice junction, fusion, 새로운 transcript → 더 긴 read, paired-end
+-   💡 **Long read**(PacBio, Nanopore; 🔗 [W1 §2.1③](w1_intro.qmd#w1-s2-1-3)) → transcript 하나를 처음부터 끝까지 한 read로 읽음 → isoform과 fusion을 조각으로 짐작하지 않고 직접 확인
 -   깊이는 예상보다 훨씬 일찍 포화 ([§4.3④](#w4-s4-3-4))
+
+![(a) 150 bp short read는 exon 한두 개만 덮음 → 어떤 exon들이 한 분자에 함께 있었는지 알 수 없음. Long read는 분자 하나를 통째로 읽음 (b) Short read로는 breakpoint를 지나는 소수의 read나 paired-end 짝으로만 fusion을 찾음. Long read는 두 유전자를 한 read에 담음](/assets/img/w4/long_read.png){fig-align="center"}
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 더 알아보기 — read 길이·paired-end·깊이 한눈에 보기
@@ -155,6 +159,7 @@ execute:
 |------------------------------------|------------------------------------|
 | **더 긴 read** (2×150 vs 1×50) | Isoform과 splice junction 분석. 단순 gene-level counting에서는 이점이 적음 |
 | **Paired-end** | Isoform, fusion 탐지, 새로운 transcript. Gene-level DE에는 single-end로 충분한 경우가 많음 |
+| **Long read** (PacBio, Nanopore) | Full-length isoform, fusion, 새로운 transcript. Read 수가 적고 비쌈 → 유전자 정량(DE)은 아직 short read가 주류 |
 | **깊이** | [§4.3④](#w4-s4-3-4) 참고 — 예상보다 훨씬 일찍 포화됨 |
 :::
 
@@ -191,36 +196,59 @@ execute:
 
 ------------------------------------------------------------------------
 
-# 3. Pre-processing: read에서 count까지 🔢 {#w4-s3}
+# 3. Pre-processing 🔢 {#w4-s3}
 
 > 🔑 **핵심** — QC로 시료 확인 → read를 유전자에 배정해 count matrix 만들기 → 정규화 → 검정 전에 시료 전체 살피기(EDA)
 
+![우리 랩 bulk RNA-seq 파이프라인 예시: FastQC → TrimGalore → salmon → tximport → DESeq2. 단계마다 QC 지표를 확인하고(§3.1), 통계 검정(§4) 뒤 downstream 분석(§5)으로 넘어감](/assets/img/w4/rnaseq_pipeline.png){fig-align="center"}
+
 ## 1) QC {#w4-s3-1}
 
--   **Raw read QC** — FastQC로 base quality, adapter 잔여, GC 분포 확인 → 여러 시료는 MultiQC로 한 번에
--   **Read가 어디로 갔나** — 유전체에 정렬된 비율(mapping rate), exon에 떨어진 비율, rRNA 비율 → 한 시료만 튀면 의심
+-   단계마다 따로 확인: raw read → alignment → count matrix (시료 전체의 모양은 EDA, [§3.4](#w4-s3-4))
+-   💡 절대 기준보다 **같은 실험의 다른 시료와 비교**가 핵심
+
+### ① Raw sequencing read {#w4-s3-1-1}
+
+-   **FastQC** — base quality, adapter 잔여, GC 분포, 과다 반복 서열 확인 → 여러 시료는 MultiQC로 한 번에
+-   Adapter와 quality 낮은 염기 → trimming (TrimGalore, cutadapt)
+-   ⚠️ Duplication — RNA-seq에서는 발현이 높은 유전자에서 자연스럽게 높음 → 그것만으로 read 제거 x
+
+### ② Read alignment {#w4-s3-1-2}
+
+-   **Mapping rate** — 유전체(또는 transcriptome)에 정렬된 read 비율
+-   **Read가 떨어진 곳** — exon, intron, intergenic, rRNA 비율 → 한 시료만 튀면 의심
 -   **Gene-body coverage** — transcript의 5′에서 3′까지 read가 고르게 깔려야 정상. ⚠️ 3′ 쪽으로 쏠림 = RNA 분해(낮은 RIN)의 신호 (poly(A) library)
+-   **Strandedness** — 실험 기록과 맞는지
 
 ![(a) 시료마다 read가 어디로 갔는지. S5만 rRNA가 많고 정렬된 read가 적음 → 원인 확인 후 제외 여부 결정 (b) 분해된 RNA는 poly(A) tail 쪽 3′ 조각만 남아 coverage가 3′으로 쏠림](/assets/img/w4/rnaseq_qc.png){fig-align="center"}
 
+💡 salmon(pseudo-alignment)은 mapping rate만 알려줌 → read 분포와 gene-body coverage는 유전체 alignment(STAR 등) 결과를 RSeQC·Qualimap으로 확인
+
+### ③ Count matrix {#w4-s3-1-3}
+
+-   **Library size**(시료의 총 count), **검출된 유전자 수** → 다른 시료보다 크게 적으면 의심
+-   소수 유전자가 count를 독차지하지 않는지 (예: 전혈 시료의 hemoglobin 유전자)
+-   시료 전체의 모양 → EDA ([§3.4](#w4-s3-4))
+
 ::: {.callout-note collapse="true" icon=false}
-## 🔍 더 알아보기 — QC 지표 자세히
+## 🔍 더 알아보기 — 단계별 QC 지표 한눈에 보기
 
-| 지표 | 보는 것 | 문제 신호 |
+| 단계 | 지표 | 문제 신호 |
 |------------------------|------------------------|------------------------|
-| **Mapping rate** | 유전체에 정렬된 read 비율 | 다른 시료보다 확연히 낮음 → 오염, 다른 종, adapter |
-| **Exonic / intronic 비율** | mRNA에서 온 read인지 | Poly(A) library인데 intron 비율이 높음 → 핵 RNA나 DNA 오염 |
-| **rRNA 비율** | rRNA 제거가 잘 됐는지 | 다른 시료보다 높음 → 제거 실패 |
-| **Gene-body coverage** | RNA가 온전한지 | 3′ 쏠림 → 분해 |
-| **Library size, 검출 유전자 수** | 깊이 | 다른 시료보다 크게 적음 |
-| **Duplication** | PCR 중복 | RNA-seq에서는 발현 높은 유전자에서 자연스럽게 높음 → 그것만으로 제거 x |
-| **Strandedness** | 실험 기록과 일치하는지 | 기록과 다름 → counting 설정 오류 |
+| **Raw read** | Base quality | Read 끝으로 갈수록 급격히 떨어짐 → trimming |
+| **Raw read** | Adapter 잔여 | 많음 → 절편이 짧음, trimming 필요 |
+| **Raw read** | Duplication | RNA-seq에서는 높아도 정상일 수 있음 |
+| **Alignment** | Mapping rate | 다른 시료보다 확연히 낮음 → 오염, 다른 종, adapter |
+| **Alignment** | Exonic / intronic 비율 | Poly(A) library인데 intron 비율이 높음 → 핵 RNA나 DNA 오염 |
+| **Alignment** | rRNA 비율 | 다른 시료보다 높음 → 제거 실패 |
+| **Alignment** | Gene-body coverage | 3′ 쏠림 → 분해 |
+| **Alignment** | Strandedness | 기록과 다름 → counting 설정 오류 |
+| **Count matrix** | Library size, 검출 유전자 수 | 다른 시료보다 크게 적음 |
 
--   절대 기준보다 **같은 실험의 다른 시료와 비교**가 핵심
 -   도구: FastQC, MultiQC, RSeQC, Qualimap. nf-core/rnaseq 같은 pipeline이 한 번에 실행
 :::
 
-## 2) Read에서 count까지 {#w4-s3-2}
+## 2) Alignment와 정량 {#w4-s3-2}
 
 -   Read를 유전자에 배정하고 셈 → 유전자 × 시료 count matrix
 -   ⚠️ 모든 count matrix 안에는 이 과정에서 내린 보이지 않는 결정 네 가지가 숨어 있음 (①–④)
@@ -239,7 +267,7 @@ execute:
 -   ✅ 약 10배 빠르고 메모리를 훨씬 적게 사용
 -   ❌ BAM 파일 없음 → alignment 직접 확인 불가
 
-![Read를 짧은 조각(k-mer)으로 쪼개 어느 transcript와 맞는지만 확인. 이 read는 T1, T2와 호환, T3와는 맞지 않음](/assets/img/w4/pseudo_alignment.png){fig-align="center"}
+![Read를 짧은 조각(k-mer)으로 쪼개 어느 transcript와 맞는지만 확인. 이 read는 exon 1 끝과 exon 2 앞부분에서 옴 → exon 1과 exon 2가 이어진 T1, T2와 호환, exon 2가 없는 T3와는 맞지 않음](/assets/img/w4/pseudo_alignment.png){fig-align="center"}
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 더 알아보기 — pseudo-alignment 자세히
@@ -281,7 +309,7 @@ execute:
 
 -   Raw count = 생물학 + sequencing 깊이 + 유전자 길이 + library 조성 → 시료를 비교하기 전 정규화 필요
 
-### ① Raw count를 비교할 수 없는 이유 {#w4-s3-3-1}
+### ① 깊이, 유전자 길이, 조성 {#w4-s3-3-1}
 
 Count에 영향을 주는, 생물학과 무관한 세 가지 요인:
 
@@ -321,7 +349,7 @@ Count에 영향을 주는, 생물학과 무관한 세 가지 요인:
 → 이런 경우 척도의 기준을 고정할 spike-in control(ERCC) 필요
 :::
 
-### ③ 어떤 측정값을 언제 쓰나 {#w4-s3-3-3}
+### ③ 발현 단위 {#w4-s3-3-3}
 
 -   **Raw count** → DESeq2 / edgeR 입력값. 미리 정규화 x
 -   **TPM** → 발현량 보고, heatmap
@@ -350,7 +378,7 @@ Count에 영향을 주는, 생물학과 무관한 세 가지 요인:
 | **TMM / RLE** | 깊이 + **조성** | 시료 간 | **Differential expression의 표준** |
 :::
 
-## 4) 탐색적 자료 분석(EDA): 검정 전에 시료부터 보기 {#w4-s3-4}
+## 4) 탐색적 자료 분석(EDA) {#w4-s3-4}
 
 -   유전자 하나하나를 검정하기 전에 **시료 전체**를 먼저 봄
 -   확인할 것: 반복끼리 비슷한가? 두 집단이 갈리나? 혼자 튀는 시료(outlier)가 있나? batch가 보이나?
@@ -402,7 +430,7 @@ dist(t(assay(vsd)))                                  # 시료 사이 거리 → 
 
 > 🔑 **핵심** — 유전자마다 "집단 사이 차이가 잡음보다 큰가?"를 검정. DESeq2 = count에 맞춘 회귀모형(negative binomial GLM) + 유전자 사이에서 정보 빌리기. 그래도 충분한 생물학적 반복을 대신하지는 못함
 
-## 1) DEG란 {#w4-s4-1}
+## 1) DEG {#w4-s4-1}
 
 -   **DEG**(differentially expressed gene) = 조건(예: case vs control) 사이에서 발현이 유의하게 달라진 유전자
 -   어려움 — 관찰한 발현에는 생물학적 신호, 기술적 잡음, 개인 간 차이가 섞여 있음
@@ -410,7 +438,7 @@ dist(t(assay(vsd)))                                  # 시료 사이 거리 → 
 
 ![평균 차이는 같음. 집단 안 퍼짐이 작은 gene X는 DEG, 퍼짐이 큰 gene Y는 우연과 구분할 수 없음](/assets/img/w4/deg_signal_noise.png){fig-align="center"}
 
-## 2) 회귀분석으로 보기 {#w4-s4-2}
+## 2) 회귀분석 {#w4-s4-2}
 
 ### ① 선형 회귀 {#w4-s4-2-1}
 
@@ -588,7 +616,7 @@ res <- results(dds, contrast = c("condition", "case", "control"))
 -   Batch와 condition이 완전히 겹침 → design matrix의 두 열이 같아짐 → 둘을 분리할 수 없음 (🔗 [§2.5](#w4-s2-5))
 :::
 
-## 5) 결과표 읽기 {#w4-s4-5}
+## 5) 결과표와 시각화 {#w4-s4-5}
 
 ![같은 결과를 보는 두 가지 방법. 대부분의 논문은 첫 번째만 보여줌. 두 기준선은 관례일 뿐이고, hit가 낮은 count에 몰려 있는지는 MA plot에서 드러남](/assets/img/w4/volcano_ma.png){fig-align="center"}
 
@@ -750,7 +778,7 @@ res <- results(dds, contrast = c("condition", "case", "control"))
 
 -   RNA-seq = RNA를 cDNA로 바꿔 read를 유전자별로 셈. 측정값 = 한순간, 혼합된 세포 안에 존재하는 정상상태 RNA 양. 합성 속도 x, 단백질 x, 개별 세포 x
 -   Poly(A) selection이 기본. FFPE, non-coding RNA, 신생 전사 → rRNA depletion
--   QC: mapping rate, rRNA 비율, gene-body coverage → 같은 실험의 다른 시료와 비교
+-   QC는 단계별로: raw read(FastQC) → alignment(mapping rate, rRNA 비율, gene-body coverage) → count matrix. 같은 실험의 다른 시료와 비교
 -   Pseudo-alignment = 정량에 빠르고 정확. Read 위치가 중요하면 spliced alignment
 -   Raw count는 깊이, 유전자 길이, **조성**의 영향 → 조성까지 보정하는 TMM·RLE가 DE의 표준
 -   ⚠️ **정규화된 값을 DESeq2 또는 edgeR에 절대 입력 x**

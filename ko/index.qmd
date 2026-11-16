@@ -99,13 +99,12 @@ editor: visual
 
 > **RNA-seq 결과 유전자 847개. 그중 무엇이 실제로 의미 있나?**
 
-1.  RNA-seq가 측정하는 것 📏 — 합성량이 아닌 존재량, 단백질도 아님
-2.  실험 선택 ⚙️ — poly(A)와 rRNA depletion, strandedness, 반복 수, 설계 체크리스트
-3.  리드에서 카운트까지 🔢 — spliced alignment와 pseudo-alignment, 유전자와 전사체 수준
-4.  정규화 ⚖️ — library size, gene length, composition effect, CPM/TPM/TMM/RLE
-5.  차등발현 📊 — 음이항 모형, shrinkage, 표본 수, volcano·MA plot
-6.  유전자 목록 해석하기 🧠 — ORA와 GSEA, 가장 흔한 세 가지 오용
-7.  차등발현 너머 🌐 — WGCNA, deconvolution, splicing, eQTL
+1.  RNA-seq이란 🧬 — 원리, 합성량이 아닌 존재량, 단백질도 아님, 한순간의 snapshot
+2.  Sequencing 전 고려할 점 ⚙️ — poly(A)와 rRNA depletion, strandedness, read 길이와 long read, 반복 수, 연구 설계
+3.  Pre-processing 🔢 — 파이프라인, 단계별 QC, alignment와 정량, 정규화, EDA(VST·PCA·batch effect)
+4.  분석: 차등 발현 검정 📊 — 회귀분석, DESeq2의 음이항 GLM, shrinkage, design matrix, volcano·MA plot
+5.  Downstream analysis 🧠 — ORA와 GSEA, 가장 흔한 세 가지 오용
+6.  차등 발현 너머 🌐 — WGCNA, deconvolution, splicing, eQTL
 
 ⚠️ **함정** — Bulk 차등발현은 흔히 세포 조성 차이를 반영
 
@@ -118,12 +117,12 @@ editor: visual
 > **모든 세포가 조금씩 변했나, 아니면 세포의 5%가 크게 변했나?**
 
 1.  왜 단일세포인가 🔬 — 평균이 지워버리는 것과 bulk가 여전히 더 나은 경우
-2.  장비에 넣기 전에 내리는 결정 🧫 — droplet·plate·combinatorial, 3′/5′, cell과 nucleus, 해리 편향, 기증자 단위 설계
-3.  액적에서 count matrix까지 🧮 — barcode, UMI, zero, cell calling, ambient RNA, doublet, 품질관리, PCA
-4.  세포 유형 찾기 🗺️ — 이웃 graph, clustering resolution, UMAP, annotation
-5.  배치 효과와 통합 🔗 — Harmony/scVI와 과도한 보정
-6.  통계 검정 📊 — 세포 단위 검정이 잘못된 이유, pseudobulk, differential abundance
-7.  동역학·기전 추론·공간·아틀라스 🌈 — trajectory, regulon, 세포 간 소통, spatial, HCA, 결과별 근거의 강도
+2.  Sequencing 전 고려할 점 🧫 — cell과 nucleus, 해리 편향, 기증자 단위 설계
+3.  Sequencing 기술 🧪 — droplet·plate·combinatorial, barcode와 UMI, 3′/5′, sparsity
+4.  Pre-processing 🧮 — 파이프라인, 단계별 QC(cell calling, ambient RNA, doublet), PCA, integration, clustering, UMAP, annotation
+5.  통계 검정 📊 — pseudoreplication, pseudobulk, differential abundance
+6.  Downstream analysis 🌈 — trajectory, regulon, 세포 간 소통, 참조 atlas, 결과별 근거의 강도
+7.  기타 🧩 — 공간전사체학, snATAC-seq, multiome
 
 ⚠️ **함정** — 조건 간 세포 단위 검정은 무효. n = 세포 수가 아니라 공여자 수
 
@@ -135,13 +134,12 @@ editor: visual
 
 > **mRNA와 단백질의 상관은 약 r = 0.4. 그렇다면 RNA-seq가 알려준 것은?**
 
-1.  왜 단백질을 측정하는가 💪 — 단백질 변이의 나머지 80%는 어디에서 오는가
-2.  질량분석 기초 ⚗️ — bottom-up 워크플로, MS2 spectrum, DDA·DIA·targeted 분석
-3.  동정과 정량 🏷️ — target–decoy FDR, protein inference, LFQ/TMT/SILAC
-4.  결측값 문제 🕳️ — MNAR와 MAR, 단순 대치가 위험한 이유
-5.  통계 분석 📊 — 단백체 분석이 통계적으로 RNA-seq와 다른 점
-6.  친화성 기반·집단 단백체학 🩸 — dynamic range, Olink/SomaScan, pQTL
-7.  최전선과 함정 🚧 — PTM, AlphaFold, 오염과 분석 전 변이
+1.  단백질을 측정해야 하는 이유 💪 — 단백질 변이의 나머지 80%는 어디에서 오는가
+2.  측정 기술 ⚗️ — bottom-up MS, MS2 spectrum, DDA·DIA·targeted, LFQ/TMT/SILAC, Olink/SomaScan, 시료 처리
+3.  Pre-processing 🔢 — pipeline, 단계별 QC, target–decoy FDR, protein inference, 정규화, 결측값
+4.  통계 분석 📊 — limma와 MSstats, batch와 설계
+5.  Downstream analysis 🧠 — enrichment background, phosphorylation과 신호전달, pQTL과 약물 표적
+6.  존재량을 넘어서 🔭 — AlphaFold, 단일세포·공간 단백체학
 
 ⚠️ **함정** — 단백질 자체를 직접 관찰하는 것이 아님. 단순 결측치 대치 → 위양성
 
@@ -154,16 +152,14 @@ editor: visual
 > **원인? 결과? 아니면 인공물(artifact)?**
 
 1.  인간 마이크로바이옴 🦠 — 신체 부위, 개인 간 차이, 근거의 단계
-2.  연구 설계와 검체 처리 🧊 — 추출 편향, 교란, kit-ome
-3.  군집을 시퀀싱하는 두 방법 🧬 — 16S amplicon과 shotgun, OTU와 ASV
-4.  참조 데이터베이스와 한계 📚 — SILVA, GTDB, microbial dark matter
-5.  다양성 🌿 — alpha, beta, rarefaction, PCoA, PERMANOVA
-6.  조성 데이터의 통계 ⚠️ — CLR, 차등풍부도 분석법들이 서로 다른 답을 내는 이유
-7.  연관성에서 인과성으로 🔀 — 인공물, 교란, 역인과, 인과
-8.  세균과 DNA 너머 🔭 — virome, metatranscriptomics, metabolomics
-9.  🎓 **모든 오믹스 논문을 비판적으로 읽기** — 강의 전체를 마무리하는 체크리스트
+2.  Sequencing 기술과 연구 설계 🧬 — 16S amplicon과 shotgun, 추출 편향, 교란, kit-ome
+3.  Pre-processing 🔢 — pipeline, 단계별 QC, OTU와 ASV, 참조 데이터베이스, 오염 제거, rarefaction
+4.  통계 분석 📊 — alpha·beta 다양성, PERMANOVA, 조성 데이터, CLR, 차등풍부도 분석법들이 서로 다른 답을 내는 이유
+5.  Downstream analysis 🧠 — 기능 profiling, 연관성에서 인과성으로
+6.  세균과 DNA 너머 🔭 — virome, metatranscriptomics, metabolomics
+7.  🎓 **모든 오믹스 논문을 비판적으로 읽기** — 강의 전체를 마무리하는 체크리스트
 
-⚠️ **함정** — 시퀀싱은 비율을 측정. 같은 데이터에서도 DA 분석법마다 다른 결과
+⚠️ **함정** — sequencing은 비율을 측정. 같은 데이터에서도 DA 분석법마다 다른 결과
 
 ➡️ [W7 읽기](chapters/w7_metagenomics.qmd)
 :::
@@ -211,7 +207,7 @@ editor: visual
 ::: {.callout-important collapse="true"}
 ## 강의의 도착점
 
--   마지막은 모든 오믹스 논문을 비판적으로 읽기 위한 [**W7 §9 체크리스트**](chapters/w7_metagenomics.qmd#w7-s9)
+-   마지막은 모든 오믹스 논문을 비판적으로 읽기 위한 [**W7 §7 체크리스트**](chapters/w7_metagenomics.qmd#w7-s7)
 -   연구 설계, 측정, 분석, 해석 점검 → 각 질문을 자세히 다룬 장으로 돌아갈 수 있음
 
 → 자신의 연구 분야 논문 한 편에 이 목록을 적용할 수 있다면 강의의 목적 달성

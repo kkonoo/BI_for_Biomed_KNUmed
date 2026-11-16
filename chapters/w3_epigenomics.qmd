@@ -570,7 +570,7 @@ Not hypothetical. Disease, infection, medication, age, and smoking all shift blo
 -   ✅ Reference-free methods (RefFreeEWAS, ReFACTor, SVA) for tissues without reference panels — at the cost of possibly removing real signal too
 -   ✅ **State exactly what you did.** "We adjusted for cell composition" with no detail is not enough
 
-🔗 This continues the confounding thread from [W1 §4.3](w1_intro.qmd#w1-s4-3), which runs across chapters. It returns in [W4 §6.2](w4_transcriptomics.qmd#w4-s6-2) as bulk tissue deconvolution, and in [W5 §6.3](w5_singlecell.qmd#w5-s6-3) as differential abundance
+🔗 This continues the confounding thread from [W1 §4.3](w1_intro.qmd#w1-s4-3), which runs across chapters. It returns in [W4 §6.2](w4_transcriptomics.qmd#w4-s6-2) as bulk tissue deconvolution, and in [W5 §5.3](w5_singlecell.qmd#w5-s5-3) as differential abundance
 :::
 
 ## 4) Epigenetic clocks ⏳ {#w3-s5-4}

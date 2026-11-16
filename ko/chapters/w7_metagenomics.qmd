@@ -369,7 +369,7 @@ Rarefaction (모든 시료를 같은 깊이로 subsampling)
 
 -   전체 read 수 = 시료 속 세균 수가 아니라 구매한 sequencing 양으로 고정
 -   한 taxon 증가 → 산술적으로 **다른 모든 taxon의 비율 감소** → 실제 생물학적 변화가 전혀 없어도
--   🔗 같은 문제를 세 번째로 만남: RNA-seq 조성 효과([W4 §3.3②](w4_transcriptomics.qmd#w4-s3-3-2)), 단일세포 differential abundance([W5 §6.3](w5_singlecell.qmd#w5-s6-3)), 그리고 여기
+-   🔗 같은 문제를 세 번째로 만남: RNA-seq 조성 효과([W4 §3.3②](w4_transcriptomics.qmd#w4-s3-3-2)), 단일세포 differential abundance([W5 §5.3](w5_singlecell.qmd#w5-s5-3)), 그리고 여기
 -   ⚠️ Microbiome 자료 = 변화가 크고 taxon 수가 적어 가장 극단적인 사례
 
 ::: {.callout-tip collapse="true"}
@@ -558,7 +558,7 @@ Rarefaction (모든 시료를 같은 깊이로 subsampling)
 
 **연구 설계**
 
--   정확히 무엇을 비교? **반복의 단위**는? ([W1 §5.3](w1_intro.qmd#w1-s5-3), [W5 §6.2](w5_singlecell.qmd#w5-s6-2))
+-   정확히 무엇을 비교? **반복의 단위**는? ([W1 §5.3](w1_intro.qmd#w1-s5-3), [W5 §5.2](w5_singlecell.qmd#w5-s5-2))
 -   생물학적 반복은 몇 개? 충분해 보이나? ([W4 §4.3④](w4_transcriptomics.qmd#w4-s4-3-4))
 -   **Batch와 조건이 교락**되어 있나? 무작위화 설명은? ([W1 §4.3](w1_intro.qmd#w1-s4-3))
 -   어떤 공변량을 수집? 명백한데 수집하지 **않은** 변수는? ([W3 §5.3](w3_epigenomics.qmd#w3-s5-3), [W7 §2.5](#w7-s2-5))
@@ -567,14 +567,14 @@ Rarefaction (모든 시료를 같은 깊이로 subsampling)
 
 -   이 assay가 실제로 측정하는 것은? **볼 수 없는** 것은? ([W2 §1.1](w2_genomics.qmd#w2-s1-1), [W6 §1](w6_proteomics.qmd#w6-s1))
 -   어떤 참조, 어떤 annotation, **어떤 version**? ([W1 §2.3](w1_intro.qmd#w1-s2-3), [W7 §3.3](#w7-s3-3))
--   QC 수치는? 제시되어 있나? ([W3 §3.2①](w3_epigenomics.qmd#w3-s3-2-1), [W5 §3.3](w5_singlecell.qmd#w5-s3-3), [W7 §3.1](#w7-s3-1))
+-   QC 수치는? 제시되어 있나? ([W3 §3.2①](w3_epigenomics.qmd#w3-s3-2-1), [W5 §4.1](w5_singlecell.qmd#w5-s4-1), [W7 §3.1](#w7-s3-1))
 
 **분석**
 
 -   정규화 방법은? 그 방법의 **가정이 성립**하나? ([W4 §3.3](w4_transcriptomics.qmd#w4-s3-3), [W7 §4.3](#w7-s4-3))
 -   다중검정 보정 방법과 threshold는? ([W1 §4.2](w1_intro.qmd#w1-s4-2))
 -   합리적인 **다른 도구**로도 같은 답이 나오나? ([W4 §4.3](w4_transcriptomics.qmd#w4-s4-3), [W7 §4.5](#w7-s4-5))
--   결측값·0 처리 방법은? ([W5 §3.2](w5_singlecell.qmd#w5-s3-2), [W6 §3.6](w6_proteomics.qmd#w6-s3-6))
+-   결측값·0 처리 방법은? ([W5 §3.4](w5_singlecell.qmd#w5-s3-4), [W6 §3.6](w6_proteomics.qmd#w6-s3-6))
 
 **해석**
 

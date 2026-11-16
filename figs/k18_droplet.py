@@ -26,7 +26,7 @@ for i, n in enumerate(seq):
 a.text(3.6 + 6 * 0.62, 3.55, "2 cells", ha="center", va="center", fontsize=8.3, color=CRIMSON, fontweight="semibold")
 a.text(3.6 + 2 * 0.62, 2.45, "1 cell", ha="center", va="center", fontsize=8.3, color=TEXT)
 a.text(3.6, 2.45, "empty", ha="center", va="center", fontsize=8.3, color=TEXT2)
-a.text(3.3, 1.4, "Cells are loaded dilute, so that two cells rarely share a droplet.\nThe price: most droplets hold a bead and no cell —\nthey still get a barcode and still produce reads (§3.3).",
+a.text(3.3, 1.4, "Cells are loaded dilute, so that two cells rarely share a droplet.\nThe price: most droplets hold a bead and no cell —\nthey still get a barcode and still produce reads (§4.1②).",
        ha="left", va="center", fontsize=8.6, color=TEXT2, linespacing=1.3)
 
 # (b) Poisson loading

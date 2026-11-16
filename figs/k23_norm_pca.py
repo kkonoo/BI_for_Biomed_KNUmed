@@ -66,7 +66,7 @@ d.axvline(0, color=LINE, lw=0.8); d.set_xlabel("PC1 loading", color=TEXT2, fonts
 deco(d, "④ A PC = a gene program", "genes that move together")
 d.text(0, -0.2, f"{ismk.sum()} of 10 are marker genes\nof one cell type (red)", transform=d.transAxes, fontsize=8,
        color=TEXT2, va="top", linespacing=1.2)
-fig.text(0.06, -0.21, "Graph, clustering and UMAP all run on 10–50 PCs.  Tests go back to the raw counts (§6).",
+fig.text(0.06, -0.21, "Graph, clustering and UMAP all run on 10–50 PCs.  Tests go back to the raw counts (§5).",
          fontsize=8.8, color=TEXT)
 header(axes[0], "Single-cell RNA-seq · normalisation and PCA", "From 20,000 noisy genes to a few dozen stable axes",
        dy=40, x1=5.6)

@@ -137,11 +137,12 @@ By the end of this chapter you should be able to:
 
 # 3. Sequencing Technology 🧪 {#w5-s3}
 
-> 🔑 **Core idea** — trap one cell in one droplet and tag all of its RNA with the same barcode → every read tells you which cell and which molecule it came from. The price: only part of each cell's RNA is captured
+> 🔑 **Core idea** — trap one cell in one droplet (or microwell) and tag all of its RNA with the same barcode → every read tells you which cell and which molecule it came from. The price: only part of each cell's RNA is captured
 
 ## 1) Platforms {#w5-s3-1}
 
 -   The current default = **droplet-based (10x Genomics)**: each cell is sealed in an oil droplet with one barcoded bead
+-   Another option = **microwell-based (BD Rhapsody)**: cells settle by gravity into hundreds of thousands of tiny wells, and each well gets one barcoded bead. No microfluidics, so cells are handled gently
 -   Thousands to tens of thousands of cells per run — but only part of each cell's genes is detected
 -   Every platform trades **number of cells vs. depth per cell**
 
@@ -155,6 +156,7 @@ By the end of this chapter you should be able to:
 | Platform | How it works | Cells | Depth | When |
 |-------------------|-------------------|-----------|-------------------|-------------------|
 | **Droplet (10x Genomics)** | one cell + one barcoded bead in an oil droplet | 10³–10⁵ | a few thousand genes/cell, 3′ or 5′ end only | the current default |
+| **Microwell (BD Rhapsody)** | cells settle by gravity into hundreds of thousands of microwells; one barcoded bead per well | 10³–10⁵ | a few thousand genes/cell, 3′ end (whole transcriptome) or a targeted panel (hundreds of genes, deeper) | gentle handling without microfluidics; when a targeted panel is enough |
 | **Plate (Smart-seq2/3)** | one cell per well | 10² | full-length, deep | isoforms, very sensitive detection |
 | **Combinatorial indexing (sci-, SPLiT-seq)** | no physical isolation; barcode combinations built by rounds of split-pool | 10⁶ | very shallow | whole-organism atlases |
 :::
@@ -235,7 +237,7 @@ Four things QC removes:
 
 ### ① Sequencing reads and alignment {#w5-s4-1-1}
 
--   Cell Ranger (or STARsolo) aligns reads to the transcriptome and counts them by barcode and UMI → start with its summary report (web summary)
+-   Cell Ranger (or STARsolo; for BD Rhapsody data, the BD Rhapsody Sequence Analysis Pipeline) aligns reads to the transcriptome and counts them by barcode and UMI → start with its summary report (web summary)
 -   **Valid barcodes**, **reads mapped to the transcriptome**, **fraction of reads in cells**, **sequencing saturation** (how often the same molecule has already been read), **median genes per cell**
 -   ⚠️ One sample lower than the rest → suspect that sample's dissociation or loading first
 
@@ -789,6 +791,7 @@ CellPhoneDB, CellChat, NicheNet score ligand–receptor pairs co-expressed betwe
 |-------------------------|------------------------------------------------|
 | scRNA-seq / snRNA-seq | Reading RNA per cell / per nucleus |
 | Droplet | Oil droplet that seals one cell with one barcoded bead |
+| Microwell | Tiny well that a cell settles into by gravity, with one barcoded bead per well (BD Rhapsody) |
 | Cell barcode | Sequence identifying which cell a read came from |
 | UMI | Tag marking one original mRNA molecule |
 | Count matrix | Table of molecule counts per cell × gene |
@@ -844,6 +847,7 @@ Luecken MD, Theis FJ. [*Current best practices in single-cell RNA-seq analysis: 
 ### Technology, QC, artifacts
 
 Svensson V, Vento-Tormo R, Teichmann SA. [*Exponential scaling of single-cell RNA-seq in the past decade.*](https://pubmed.ncbi.nlm.nih.gov/?term=Exponential+scaling+of+single-cell+RNA-seq+in+the+past+decade) Nat Protoc. 2018.\
+Fan HC, Fu GK, Fodor SPA. [*Combinatorial labeling of single cells for gene expression cytometry.*](https://doi.org/10.1126/science.1258367) Science. 2015. **← the microwell method behind BD Rhapsody**\
 van den Brink SC, et al. [*Single-cell sequencing reveals dissociation-induced gene expression in tissue subpopulations.*](https://doi.org/10.1038/nmeth.4437) Nat Methods. 2017. **← read before designing a dissociation protocol**\
 Denisenko E, et al. [*Systematic assessment of tissue dissociation and storage biases in single-cell and single-nucleus RNA-seq workflows.*](https://doi.org/10.1186/s13059-020-02048-6) Genome Biol. 2020.\
 Lun ATL, et al. [*EmptyDrops: distinguishing cells from empty droplets in droplet-based single-cell RNA sequencing data.*](https://doi.org/10.1186/s13059-019-1662-y) Genome Biol. 2019.\

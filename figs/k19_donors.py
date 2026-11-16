@@ -22,7 +22,7 @@ for lab, k, n, col, y in designs:
     for i in range(k): person(0.3 + i * 0.22, y, tint(0.6), s=0.8)
     for i in range(k): person(0.5 + (k + i) * 0.22, y, GREYF, s=0.8)
     ax.text(4.55, y, n, ha="right", va="center", fontsize=13, fontweight="bold", color=col)
-ax.text(0.1, 0.1, "red = patients, grey = controls.  More cells per donor\nadd resolution, not power (§6)", ha="left",
+ax.text(0.1, 0.1, "red = patients, grey = controls.  More cells per donor\nadd resolution, not power (§5)", ha="left",
         va="center", fontsize=8.5, color=TEXT2, linespacing=1.25)
 ax.plot([4.85, 4.85], [-0.3, 3.7], color="#E3E6EB", lw=0.9)
 

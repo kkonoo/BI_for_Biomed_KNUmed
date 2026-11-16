@@ -27,7 +27,7 @@ ax.annotate("", (8.4, 2.5), (6.6, 2.5), arrowprops=dict(arrowstyle="-|>", color=
 ax.text(7.5, 2.68, "TNF signalling", ha="center", va="bottom", fontsize=8.8, color=CRIMSON, fontweight="semibold")
 ax.text(7.5, 2.3, "p < 0.001", ha="center", va="top", fontsize=8.8, color=CRIMSON, fontweight="semibold")
 # three gaps
-gaps = [("① Never adjacent?", "dissociation threw away\nall spatial information", "→ spatial data (§7.3)"),
+gaps = [("① Never adjacent?", "dissociation threw away\nall spatial information", "→ spatial data (§7.1)"),
         ("② Protein never made?", "mRNA is not protein: secretion,\ncleavage and trafficking are unseen", "→ proteomics (W6)"),
         ("③ Database not neutral", "well-studied pairs are\nover-represented", "→ rediscovers the literature")]
 for i, (h, d, fix) in enumerate(gaps):

@@ -118,7 +118,7 @@ editor: visual
 
 1.  왜 단일세포인가 🔬 — 평균이 지워버리는 것과 bulk가 여전히 더 나은 경우
 2.  Sequencing 전 고려할 점 🧫 — cell과 nucleus, 해리 편향, 기증자 단위 설계
-3.  Sequencing 기술 🧪 — droplet·plate·combinatorial, barcode와 UMI, 3′/5′, sparsity
+3.  Sequencing 기술 🧪 — droplet·microwell·plate·combinatorial, barcode와 UMI, 3′/5′, sparsity
 4.  Pre-processing 🧮 — 파이프라인, 단계별 QC(cell calling, ambient RNA, doublet), PCA, integration, clustering, UMAP, annotation
 5.  통계 검정 📊 — pseudoreplication, pseudobulk, differential abundance
 6.  Downstream analysis 🌈 — trajectory, regulon, 세포 간 소통, 참조 atlas, 결과별 근거의 강도

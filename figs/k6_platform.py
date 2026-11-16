@@ -5,7 +5,7 @@ fig, ax = plt.subplots(figsize=(9.8, 5.0))
 DARK = "#5E6670"
 pts = [("Bulk RNA-seq", 1, 3e7, DARK, "one averaged 'cell',\nvery deep", "above"),
        ("Plate\n(Smart-seq2/3)", 400, 3.2e6, tint(0.55), "full-length, isoforms;\nlabour-intensive", "diag"),
-       ("Droplet\n(10x Genomics)", 50000, 26000, CRIMSON, "3′ or 5′ end only;\nthe current default", "diag"),
+       ("Droplet (10x Genomics)\nMicrowell (BD Rhapsody)", 50000, 26000, CRIMSON, "3′ or 5′ end only;\nthe usual choice today", "diag"),
        ("Combinatorial\nindexing (sci-)", 1_000_000, 1300, tint(0.35), "whole-organism atlases;\nvery shallow",
         "diag")]
 x = np.logspace(1.9, 6.75, 80)

@@ -137,11 +137,12 @@ execute:
 
 # 3. Sequencing 기술 🧪 {#w5-s3}
 
-> 🔑 **핵심** — 세포 하나를 droplet 하나에 가두고, 그 세포에서 나온 모든 RNA에 같은 barcode를 붙임 → read마다 어느 세포, 어느 분자에서 왔는지 앎. 대신 세포당 RNA의 일부만 잡힘
+> 🔑 **핵심** — 세포 하나를 droplet(또는 microwell) 하나에 가두고, 그 세포에서 나온 모든 RNA에 같은 barcode를 붙임 → read마다 어느 세포, 어느 분자에서 왔는지 앎. 대신 세포당 RNA의 일부만 잡힘
 
 ## 1) Platform {#w5-s3-1}
 
 -   현재 기본 = **droplet 방식(10x Genomics)**: 세포 하나를 barcode bead 하나와 함께 기름방울에 가둠
+-   또 다른 선택 = **microwell 방식(BD Rhapsody)**: 수십만 개의 작은 well에 세포를 중력으로 가라앉힌 뒤, well마다 barcode bead를 하나씩 채움. Microfluidics가 없어 세포를 부드럽게 다룸
 -   한 번에 세포 수천~수만 개. 대신 세포당 유전자의 일부만 검출
 -   모든 platform = **세포 수 vs 세포당 깊이**의 맞교환
 
@@ -155,6 +156,7 @@ execute:
 | Platform | 원리 | 세포 수 | 깊이 | 언제 |
 |-------------------|-------------------|-----------|-------------------|-------------------|
 | **Droplet (10x Genomics)** | 세포 하나 + barcode bead 하나를 기름방울에 | 10³–10⁵ | 세포당 유전자 수천 개, 3′ 또는 5′ 말단만 | 현재의 기본 선택 |
+| **Microwell (BD Rhapsody)** | 수십만 개의 미세 well에 세포가 중력으로 가라앉고, well마다 barcode bead 하나 | 10³–10⁵ | 세포당 유전자 수천 개, 3′ 말단(전사체 전체) 또는 표적 panel(수백 유전자, 더 깊음) | microfluidics 없이 부드럽게 다룰 때, 표적 panel로 충분할 때 |
 | **Plate (Smart-seq2/3)** | well 하나에 세포 하나 | 10² | full-length, 깊음 | isoform, 매우 민감한 검출 |
 | **Combinatorial indexing (sci-, SPLiT-seq)** | 물리적 분리 없이 split-pool을 반복해 barcode 조합 | 10⁶ | 매우 얕음 | 전 개체 atlas |
 :::
@@ -235,7 +237,7 @@ QC로 걸러내는 네 가지:
 
 ### ① Sequencing read와 alignment {#w5-s4-1-1}
 
--   Cell Ranger(또는 STARsolo) → read를 transcriptome에 정렬하고 barcode·UMI별로 셈 → 결과 요약(web summary)부터 확인
+-   Cell Ranger(또는 STARsolo; BD Rhapsody 데이터는 BD Rhapsody Sequence Analysis Pipeline) → read를 transcriptome에 정렬하고 barcode·UMI별로 셈 → 결과 요약(web summary)부터 확인
 -   **Valid barcode 비율**, **transcriptome에 정렬된 read 비율**, **세포 안에 든 read 비율**, **sequencing saturation**(같은 분자를 이미 얼마나 반복해 읽었나), **세포당 유전자 수 중앙값**
 -   ⚠️ 한 시료만 낮으면 → 그 시료의 해리·loading 문제부터 의심
 
@@ -789,6 +791,7 @@ CellPhoneDB, CellChat, NicheNet = cluster 쌍 사이에서 함께 발현되는 l
 |-------------------------|------------------------------------------------|
 | scRNA-seq / snRNA-seq | 세포 / 핵 단위로 RNA를 읽는 방법 |
 | Droplet | 세포 하나와 barcode bead 하나를 가두는 기름방울 |
+| Microwell | 세포가 중력으로 가라앉는 아주 작은 well, well마다 barcode bead 하나 (BD Rhapsody) |
 | Cell barcode | Read가 어느 세포에서 왔는지 식별하는 서열 |
 | UMI | 원래 mRNA 분자 하나를 표시하는 tag |
 | Count matrix | 세포 × 유전자별 분자 수 표 |
@@ -844,6 +847,7 @@ Luecken MD, Theis FJ. [*Current best practices in single-cell RNA-seq analysis: 
 ### 기술, QC, artifact
 
 Svensson V, Vento-Tormo R, Teichmann SA. [*Exponential scaling of single-cell RNA-seq in the past decade.*](https://pubmed.ncbi.nlm.nih.gov/?term=Exponential+scaling+of+single-cell+RNA-seq+in+the+past+decade) Nat Protoc. 2018.\
+Fan HC, Fu GK, Fodor SPA. [*Combinatorial labeling of single cells for gene expression cytometry.*](https://doi.org/10.1126/science.1258367) Science. 2015. **← BD Rhapsody의 바탕이 된 microwell 방식**\
 van den Brink SC, et al. [*Single-cell sequencing reveals dissociation-induced gene expression in tissue subpopulations.*](https://doi.org/10.1038/nmeth.4437) Nat Methods. 2017. **← 해리 protocol을 설계하기 전에 읽을 논문**\
 Denisenko E, et al. [*Systematic assessment of tissue dissociation and storage biases in single-cell and single-nucleus RNA-seq workflows.*](https://doi.org/10.1186/s13059-020-02048-6) Genome Biol. 2020.\
 Lun ATL, et al. [*EmptyDrops: distinguishing cells from empty droplets in droplet-based single-cell RNA sequencing data.*](https://doi.org/10.1186/s13059-019-1662-y) Genome Biol. 2019.\

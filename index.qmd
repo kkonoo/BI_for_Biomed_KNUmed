@@ -118,7 +118,7 @@ editor: visual
 
 1.  Why Single Cell 🔬 — what averaging destroys, and when bulk is still better
 2.  Before You Sequence 🧫 — cells vs nuclei; dissociation bias; donor-level design
-3.  Sequencing Technology 🧪 — droplet vs plate vs combinatorial; barcodes and UMIs; 3′ vs 5′; sparsity
+3.  Sequencing Technology 🧪 — droplet vs microwell vs plate vs combinatorial; barcodes and UMIs; 3′ vs 5′; sparsity
 4.  Pre-processing 🧮 — the pipeline, QC by step (cell calling, ambient RNA, doublets), PCA, integration, clustering, UMAP, annotation
 5.  Statistical Testing 📊 — pseudoreplication; pseudobulk; differential abundance
 6.  Downstream Analysis 🌈 — trajectories, regulons, cell–cell communication, reference atlases, strength of evidence

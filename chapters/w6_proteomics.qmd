@@ -15,11 +15,12 @@ By the end of this chapter you should be able to:
 
 -   Explain why mRNA is not a proxy for protein
 -   Describe the bottom-up MS workflow — measure peptides, infer proteins
--   Tell DDA, DIA and targeted acquisition apart
--   ⚠️ Explain the protein inference problem and what a "protein group" means
--   Distinguish LFQ, TMT and SILAC
--   ⚠️ Explain why proteomics data has missing values, and why naive imputation is dangerous
+-   Tell DDA, DIA and targeted acquisition apart, and LFQ, TMT and SILAC
 -   Say when to use mass spectrometry and when to use an affinity platform
+-   Follow the pipeline from spectra to a protein matrix, and spot a problem run from its QC metrics
+-   ⚠️ Explain the protein inference problem and what a "protein group" means
+-   ⚠️ Explain why proteomics data has missing values, and why naive imputation is dangerous
+-   Explain how differential abundance is tested (`limma`, MSstats), and why enrichment needs the detected proteome as its background
 :::
 
 > 🤔 **Motivating question**\
@@ -81,11 +82,15 @@ Whenever a conclusion is *about protein* — a drug target, a biomarker, a signa
 
 ------------------------------------------------------------------------
 
-# 2. Mass Spectrometry Basics ⚗️ {#w6-s2}
+# 2. Techniques: Mass Spectrometry and Affinity Assays ⚗️ {#w6-s2}
 
-> 🔑 **Core idea** — MS does not measure whole proteins. It cuts them into peptides, weighs the peptides and their fragments, and **infers** the proteins
+> 🔑 **Core idea** — MS does not measure whole proteins. It cuts them into peptides, weighs the peptides and their fragments, and **infers** the proteins. Affinity assays instead count **binding** to a reagent. Each choice decides what you can see — and which artifact you inherit
 
-## 1) The bottom-up workflow {#w6-s2-1}
+-   **Mass spectrometry** — how it works (①–②), which peptides it picks (③), how samples are compared (④)
+-   **Affinity assays** — when the sample is plasma and the cohort is a biobank (⑤)
+-   **Sample handling** — what goes wrong before any instrument runs (⑥)
+
+## 1) Bottom-up mass spectrometry {#w6-s2-1}
 
 ![The instrument records peptide and fragment masses; the protein is a conclusion drawn by software.](/assets/img/w6/bottomup_msms.png){fig-align="center"}
 
@@ -112,10 +117,10 @@ Every step from ④ onwards is **inference**
 
 -   You observe peptide fragment masses
 -   The protein identity is a **conclusion drawn from them**
--   → [§3.2](#w6-s3-2) explains why that conclusion is sometimes ambiguous
+-   → [§3.3](#w6-s3-3) explains why that conclusion is sometimes ambiguous
 :::
 
-## 2) Reading an MS2 spectrum {#w6-s2-2}
+## 2) The MS2 spectrum {#w6-s2-2}
 
 -   Fragmentation breaks the peptide backbone at different positions → a **ladder** of fragments
 -   **Mass difference between neighbouring rungs = one amino acid** → this is how the sequence is read
@@ -131,13 +136,13 @@ Every step from ④ onwards is **inference**
 -   💡 In practice a search engine does not read sequences *de novo* → it generates theoretical spectra for every peptide in a database and scores the match
 :::
 
-## 3) Acquisition strategies {#w6-s2-3}
+## 3) Acquisition: DDA, DIA and targeted {#w6-s2-3}
 
 ![Top: how the instrument decides what to fragment. Bottom: the missing values this leaves across runs (simulated).](/assets/img/w6/dda_vs_dia.png){fig-align="center"}
 
 Three rules for **which peptides to fragment**:
 
--   **DDA** — only the most intense at each moment → the picks differ run to run → many missing values ([§4](#w6-s4))
+-   **DDA** — only the most intense at each moment → the picks differ run to run → many missing values ([§3.6](#w6-s3-6))
 -   **DIA** — everything, window by window → far fewer missing values. Now the default for large cohorts
 -   **Targeted (PRM/MRM)** — a predefined list only → for validating a specific panel
 
@@ -160,7 +165,7 @@ Three rules for **which peptides to fragment**:
 **DDA's weakness — the selection is stochastic:**
 
 -   A low-abundance peptide picked in run 1 may be skipped in run 2, simply because something else was momentarily more intense
--   → across 100 clinical samples, a matrix full of holes ([§4](#w6-s4))
+-   → across 100 clinical samples, a matrix full of holes ([§3.6](#w6-s3-6))
 
 **DIA's fix** — fragment everything. Cost: far more complex spectra
 
@@ -168,58 +173,14 @@ Three rules for **which peptides to fragment**:
 -   → what made DIA practical, and now the default for large cohort studies
 :::
 
-------------------------------------------------------------------------
-
-# 3. Identification and Quantification 🏷️ {#w6-s3}
-
-> 🔑 **Core idea** — an identification is a statistical match with an estimated error rate (FDR), and one peptide can fit several proteins. Quantification methods differ in **when samples are combined** — each with its own artifact
-
-## 1) Target–decoy FDR {#w6-s3-1}
-
--   **The question** — how do you know a peptide–spectrum match is real?
--   **The trick** — also search the spectra against a **decoy** database of reversed or shuffled sequences → any decoy match is false by definition → the decoy hit rate estimates the false discovery rate (FDR)
--   Convention: **1% FDR**
--   ⚠️ 1% FDR at the *peptide* level ≠ 1% FDR at the *protein* level
-
-![Simulated data](/assets/img/w6/target_decoy.png){fig-align="center"}
-
-::: {.callout-note collapse="true" icon=false}
-## 🔍 Going further — why protein-level error is larger
-
--   The FDR among target hits is estimated from the rate of decoy hits **above a score threshold**
--   Protein-level error **accumulates**
--   ⚠️ Single-peptide identifications are the least reliable
-:::
-
-## 2) ⚠️ The protein inference problem {#w6-s3-2}
-
-![Peptides do not map cleanly onto proteins.](/assets/img/w6/protein_inference.png){fig-align="center"}
-
--   Many peptides are **shared** between related proteins — paralogues, isoforms, family members
--   Detect only a shared peptide → several proteins are equally consistent with the data
--   Software reports a **protein group** — a set of indistinguishable proteins under one representative name
--   ✅ For any protein you care about → check how many **unique** (protein-specific) peptides support it
-
-::: {.callout-warning collapse="true"}
-## Shared peptides and protein groups
-
-⚠️ The group's representative accession is often the only name that reaches your results table, your figure, and your abstract
-
-**What to check on any protein of interest:**
-
--   How many **unique** peptides support it? One is weak; two is a common minimum
--   Is it reported as part of a group? If so, which members?
--   Would the biological story change if a different group member were the real one?
-:::
-
-## 3) Quantification strategies {#w6-s3-3}
+## 4) Quantification: LFQ, TMT and SILAC {#w6-s2-4}
 
 ![Top: when the samples are combined determines how much technical variation they share. Bottom: the artifact specific to TMT.](/assets/img/w6/quantification.png){fig-align="center"}
 
 Three ways to compare protein amounts between samples — they differ in **when samples are combined**:
 
 -   **LFQ** (label-free) — separate runs, intensities compared → applicable to anything, including tissue and plasma
--   **TMT** — isobaric chemical tags → up to 18 samples in one run. ⚠️ Ratios pulled toward 1, and batches must be randomised
+-   **TMT** — isobaric chemical tags → up to 18 samples in one run. ⚠️ Ratios pulled toward 1, and batches must be randomised ([§4.3](#w6-s4-3))
 -   **SILAC** — heavy amino acids fed to cells → cultured cells only
 
 ::: {.callout-note collapse="true" icon=false}
@@ -249,35 +210,184 @@ Three ways to compare protein amounts between samples — they differ in **when 
 **The fix** — SPS-MS3 acquisition largely corrects it, at the cost of speed and sensitivity
 :::
 
-::: {.callout-note collapse="true" icon=false}
-## 🔍 Going further — TMT batch structure
+## 5) Affinity assays: Olink and SomaScan {#w6-s2-5}
 
--   An 18-plex TMT experiment analysing 90 samples requires **5 batches**
--   ⚠️ Cases and controls unevenly distributed across batches → 🔗 [W1 §4.3](w1_intro.qmd#w1-s4-3)'s confounding problem, reproduced exactly
+### ① The dynamic range problem {#w6-s2-5-1}
 
-→ Randomise, and include a **common reference channel** in every batch so batches can be aligned
+![Plasma spans more than ten orders of magnitude. No single method covers it.](/assets/img/w6/dynamic_range.png){fig-align="center"}
 
-![Simulated: 2,000 proteins with batch effects and no true difference](/assets/img/w6/tmt_batches.png){fig-align="center"}
+-   Plasma — the most clinically desirable sample, and the hardest to analyse
+-   The top 20 proteins ≈ **99%** of the protein mass (albumin alone ≈ half)
+-   The biomarkers you want (cytokines, tissue leakage proteins, tumour-derived proteins) sit **ten orders of magnitude below**
+-   → Unfractionated MS covers perhaps five to six orders → hence depletion of abundant proteins, fractionation or enrichment — all of which add variability and cost
+
+### ② Affinity platforms {#w6-s2-5-2}
+
+Two technologies dominate large-cohort plasma proteomics — **neither uses mass spectrometry**:
+
+-   **Olink (PEA)** — a pair of antibodies; signal only when **both** bind → high specificity
+-   **SomaScan** — modified DNA aptamers (SOMAmers) bind the targets
+-   ✅ Thousands of proteins (up to \~11,000), down to pg/mL, from a few µL, at biobank scale. ❌ Predefined panel only
+-   ⚠️ What is measured = **binding** to a reagent, not the peptide sequence
+
+![](/assets/img/w6/affinity.png){fig-align="center"}
+
+::: {.callout-warning collapse="true"}
+## Affinity assays measure binding, not identity
+
+An Olink or SomaScan readout is a **binding signal** → binding can be affected by things other than concentration:
+
+-   **Cross-reactivity** — the reagent binds something else
+-   **Epitope-altering variants** — a missense variant in the epitope reduces binding → appears as reduced protein level
+    -   ⚠️ In pQTL studies this produces spurious *cis*-signals. A known confounder requiring explicit checking ([§5.3](#w6-s5-3))
+-   **Platform disagreement** — Olink and SomaScan measurements of the same protein correlate only moderately for many targets. Which one is "right" is often unresolved
 :::
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 Going further — how Olink and SomaScan read out
+
+-   **Olink (PEA)** — a pair of antibodies binds the target; when both bind, attached DNA oligos hybridise, are amplified, and read out by sequencing or qPCR. Requiring **two** binding events gives high specificity
+-   **SomaScan** — modified DNA aptamers (SOMAmers) bind targets; abundance read from aptamer quantity on an array
+:::
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 Going further — mass spectrometry vs. affinity
+
+|   | Mass spectrometry | Affinity (Olink / SomaScan) |
+|------------------------|------------------------|------------------------|
+| Targets | Unbiased — whatever is there | Predefined panel only |
+| Proteins measured | \~3,000 (plasma, with effort) | Thousands, up to \~11,000 |
+| Sensitivity | Limited by dynamic range | Reaches pg/mL |
+| Sample volume | µL–mL | A few µL |
+| Throughput | Moderate | Very high — biobank scale |
+| What is measured | Peptide sequence | **Binding** to a reagent |
+| Isoforms and PTMs | Detectable | Generally not distinguished |
+:::
+
+## 6) ⚠️ Sample handling {#w6-s2-6}
+
+Many proteomics errors start at the bench, not in the software:
+
+-   **Keratin contamination** — skin and hair keratins are the classic proteomics contaminant. Keratins in your top hits → the problem is at the bench (QC: [§3.1](#w6-s3-1))
+-   **Dynamic range** — failing to deplete or fractionate plasma means **you measured albumin** ([①](#w6-s2-5-1))
+-   **Storage and freeze–thaw** — plasma proteomes are sensitive to pre-analytical handling: collection tube, time to freezing, freeze–thaw cycles. ⚠️ In biobank studies, collection protocols that differed between groups → a **systematic confounder**
+-   **Digestion** — incomplete tryptic digestion varies between samples → a real source of quantitative noise (QC: missed cleavages, [§3.1](#w6-s3-1))
+
+![](/assets/img/w6/pitfalls.png){fig-align="center"}
 
 ------------------------------------------------------------------------
 
-# 4. The Missing Value Problem 🕳️ {#w6-s4}
+# 3. Pre-processing: From Spectra to a Protein Matrix 🔢 {#w6-s3}
 
-> 🔑 **Core idea** — a gap in a proteomics table usually means "too little to detect". Filling the gaps carelessly inflates fold changes and manufactures false positives
+> 🔑 **Core idea** — match spectra to peptides with a known error rate → group peptides into proteins → one value per protein per sample → a normalised matrix. Check QC at every step, and decide what to do with the gaps
 
-![Left: missingness depends on abundance. Right: what happens when you ignore that and fill the blanks (simulated).](/assets/img/w6/missing_values.png){fig-align="center"}
+![The proteomics workflow. Search spectra against a protein database, control the error rate, group peptides into proteins and quantify them (pre-processing) → ① QC → ② statistical test.](/assets/img/w6/proteomics_pipeline.png){fig-align="center"}
+
+-   The search software (MaxQuant, FragPipe, DIA-NN, Spectronaut) runs steps 2–5 in one go → its output is a **protein × sample intensity matrix**
+-   ⚠️ Every matrix carries the decisions made along the way: the FDR threshold ([②](#w6-s3-2)), how shared peptides were assigned ([③](#w6-s3-3)), how peptides were summarised ([④](#w6-s3-4)), how samples were normalised ([⑤](#w6-s3-5)) and how gaps were handled ([⑥](#w6-s3-6))
+
+## 1) QC {#w6-s3-1}
+
+Check each step with its own metrics:
+
+-   **LC–MS run** — total ion current (TIC) and retention time: did the chromatography and the instrument behave the same in every run? Mass error: is the instrument still calibrated?
+-   **Identification** — PSMs (peptide–spectrum matches), peptides and proteins per run → a run far below the rest is a problem run. **Missed cleavages** — the share of peptides where trypsin skipped a K/R → digestion efficiency
+-   **Contaminants** — keratins, trypsin itself; blood proteins in a tissue sample. High in one sample → a handling problem, not biology
+-   **Quantification** — % missing per sample; the CV of a **pooled QC sample** (a mix of all samples, injected again and again through the batch) → technical noise must sit well below the biological spread
+-   **Sample overview** — intensity distributions, sample correlation, PCA (🔗 [W4 §3.4](w4_transcriptomics.qmd#w4-s3-4)) → outliers, batches, run-order drift
+
+![(a) One run identified half as many proteins as the others → find the cause before using it. (b) One sample with a lot of keratin → a handling problem, not biology. (c) A pooled QC sample injected again and again shows the technical noise; it should sit well below the variation between replicates (illustrative numbers).](/assets/img/w6/prot_qc.png){fig-align="center"}
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 Going further — the QC metrics in detail
+
+| Step | Metric | What it shows | Warning sign |
+|------------------|------------------|------------------|------------------|
+| **LC–MS run** | TIC, retention time | Whether chromatography was stable | One run's trace shifted or much lower |
+| **LC–MS run** | Mass error (ppm) | Instrument calibration | Drifts away from 0 over the batch |
+| **Identification** | PSMs / peptides / proteins per run | Whether the run and search worked | Clearly fewer than other runs |
+| **Identification** | Missed cleavages | Whether digestion was complete | Higher than other samples |
+| **Contaminants** | Keratin, trypsin share | Sample handling | High in one sample |
+| **Quantification** | % missing per sample | Depth of detection | Much higher than the others |
+| **Quantification** | CV of a pooled QC sample | Technical reproducibility | Close to the CV between replicates |
+| **Sample overview** | Correlation, PCA | Outliers, batch effects | Samples cluster by run date or TMT set |
+
+-   **Comparison with the other runs in the same experiment** matters more than any absolute cut-off
+-   Tools: the search software's own report (MaxQuant, DIA-NN), PTXQC for MaxQuant output
+:::
+
+## 2) Target–decoy FDR {#w6-s3-2}
+
+-   **The question** — how do you know a peptide–spectrum match is real?
+-   **The trick** — also search the spectra against a **decoy** database of reversed or shuffled sequences → any decoy match is false by definition → the decoy hit rate estimates the false discovery rate (FDR)
+-   Convention: **1% FDR**
+-   ⚠️ 1% FDR at the *peptide* level ≠ 1% FDR at the *protein* level
+
+![Simulated data](/assets/img/w6/target_decoy.png){fig-align="center"}
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 Going further — why protein-level error is larger
+
+-   The FDR among target hits is estimated from the rate of decoy hits **above a score threshold**
+-   Protein-level error **accumulates**
+-   ⚠️ Single-peptide identifications are the least reliable
+:::
+
+## 3) ⚠️ Protein inference {#w6-s3-3}
+
+![Peptides do not map cleanly onto proteins.](/assets/img/w6/protein_inference.png){fig-align="center"}
+
+-   Many peptides are **shared** between related proteins — paralogues, isoforms, family members
+-   Detect only a shared peptide → several proteins are equally consistent with the data
+-   Software reports a **protein group** — a set of indistinguishable proteins under one representative name
+-   ✅ For any protein you care about → check how many **unique** (protein-specific) peptides support it
+
+::: {.callout-warning collapse="true"}
+## Shared peptides and protein groups
+
+⚠️ The group's representative accession is often the only name that reaches your results table, your figure, and your abstract
+
+**What to check on any protein of interest:**
+
+-   How many **unique** peptides support it? One is weak; two is a common minimum
+-   Is it reported as part of a group? If so, which members?
+-   Would the biological story change if a different group member were the real one?
+:::
+
+## 4) Protein quantification {#w6-s3-4}
+
+-   One protein is seen through several peptides → their intensities must be summarised into **one value per sample**
+-   Peptides ionise very differently → within one protein, raw heights can differ a hundred-fold → summarise the **pattern across samples**, not the raw sum
+-   Common methods — **MaxLFQ** (label-free; built from peptide ratios between samples), **Tukey median polish** (MSstats). TMT: reporter-ion intensities per peptide, summed per protein
+-   ✅ Use peptides unique to the protein group — shared ones mix the signal of several proteins ([③](#w6-s3-3))
+
+![(a) Five peptides of one protein. They sit at different heights because peptides ionise differently, but they rise together in the treated samples; peptide 5 is too faint to see in two controls. (b) Median polish removes the peptide effect and leaves one value per sample — including the samples where a peptide is missing (simulated).](/assets/img/w6/peptide_to_protein.png){fig-align="center"}
+
+## 5) Normalization {#w6-s3-5}
+
+-   Raw intensities are extremely skewed → **log₂-transform**: the distribution becomes roughly symmetric, and a doubling is +1 anywhere on the scale
+-   Samples differ in how much material was loaded → every protein in a sample shifts together → **median centring** of log intensities lines the samples up (quantile normalisation is the stronger alternative)
+-   Intensities are **continuous, not counts** → the negative binomial machinery of RNA-seq (🔗 [W4 §4.3](w4_transcriptomics.qmd#w4-s4-3)) does not apply
+-   ⚠️ The same assumption as TMM and RLE — **most proteins do not change**. One dominant protein, or very different sample types, distorts everything (🔗 [W4 §3.3②](w4_transcriptomics.qmd#w4-s3-3-2))
+-   TMT — normalise within each set, then align sets through a common reference channel ([§4.3](#w6-s4-3))
+
+![(a) Raw intensities: a few abundant proteins stretch the axis and squash the rest near zero. (b) On the log₂ scale the distribution is roughly symmetric. (c) Samples loaded with different amounts shift as a whole; median centring lines them up (simulated).](/assets/img/w6/prot_norm.png){fig-align="center"}
+
+## 6) Missing values {#w6-s3-6}
 
 -   A proteomics matrix commonly has **20–50% missing entries** — shocking to RNA-seq analysts, normal to proteomics analysts
 -   **The difference** — sequencing counts a zero; MS simply fails to record anything
+-   💡 Usually a gap means "too little to detect" → filling the gaps carelessly inflates fold changes and manufactures false positives
 
-## 1) Two kinds of missing {#w6-s4-1}
+![Left: missingness depends on abundance. Right: what happens when you ignore that and fill the blanks (simulated).](/assets/img/w6/missing_values.png){fig-align="center"}
+
+### ① Two kinds of missing {#w6-s3-6-1}
 
 -   **MNAR** (missing not at random) — the protein was below the limit of detection → the gap itself is **informative**: the abundance was low
 -   **MAR / MCAR** (missing at random) — missed by chance: DDA happened not to select it, or the peptide had a poor retention time that run → uninformative
 -   ⚠️ Real data = a mixture, and the proportion depends heavily on abundance — exactly what the left panel shows
 
-## 2) ⚠️ Why imputation is dangerous {#w6-s4-2}
+### ② ⚠️ Imputation {#w6-s3-6-2}
 
 -   **Imputation** = filling in missing values with estimated numbers
 -   ⚠️ Fill them with a small constant → every protein near the detection limit gets an **inflated fold change**: a small real change looks large, and some proteins with no change at all become "highly significant" hits = **false positives**
@@ -307,32 +417,40 @@ Three ways to compare protein amounts between samples — they differ in **when 
 
 ------------------------------------------------------------------------
 
-# 5. Statistical Analysis 📊 {#w6-s5}
+# 4. Statistical Analysis: Differential Abundance 📊 {#w6-s4}
 
-> 🔑 **Core idea** — the same logic as RNA-seq differential expression, adapted to continuous intensities, fewer proteins and small n
+> 🔑 **Core idea** — the same logic as RNA-seq differential expression (🔗 [W4 §4](w4_transcriptomics.qmd#w4-s4)), on continuous log intensities, with fewer proteins and small n → a linear model per protein, with variance borrowed across proteins
 
-Much of 🔗 [W4 §4](w4_transcriptomics.qmd#w4-s4) transfers. Three differences worth knowing:
+## 1) Differences from RNA-seq {#w6-s4-1}
 
--   **① Normalisation** — intensities are continuous, not counts → median or quantile normalisation on log intensities is standard
+-   **① Continuous intensities** — log₂ intensities are roughly normal → a linear model (t-test family), not the negative binomial ([§3.5](#w6-s3-5))
 -   **② Fewer features** — typically **3,000–9,000 proteins**, not 20,000 genes → FDR correction still essential, but the burden is lighter
 -   **③ Small n, high variability** → `limma` (moderated t-statistic) and **MSstats** are the standard tools
 
-![Simulated data](/assets/img/w6/prot_stats.png){fig-align="center"}
-
 ::: {.callout-note collapse="true" icon=false}
-## 🔍 Going further — the three differences in detail
-
-**① Normalisation**
-
--   Continuous intensities → the negative binomial machinery does not apply
--   ⚠️ Same composition caveat holds — one dominant protein distorts everything (🔗 [W4 §3.3②](w4_transcriptomics.qmd#w4-s3-3-2))
-
-**③ Small n, high variability**
+## 🔍 Going further — small n, high variability
 
 -   Proteomics experiments are usually smaller than RNA-seq experiments, and technical variability is larger
--   `limma`'s **moderated t-statistic** — the same borrowing-across-features idea as DESeq2's dispersion shrinkage (🔗 [W4 §4.3④](w4_transcriptomics.qmd#w4-s4-3-4))
--   **MSstats** models the peptide-to-protein structure explicitly
+-   → a protein's variance from 3 vs. 3 samples is a noisy guess. By chance some look tiny, and tiny variances make huge t-statistics
 :::
+
+## 2) limma and MSstats {#w6-s4-2}
+
+-   **`limma`** — fits a linear model to each protein's log intensities, then shrinks each protein's variance toward the typical value across all proteins = the **moderated t-statistic**
+-   The same borrowing-across-features idea as DESeq2's dispersion shrinkage (🔗 [W4 §4.3④](w4_transcriptomics.qmd#w4-s4-3-4))
+-   ✅ Variances that look tiny by chance are pulled up → fewer spurious hits and more real ones
+-   **MSstats** — starts from **peptide-level** intensities: summarises them ([§3.4](#w6-s3-4)) and models the peptide-to-protein structure explicitly
+
+![(a) With 3 vs. 3 samples, each protein's own SD scatters widely around the truth; limma pulls the extremes toward the typical value. (b) What that buys at 5% FDR (simulated).](/assets/img/w6/prot_stats.png){fig-align="center"}
+
+## 3) Batches and design {#w6-s4-3}
+
+-   An 18-plex TMT experiment analysing 90 samples requires **5 sets** (batches); a DIA cohort runs over weeks → drift with run order
+-   ⚠️ Cases and controls unevenly distributed across batches → 🔗 [W1 §4.3](w1_intro.qmd#w1-s4-3)'s confounding problem, reproduced exactly
+-   ✅ **Before** the experiment — randomise samples across sets and run order; include a **common reference channel** in every TMT set and a pooled QC sample through the run
+-   ✅ **In the model** — put batch in the design (`~ batch + group`), as in RNA-seq (🔗 [W4 §4.4](w4_transcriptomics.qmd#w4-s4-4))
+
+![Simulated: 2,000 proteins with batch effects and no true difference](/assets/img/w6/tmt_batches.png){fig-align="center"}
 
 ::: {.callout-tip collapse="true"}
 ## What to look for when reading a proteomics paper
@@ -346,63 +464,37 @@ Much of 🔗 [W4 §4](w4_transcriptomics.qmd#w4-s4) transfers. Three differences
 
 ------------------------------------------------------------------------
 
-# 6. Affinity-Based and Population Proteomics 🩸 {#w6-s6}
+# 5. Downstream Analysis: From a Protein List to Biology 🧠 {#w6-s5}
 
-> 🔑 **Core idea** — plasma is the sample clinicians want, but its proteins span more than ten orders of magnitude. Affinity platforms reach deep and scale to biobanks — but they measure **binding**, not identity
+> 🔑 **Core idea** — a list of changed proteins → pathways, signalling and drug targets. Each step has a proteomics-specific trap: the background, the protein under a phosphosite, the epitope under a pQTL
 
-## 1) The dynamic range problem {#w6-s6-1}
+## 1) Enrichment analysis and its background {#w6-s5-1}
 
-![Plasma spans more than ten orders of magnitude. No single method covers it.](/assets/img/w6/dynamic_range.png){fig-align="center"}
+-   The same tools as RNA-seq — ORA and GSEA (🔗 [W4 §5](w4_transcriptomics.qmd#w4-s5))
+-   ⚠️ MS sees **abundant proteins first** — ribosomes, metabolism, the proteasome. Receptors and transcription factors are rarely detected
+-   → against the whole genome, *any* list of detected proteins looks "enriched" for ribosomes and glycolysis
+-   ✅ **Background = all proteins quantified in this experiment**, not the genome
+-   💡 Proteins in one complex often change together → complex-level (CORUM) and interaction-network (STRING) views suit proteomics well
 
--   Plasma — the most clinically desirable sample, and the hardest to analyse
--   The top 20 proteins ≈ **99%** of the protein mass (albumin alone ≈ half)
--   The biomarkers you want (cytokines, tissue leakage proteins, tumour-derived proteins) sit **ten orders of magnitude below**
--   → Unfractionated MS covers perhaps five to six orders → hence depletion of abundant proteins, fractionation or enrichment — all of which add variability and cost
+![(a) The share of each gene set that MS detects. (b) A list of 300 proteins picked at random from the detected ones — no biology in it — looks enriched for ribosomes and glycolysis against the whole genome, and shows nothing against the detected proteins (simulated).](/assets/img/w6/prot_background.png){fig-align="center"}
 
-## 2) Affinity platforms {#w6-s6-2}
+## 2) Phosphorylation and signalling {#w6-s5-2}
 
-Two technologies dominate large-cohort plasma proteomics — **neither uses mass spectrometry**:
+-   **Phosphoproteomics** — the main clinical example. Signalling is regulated by phosphorylation, and total protein abundance says nothing about it
+-   Phosphopeptides are a small fraction of the total → the workflow adds an **enrichment step** (TiO₂, IMAC) before MS
+-   ⚠️ A phosphopeptide can rise simply because the protein rose → interpreting phosphorylation as *signalling* requires knowing the protein level too
+-   💡 Which kinases were active? → test whether the known substrates of each kinase moved together (kinase activity inference)
 
--   **Olink (PEA)** — a pair of antibodies; signal only when **both** bind → high specificity
--   **SomaScan** — modified DNA aptamers (SOMAmers) bind the targets
--   ✅ Thousands of proteins (up to \~11,000), down to pg/mL, from a few µL, at biobank scale. ❌ Predefined panel only
--   ⚠️ What is measured = **binding** to a reagent, not the peptide sequence
-
-![](/assets/img/w6/affinity.png){fig-align="center"}
-
-::: {.callout-warning collapse="true"}
-## Affinity assays measure binding, not identity
-
-An Olink or SomaScan readout is a **binding signal** → binding can be affected by things other than concentration:
-
--   **Cross-reactivity** — the reagent binds something else
--   **Epitope-altering variants** — a missense variant in the epitope reduces binding → appears as reduced protein level
-    -   ⚠️ In pQTL studies this produces spurious *cis*-signals. A known confounder requiring explicit checking
--   **Platform disagreement** — Olink and SomaScan measurements of the same protein correlate only moderately for many targets. Which one is "right" is often unresolved
-:::
+![](/assets/img/w6/phospho.png){fig-align="center"}
 
 ::: {.callout-note collapse="true" icon=false}
-## 🔍 Going further — how Olink and SomaScan read out
+## 🔍 Going further — which site? (site localisation)
 
--   **Olink (PEA)** — a pair of antibodies binds the target; when both bind, attached DNA oligos hybridise, are amplified, and read out by sequencing or qPCR. Requiring **two** binding events gives high specificity
--   **SomaScan** — modified DNA aptamers (SOMAmers) bind targets; abundance read from aptamer quantity on an array
+-   ⚠️ A peptide may contain several possible sites, and the spectrum may not distinguish them
+-   Search engines report a localisation probability → treat sites below \~0.75 as uncertain
 :::
 
-::: {.callout-note collapse="true" icon=false}
-## 🔍 Going further — mass spectrometry vs. affinity
-
-|   | Mass spectrometry | Affinity (Olink / SomaScan) |
-|------------------------|------------------------|------------------------|
-| Targets | Unbiased — whatever is there | Predefined panel only |
-| Proteins measured | \~3,000 (plasma, with effort) | Thousands, up to \~11,000 |
-| Sensitivity | Limited by dynamic range | Reaches pg/mL |
-| Sample volume | µL–mL | A few µL |
-| Throughput | Moderate | Very high — biobank scale |
-| What is measured | Peptide sequence | **Binding** to a reagent |
-| Isoforms and PTMs | Detectable | Generally not distinguished |
-:::
-
-## 3) 💊 Proteogenomics and pQTLs {#w6-s6-3}
+## 3) 💊 pQTLs and drug targets {#w6-s5-3}
 
 ![Oh et al., Nature Medicine, 2025](images/clipboard-3472860519.png){fig-align="center"}
 
@@ -430,32 +522,17 @@ a genetically validated, druggable target (🔗 W2 §6.3)
 
 ⚠️ Distinguish:
 
--   ***cis*****-pQTL** — variant near the protein's own gene. Strong evidence, **but check for epitope effects**
+-   ***cis*****-pQTL** — variant near the protein's own gene. Strong evidence, **but check for epitope effects** ([§2.5②](#w6-s2-5-2))
 -   ***trans*****-pQTL** — variant elsewhere. Biologically interesting (a regulator, a clearance mechanism), harder to interpret
 :::
 
 ------------------------------------------------------------------------
 
-# 7. Frontiers and Pitfalls 🚧 {#w6-s7}
+# 6. Beyond Abundance 🔭 {#w6-s6}
 
-> 🔑 **Core idea** — abundance is not the whole story (modifications, structure), and many proteomics errors start at the bench, not in the software
+> 🔑 **Core idea** — a bulk abundance table leaves out shape, single cells and place in the tissue. Each has its own technology — and its own limits
 
-## 1) Post-translational modifications {#w6-s7-1}
-
--   **Phosphoproteomics** — the main clinical example. Signalling is regulated by phosphorylation, and total protein abundance says nothing about it
--   Phosphopeptides are a small fraction of the total → the workflow adds an **enrichment step** (TiO₂, IMAC)
--   ⚠️ A phosphopeptide can rise simply because the protein rose → interpreting phosphorylation as *signalling* requires knowing the protein level too
-
-![](/assets/img/w6/phospho.png){fig-align="center"}
-
-::: {.callout-note collapse="true" icon=false}
-## 🔍 Going further — which site? (site localisation)
-
--   ⚠️ A peptide may contain several possible sites, and the spectrum may not distinguish them
--   Search engines report a localisation probability → treat sites below \~0.75 as uncertain
-:::
-
-## 2) Structure in the AlphaFold era {#w6-s7-2}
+## 1) Structure in the AlphaFold era {#w6-s6-1}
 
 -   Accurate structure prediction has changed what a protein list can support — variant effect interpretation, docking, cross-linking MS interpretation
 -   ⚠️ A prediction is a **model** — not evidence of a conformation *in vivo*
@@ -469,19 +546,12 @@ a genetically validated, druggable target (🔗 W2 §6.3)
 -   Disordered regions are predicted poorly
 :::
 
-## 3) ⚠️ Common pitfalls {#w6-s7-3}
+## 2) Single-cell and spatial proteomics {#w6-s6-2}
 
--   **Keratin contamination** — skin and hair keratins are the classic proteomics contaminant. Keratins in your top hits → the problem is at the bench
--   **Dynamic range** — failing to deplete or fractionate plasma means **you measured albumin**
--   **Storage and freeze–thaw** — plasma proteomes are sensitive to pre-analytical handling: collection tube, time to freezing, freeze–thaw cycles. ⚠️ In biobank studies, collection protocols that differed between groups → a **systematic confounder**
-
-![](/assets/img/w6/pitfalls.png){fig-align="center"}
-
-::: {.callout-note collapse="true" icon=false}
-## 🔍 Going further — digestion efficiency
-
--   Incomplete tryptic digestion varies between samples → a real source of quantitative noise
-:::
+-   **Single-cell MS** (SCoPE2, plexDIA) — hundreds to a few thousand proteins per cell. Far fewer cells per run than single-cell RNA-seq (🔗 [W5](w5_singlecell.qmd))
+-   **Antibody-based, per cell** — flow and mass cytometry (CyTOF): tens of proteins in millions of cells. CITE-seq: DNA-barcoded antibodies read alongside RNA
+-   **Spatial** — imaging mass cytometry and CODEX: 40+ proteins on a tissue section at cellular resolution. MALDI imaging MS: untargeted, coarser resolution
+-   ⚠️ Antibody-based methods = a **predefined panel** that measures **binding** — the same caveat as affinity assays ([§2.5](#w6-s2-5))
 
 ------------------------------------------------------------------------
 
@@ -490,12 +560,13 @@ a genetically validated, druggable target (🔗 W2 §6.3)
 -   Across genes, mRNA explains roughly a fifth of protein abundance → **if the claim is about protein, measure protein**
 -   Bottom-up MS measures **peptides** and infers proteins; the MS2 fragment ladder encodes the sequence
 -   DDA picks the most intense peptides → misses things stochastically. DIA fragments everything → far less missingness. Targeted MS is for validation
--   ⚠️ **Protein inference is genuinely ambiguous** → check unique peptide counts and whether your protein is a group
 -   LFQ, TMT and SILAC differ in *when* samples are combined. ⚠️ TMT compresses ratios, and its batches must be randomised
+-   Plasma spans \>10 orders of magnitude; the top 20 proteins are \~99% of the mass. ⚠️ Affinity platforms (Olink, SomaScan) measure **binding** → cross-reactivity and epitope-altering variants matter
+-   Pre-processing = database search → target–decoy FDR → protein groups → protein values → log₂ and normalisation. Check QC **step by step**, against the other runs
+-   ⚠️ **Protein inference is genuinely ambiguous** → check unique peptide counts and whether your protein is a group
 -   ⚠️ Missing values are mostly MNAR → filter before you impute, and check that hits survive without imputation
--   Statistics = RNA-seq logic, adapted to continuous intensities and small n → `limma`, MSstats
--   Plasma spans \>10 orders of magnitude; the top 20 proteins are \~99% of the mass
--   ⚠️ Affinity platforms (Olink, SomaScan) measure **binding** → cross-reactivity and epitope-altering variants matter
+-   Statistics = RNA-seq logic, adapted to continuous intensities and small n → `limma`, MSstats. Put batch in the design
+-   ⚠️ Enrichment against the whole genome favours abundant housekeeping proteins → use the **detected proteome** as background
 -   pQTLs complete the chain from GWAS hit to genetically validated drug target
 
 ------------------------------------------------------------------------
@@ -507,6 +578,7 @@ a genetically validated, druggable target (🔗 W2 §6.3)
 | Bottom-up proteomics | Digest to peptides, then measure |
 | Tryptic peptide | Fragment produced by cutting after K/R |
 | MS1 / MS2 | Precursor survey scan / fragment scan |
+| PSM | Peptide–spectrum match: one spectrum matched to one peptide |
 | Protein inference | Deciding which proteins the peptides came from |
 | Protein group | Indistinguishable proteins reported together |
 | DDA / DIA | Data-dependent / data-independent acquisition |
@@ -514,6 +586,7 @@ a genetically validated, druggable target (🔗 W2 §6.3)
 | LFQ | Label-free quantification |
 | TMT / iTRAQ | Isobaric chemical labels, multiplexed in one run |
 | SILAC | Metabolic labelling with heavy amino acids |
+| Pooled QC sample | A mix of all samples, run repeatedly to measure technical noise |
 | MNAR / MAR | Missing because low abundance / missing by chance |
 | Dynamic range | Span between most and least abundant protein |
 | pQTL | Variant associated with a protein's level |
@@ -526,6 +599,8 @@ a genetically validated, druggable target (🔗 W2 §6.3)
 |-------------------------|------------------------------------------------|
 | b ion / y ion | N-terminal / C-terminal fragment series |
 | Target–decoy | FDR estimation using a reversed database |
+| Missed cleavage | A K/R site that trypsin failed to cut |
+| MaxLFQ | Label-free protein values built from peptide ratios between samples |
 | Ratio compression | Co-isolation pulling TMT ratios toward 1 |
 | PEA | Olink's dual-antibody DNA readout |
 :::
@@ -544,10 +619,12 @@ Liu Y, Beyer A, Aebersold R. [*On the dependency of cellular protein levels on m
 
 Ludwig C, et al. [*Data-independent acquisition-based SWATH-MS for quantitative proteomics: a tutorial.*](https://pubmed.ncbi.nlm.nih.gov/?term=Data-independent+acquisition-based+SWATH-MS+for+quantitative+proteomics%3A+a+tutorial) Mol Syst Biol. 2018.\
 Demichev V, et al. [*DIA-NN: neural networks and interference correction enable deep proteome coverage in high throughput.*](https://doi.org/10.1038/s41592-019-0638-x) Nat Methods. 2020.\
-Ting L, et al. [*MS3 eliminates ratio distortion in isobaric multiplexed quantitative proteomics.*](https://pubmed.ncbi.nlm.nih.gov/?term=MS3+eliminates+ratio+distortion+in+isobaric+multiplexed+quantitative+proteomics) Nat Methods. 2011.
+Ting L, et al. [*MS3 eliminates ratio distortion in isobaric multiplexed quantitative proteomics.*](https://pubmed.ncbi.nlm.nih.gov/?term=MS3+eliminates+ratio+distortion+in+isobaric+multiplexed+quantitative+proteomics) Nat Methods. 2011.\
+Cox J, et al. [*Accurate proteome-wide label-free quantification by delayed normalization and maximal peptide ratio extraction, termed MaxLFQ.*](https://pubmed.ncbi.nlm.nih.gov/?term=Accurate+proteome-wide+label-free+quantification+by+delayed+normalization+and+maximal+peptide+ratio+extraction%2C+termed+MaxLFQ) Mol Cell Proteomics. 2014.
 
-### Statistics and missing values
+### QC, statistics and missing values
 
+Bielow C, Mastrobuoni G, Kempa S. [*Proteomics quality control: quality control software for MaxQuant results.*](https://pubmed.ncbi.nlm.nih.gov/?term=Proteomics+quality+control%3A+quality+control+software+for+MaxQuant+results) J Proteome Res. 2016. (PTXQC)\
 Choi M, et al. [*MSstats: an R package for statistical analysis of quantitative mass spectrometry-based proteomic experiments.*](https://doi.org/10.1093/bioinformatics/btu305) Bioinformatics. 2014.\
 Lazar C, et al. [*Accounting for the multiple natures of missing values in label-free quantitative proteomics data sets.*](https://pubmed.ncbi.nlm.nih.gov/?term=Accounting+for+the+multiple+natures+of+missing+values+in+label-free+quantitative+proteomics+data+sets) J Proteome Res. 2016.\
 Nesvizhskii AI, Aebersold R. [*Interpretation of shotgun proteomic data: the protein inference problem.*](https://pubmed.ncbi.nlm.nih.gov/?term=Interpretation+of+shotgun+proteomic+data%3A+the+protein+inference+problem) Mol Cell Proteomics. 2005.
@@ -557,6 +634,10 @@ Nesvizhskii AI, Aebersold R. [*Interpretation of shotgun proteomic data: the pro
 Geyer PE, et al. [*Revisiting biomarker discovery by plasma proteomics.*](https://pubmed.ncbi.nlm.nih.gov/?term=Revisiting+biomarker+discovery+by+plasma+proteomics) Mol Syst Biol. 2017.\
 Sun BB, et al. [*Plasma proteomic associations with genetics and health in the UK Biobank.*](https://doi.org/10.1038/s41586-023-06592-6) Nature. 2023.\
 Katz DH, et al. [*Proteomic profiling platforms head to head: comparison of Olink and SomaScan.*](https://pubmed.ncbi.nlm.nih.gov/?term=Proteomic+profiling+platforms+head+to+head%3A+comparison+of+Olink+and+SomaScan) Cell Rep Med. 2022.
+
+### Single-cell proteomics
+
+Specht H, et al. [*Single-cell proteomic and transcriptomic analysis of macrophage heterogeneity using SCoPE2.*](https://pubmed.ncbi.nlm.nih.gov/?term=Single-cell+proteomic+and+transcriptomic+analysis+of+macrophage+heterogeneity+using+SCoPE2) Genome Biol. 2021.
 
 ### Resources
 

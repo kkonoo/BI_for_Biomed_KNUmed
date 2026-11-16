@@ -13,11 +13,13 @@ execute:
 
 By the end of this chapter you should be able to:
 
--   Explain why confounders and contamination dominate microbiome study design
 -   Choose between 16S amplicon and shotgun sequencing for a given question
+-   Explain why confounders and contamination dominate microbiome study design
+-   Follow reads from FASTQ to a feature table, and say what each QC metric checks
 -   Tell alpha from beta diversity, and read a PCoA with PERMANOVA
 -   ⚠️ Explain why compositional data (proportions) breaks standard statistics, and what CLR does about it
 -   ⚠️ Explain why differential abundance methods disagree, and how to report honestly
+-   Explain why what a community can do is more stable than who is in it
 -   Judge whether a microbiome–disease association is cause, consequence, or artifact
 -   Read any omics paper critically — the closing skill of the course
 :::
@@ -76,11 +78,59 @@ By the end of this chapter you should be able to:
 
 ------------------------------------------------------------------------
 
-# 2. Study Design and Sample Handling 🧊 {#w7-s2}
+# 2. Techniques and Study Design 🧬 {#w7-s2}
 
-> 🔑 **Core idea** — microbiome measurements are unusually sensitive to what happens **before** sequencing: sample handling, diet and drugs, and DNA carried in by the reagents
+> 🔑 **Core idea** — 16S = read one marker gene: cheap, reaches genus level. Shotgun = read all DNA: species/strain level + gene function, at \~10× the cost. Either way, what happens **before** sequencing — handling, extraction, drugs, DNA from the kit — shapes the result
 
-## 1) Pre-analytical variation {#w7-s2-1}
+![Left: what each approach reads. Right: how far down each can name a taxon](/assets/img/w7/amplicon_vs_shotgun.png){fig-align="center"}
+
+## 1) 16S rRNA amplicon sequencing {#w7-s2-1}
+
+-   The 16S rRNA gene is present in all bacteria and archaea
+-   It alternates **conserved regions** (where universal primers bind) and **variable regions** (which differ between taxa)
+-   → Amplify one or two variable regions, sequence, classify
+
+![Top: where the primers bind. Bottom: why read share is not cell share (computed)](/assets/img/w7/gene_16s.png){fig-align="center"}
+
+### ① ⚠️ Primer and copy-number bias {#w7-s2-1-1}
+
+-   **Different variable regions** (V3–V4, V4, V1–V2) give different answers → studies using different regions are **not directly comparable**
+-   **"Universal" primers are not universal** — some taxa are amplified poorly or not at all
+-   **16S copy number varies** from 1 to \~15 per genome → **read proportions are not cell proportions**
+
+### ② Resolution limit {#w7-s2-1-2}
+
+-   16S generally reaches **genus** level
+-   Species-level assignment → unreliable. Strain-level → impossible
+-   ⚠️ Species-level 16S results = over-claiming — and it matters: *E. coli* strains range from commensal to lethal
+
+## 2) Shotgun metagenomics {#w7-s2-2}
+
+-   Sequence **all** DNA in the sample
+-   ✅ **Who** is there, at species and often strain level + **what they can do** (genes and pathways = functional profiling, [§5.1](#w7-s5-1))
+-   ⚠️ \~an order of magnitude more expensive, and host DNA gets in the way — a tissue biopsy may be \>99% human reads
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 Going further — what shotgun adds, and what it costs
+
+-   **Taxonomic profiling** — MetaPhlAn, Kraken2/Bracken, StrainPhlAn
+-   **Functional profiling** (HUMAnN) — 💡 distantly related organisms often carry the same functional capacity → **function may matter more than identity**
+-   **Non-bacterial members** — viruses, fungi, plasmids
+-   **Assembly into MAGs** — recovering genomes of uncultured organisms
+-   Costs: ⚠️ needs high microbial biomass and low host DNA; ⚠️ much heavier computation
+:::
+
+## 3) Which to choose {#w7-s2-3}
+
+| Your question                                     | Use     |
+|---------------------------------------------------|---------|
+| Broad survey, hundreds of samples, limited budget | 16S     |
+| Low biomass where PCR amplification is needed     | 16S     |
+| Species or strain resolution                      | Shotgun |
+| What the community *does*, not just who is there  | Shotgun |
+| Viruses, fungi, or mobile elements                | Shotgun |
+
+## 4) Sample handling and DNA extraction {#w7-s2-4}
 
 -   Collection, storage, DNA extraction and primer choice all change the result
 -   ⚠️ **DNA extraction = the single largest technical source of variation** → two labs using different kits report different communities from the same stool
@@ -93,11 +143,11 @@ By the end of this chapter you should be able to:
 
 -   **Collection and storage** — time at room temperature changes composition; freeze–thaw cycles matter; preservative buffers differ in their effects
 -   **Why extraction matters so much** — Gram-positive bacteria have tough cell walls → bead-beating protocols recover them; gentle protocols do not
--   **Primer choice** ([§3.1①](#w7-s3-1-1)) and sequencing platform
+-   **Primer choice** ([§2.1①](#w7-s2-1-1)) and sequencing platform
 -   Meta-analyses must model study as a batch variable
 :::
 
-## 2) ⚠️ Confounders {#w7-s2-2}
+## 5) ⚠️ Confounders {#w7-s2-5}
 
 -   **Diet** — the dominant environmental determinant of gut composition, and almost never measured adequately
 -   **Medications** — proton pump inhibitors, metformin, antibiotics and laxatives all have large, well-documented microbiome effects
@@ -132,7 +182,7 @@ Age · sex · BMI · bowel movement frequency and stool consistency (Bristol sca
 ```
 :::
 
-## 3) ⚠️ The kit-ome {#w7-s2-3}
+## 6) ⚠️ Low biomass and the kit-ome {#w7-s2-6}
 
 ![Contaminant fraction depends on how much real biomass you started with (model)](/assets/img/w7/contamination.png){fig-align="center"}
 
@@ -146,39 +196,55 @@ Age · sex · BMI · bowel movement frequency and stool consistency (Bristol sca
 ## What a credible low-biomass study does
 
 -   ✅ Sequences **extraction blanks and no-template controls** in every batch
--   ✅ **Uses** them — `decontam` and similar tools identify contaminants by (i) prevalence in blanks and (ii) inverse correlation with DNA concentration
+-   ✅ **Uses** them — `decontam` and similar tools identify contaminants by (i) prevalence in blanks and (ii) inverse correlation with DNA concentration ([§3.4](#w7-s3-4))
 -   ✅ Records **DNA concentration** as a covariate
 -   ✅ Reports results **with and without** decontamination
-
-![Simulated: the two signals that decontam-type tools use](/assets/img/w7/decontam.png){fig-align="center"}
 
 ⚠️ A low-biomass paper that does not mention negative controls → the first thing to note
 :::
 
 ------------------------------------------------------------------------
 
-# 3. Two Ways to Sequence a Community 🧬 {#w7-s3}
+# 3. Pre-processing: From Reads to a Feature Table 🔢 {#w7-s3}
 
-> 🔑 **Core idea** — 16S = read one marker gene: cheap, reaches genus level. Shotgun = read all DNA: species/strain level + gene function, at \~10× the cost
+> 🔑 **Core idea** — turn reads into a **feature table** (taxa or pathways × samples): denoise or profile the reads, name them against a database, remove contaminants, deal with uneven depth — and at every step, check what was kept
 
-![Left: what each approach reads. Right: how far down each can name a taxon](/assets/img/w7/amplicon_vs_shotgun.png){fig-align="center"}
+![The metagenomics workflow. 16S and shotgun reads are processed differently but end in the same kind of feature table → contaminants and depth are handled on the table → ① QC → ② statistical tests (diversity, differential abundance).](/assets/img/w7/metagenomics_pipeline.png){fig-align="center"}
 
-## 1) 16S rRNA amplicon sequencing {#w7-s3-1}
+## 1) QC {#w7-s3-1}
 
--   The 16S rRNA gene is present in all bacteria and archaea
--   It alternates **conserved regions** (where universal primers bind) and **variable regions** (which differ between taxa)
--   → Amplify one or two variable regions, sequence, classify
+Each step has its own check:
 
-![Top: where the primers bind. Bottom: why read share is not cell share (computed)](/assets/img/w7/gene_16s.png){fig-align="center"}
+-   **Raw reads** — base quality, leftover primers and adapters (FastQC, MultiQC)
+-   **Denoising and merging (16S)** — share of reads kept after filtering, denoising, merging the two ends and removing chimeras. ⚠️ A sample that loses most of its reads at one step → find the cause before going on
+-   **Host read removal (shotgun)** — % of reads that are human. Stool: a few %. Tissue biopsy: often \>99% → little microbial data left
+-   **Classification** — % of reads the database could name ([§3.3](#w7-s3-3))
+-   **Negative controls and mock community** — reads in extraction blanks; a **mock community** (a known mix of strains) should come out in the expected proportions
+-   **Depth** — reads per sample; do the rarefaction curves level off? ([§3.5](#w7-s3-5))
 
-### ① ⚠️ Primer and copy-number bias {#w7-s3-1-1}
+![(a) Reads kept at each DADA2 step. S5 loses most of its reads at merging — its reads were too short for the two ends to overlap. (b) Out of 20 million reads, a stool sample keeps almost all as microbial reads; a biopsy keeps under 1 million. (c) A blank with as many reads as a sample → contamination or leakage between wells. Illustrative numbers.](/assets/img/w7/meta_qc.png){fig-align="center"}
 
--   **Different variable regions** (V3–V4, V4, V1–V2) give different answers → studies using different regions are **not directly comparable**
--   **"Universal" primers are not universal** — some taxa are amplified poorly or not at all
--   **16S copy number varies** from 1 to \~15 per genome → **read proportions are not cell proportions**
+::: {.callout-note collapse="true" icon=false}
+## 🔍 Going further — the QC metrics in detail
 
-### ② OTUs vs. ASVs {#w7-s3-1-2}
+| Step | Metric | Warning sign |
+|------------------------|------------------------|------------------------|
+| **Raw reads** | Base quality, primer and adapter content | Quality drops early; primers still present |
+| **Denoising (16S)** | Reads kept after filter / denoise / merge | One sample loses far more than the rest |
+| **Chimera removal (16S)** | Share of reads flagged as chimeric | A high share → too many PCR cycles |
+| **Host removal (shotgun)** | % host reads | \>90% → too few microbial reads for the question |
+| **Classification** | % reads classified | Much lower than other samples → contamination, wrong database |
+| **Negative controls** | Reads and taxa in blanks | Blanks approaching sample read counts |
+| **Mock community** | Observed vs expected composition | Taxa missing or skewed → extraction or PCR bias |
+| **Depth** | Reads per sample, rarefaction curve | Far fewer reads than other samples; curve still rising steeply |
 
+-   **Comparison with the other samples in the same run** matters more than any absolute cut-off
+-   Tools: FastQC, MultiQC, DADA2's read-tracking table, KneadData logs, QIIME 2 summaries
+:::
+
+## 2) Denoising: OTUs vs. ASVs {#w7-s3-2}
+
+-   Sequencing errors make one real 16S sequence look like many slightly different ones → they must be grouped or corrected
 -   **OTU** — reads clustered at 97% similarity
 -   **ASV** — the exact sequence variant (DADA2, Deblur) → now standard
 -   ✅ An ASV is a sequence, not a cluster defined by one dataset → **comparable across studies**
@@ -192,44 +258,10 @@ Age · sex · BMI · bowel movement frequency and stool consistency (Bristol sca
 -   **ASV** (amplicon sequence variant) — models the error process and resolves **exact sequences**
 :::
 
-### ③ Resolution limit {#w7-s3-1-3}
+## 3) Taxonomic classification and reference databases {#w7-s3-3}
 
--   16S generally reaches **genus** level
--   Species-level assignment → unreliable. Strain-level → impossible
--   ⚠️ Species-level 16S results = over-claiming — and it matters: *E. coli* strains range from commensal to lethal
-
-## 2) Shotgun metagenomics {#w7-s3-2}
-
--   Sequence **all** DNA in the sample
--   ✅ **Who** is there, at species and often strain level + **what they can do** (genes and pathways = functional profiling)
--   ⚠️ \~an order of magnitude more expensive, and host DNA gets in the way — a tissue biopsy may be \>99% human reads
-
-::: {.callout-note collapse="true" icon=false}
-## 🔍 Going further — what shotgun adds, and what it costs
-
--   **Taxonomic profiling** — MetaPhlAn, Kraken2/Bracken, StrainPhlAn
--   **Functional profiling** (HUMAnN) — 💡 distantly related organisms often carry the same functional capacity → **function may matter more than identity**
--   **Non-bacterial members** — viruses, fungi, plasmids
--   **Assembly into MAGs** — recovering genomes of uncultured organisms
--   Costs: ⚠️ needs high microbial biomass and low host DNA; ⚠️ much heavier computation
-:::
-
-## 3) ✅ Choosing {#w7-s3-3}
-
-| Your question                                     | Use     |
-|---------------------------------------------------|---------|
-| Broad survey, hundreds of samples, limited budget | 16S     |
-| Low biomass where PCR amplification is needed     | 16S     |
-| Species or strain resolution                      | Shotgun |
-| What the community *does*, not just who is there  | Shotgun |
-| Viruses, fungi, or mobile elements                | Shotgun |
-
-------------------------------------------------------------------------
-
-# 4. Reference Databases and Their Limits 📚 {#w7-s4}
-
-> 🔑 **Core idea** — a read can only be named if something like it is already in the database → results depend on which database, and which version
-
+-   Each ASV or read is compared with a reference database to get a name → 16S: a classifier against SILVA or GTDB; shotgun: marker genes (MetaPhlAn) or k-mers (Kraken2)
+-   ⚠️ A read can only be named if something like it is already in the database → results depend on **which database, and which version**
 -   🗺️ **Reference bias** once more (🔗 [W1 §2.3③](w1_intro.qmd#w1-s2-3-3)) — a large fraction of reads in a typical gut metagenome cannot be confidently assigned → **microbial dark matter**
 -   Non-Western populations are under-represented in reference collections → their microbiomes are characterised worse
 -   ⚠️ Taxonomies are actively being revised → **the same organism can carry different names in two papers**
@@ -248,32 +280,25 @@ Age · sex · BMI · bowel movement frequency and stool consistency (Bristol sca
 | **UHGG**, gene catalogues | Reference genomes and genes from uncultured gut organisms |
 :::
 
-------------------------------------------------------------------------
+## 4) Contaminant removal {#w7-s3-4}
 
-# 5. Diversity 🌿 {#w7-s5}
+-   Low-biomass samples carry DNA from the kit ([§2.6](#w7-s2-6)) → remove it from the table before analysis
+-   `decontam` looks for two fingerprints of kit DNA:
+    -   **Frequency** — the same small amount is added to every extraction → its share rises as the sample's own DNA falls
+    -   **Prevalence** — it is common in the blanks, rare in the samples
+-   ✅ Report results **with and without** decontamination
 
-> 🔑 **Core idea** — alpha diversity = how diverse one sample is; beta diversity = how different samples are from each other. Both depend on choices (index, depth) → say what you used
+![Simulated: the two signals that decontam-type tools use](/assets/img/w7/decontam.png){fig-align="center"}
 
-![Three of the standard microbiome figures, and what each is actually telling you (simulated)](/assets/img/w7/diversity.png){fig-align="center"}
-
-## 1) Alpha diversity — within a sample {#w7-s5-1}
-
--   **Richness** — how many taxa. ⚠️ Strongly dependent on sequencing depth
--   **Evenness** — how evenly the taxa are spread. **Shannon, Simpson** combine richness and evenness
--   💡 Report at least one **richness**-type and one **evenness**-type index — they can disagree, and the disagreement is informative
-
-::: {.callout-note collapse="true" icon=false}
-## 🔍 Going further — how the indices differ
-
--   Two samples with identical richness can have very different Shannon values
--   **Faith's PD** — richness weighted by phylogenetic distance
-:::
-
-## 2) ⚠️ The rarefaction debate {#w7-s5-2}
+## 5) Sequencing depth and rarefaction {#w7-s3-5}
 
 -   Sequencing depth varies between samples, and richness rises with depth → something must be done
 -   **Rarefaction** = subsample all samples to equal depth — once standard, now debated
+-   ⚠️ The cost: reads above the cut are thrown away, and samples below it are dropped
 -   ✅ **The defensible position** — do something explicit, say what you did, and check whether the conclusion survives the alternative
+-   💡 Rarefaction is for diversity. Differential abundance uses CLR or a model instead ([§4.4](#w7-s4-4), [§4.5](#w7-s4-5))
+
+![(a) Richness keeps rising with depth in a sample with many rare taxa (D) and levels off in a simple one (C). (b) Rarefying everyone to 8,000 reads discards most of each library and drops sample F (simulated).](/assets/img/w7/rarefaction.png){fig-align="center"}
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — how the debate unfolded
@@ -289,9 +314,31 @@ Rarefaction (subsample all to equal depth)
 ```
 :::
 
-## 3) Beta diversity — between samples {#w7-s5-3}
+------------------------------------------------------------------------
 
--   A dissimilarity for every pair of samples — **Bray–Curtis** (abundance-weighted) is the default
+# 4. Statistical Analysis 📊 {#w7-s4}
+
+> 🔑 **Core idea** — diversity summarises whole communities (within a sample: alpha; between samples: beta), differential abundance tests single taxa. Underneath both: sequencing measures **proportions**, not amounts
+
+![Three of the standard microbiome figures, and what each is actually telling you (simulated)](/assets/img/w7/diversity.png){fig-align="center"}
+
+## 1) Alpha diversity {#w7-s4-1}
+
+-   How diverse **one sample** is
+-   **Richness** — how many taxa. ⚠️ Strongly dependent on sequencing depth ([§3.5](#w7-s3-5))
+-   **Evenness** — how evenly the taxa are spread. **Shannon, Simpson** combine richness and evenness
+-   💡 Report at least one **richness**-type and one **evenness**-type index — they can disagree, and the disagreement is informative
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 Going further — how the indices differ
+
+-   Two samples with identical richness can have very different Shannon values
+-   **Faith's PD** — richness weighted by phylogenetic distance
+:::
+
+## 2) Beta diversity and PERMANOVA {#w7-s4-2}
+
+-   How different **samples** are from each other — a dissimilarity for every pair; **Bray–Curtis** (abundance-weighted) is the default
 -   Visualised by **PCoA** (a map of those distances), tested with **PERMANOVA**
 -   ⚠️ Report **R²** (how much of the variation the grouping explains), not only p
 
@@ -316,13 +363,7 @@ Rarefaction (subsample all to equal depth)
 **Both numbers belong in the abstract.**
 :::
 
-------------------------------------------------------------------------
-
-# 6. Statistics for Compositional Data ⚠️ {#w7-s6}
-
-> 🔑 **Core idea** — sequencing measures **proportions**, not amounts → when one taxon goes up, every other taxon looks as if it went down, even when nothing else changed
-
-## 1) The problem {#w7-s6-1}
+## 3) ⚠️ Compositional data {#w7-s4-3}
 
 ![Only one taxon changed; every other taxon appears to decrease](/assets/img/w7/compositional.png){fig-align="center"}
 
@@ -346,12 +387,12 @@ Compositional problems arise because you only measured **proportions**
 → dissolves the problem entirely. Not yet routine — and it should be more so
 :::
 
-## 2) The CLR transformation {#w7-s6-2}
+## 4) CLR transformation {#w7-s4-4}
 
 -   Without absolute measurements → work with **ratios** between taxa rather than proportions
 -   **CLR (centred log-ratio)** — divide each taxon by the geometric mean of all taxa in that sample, take the log
 -   ✅ Ratios within a sample are unaffected by the total → CLR does not depend on the fixed sum
--   ⚠️ But each taxon is now compared with the sample's average taxon → a big bloom still shifts every other value a little (right panel of the figure in [§6.1](#w7-s6-1))
+-   ⚠️ But each taxon is now compared with the sample's average taxon → a big bloom still shifts every other value a little (right panel of the figure in [§4.3](#w7-s4-3))
 
 ![Left: the CLR calculation. Right: what zeros do to it (simulated)](/assets/img/w7/clr.png){fig-align="center"}
 
@@ -361,7 +402,7 @@ Compositional problems arise because you only measured **proportions**
 -   ⚠️ CLR is undefined for zeros → a pseudocount must be added, and microbiome matrices are extremely sparse
 :::
 
-## 3) ⚠️ Differential abundance methods disagree {#w7-s6-3}
+## 5) ⚠️ Differential abundance {#w7-s4-5}
 
 ![Five approaches on one simulated dataset, plus a reference that knows the total load. The disagreement is not marginal](/assets/img/w7/da_disagreement.png){fig-align="center"}
 
@@ -405,25 +446,45 @@ Normalisation, whether compositionality is modelled, zero handling, and how cons
 
 ------------------------------------------------------------------------
 
-# 7. From Association to Causation 🔀 {#w7-s7}
+# 5. Downstream Analysis: From Taxa to Biology 🧠 {#w7-s5}
 
-> 🔑 **Core idea** — before calling a microbiome difference a cause, rule out artifact → confounding → reverse causation, in that order
+> 🔑 **Core idea** — a list of taxa becomes biology when you ask two more questions: what can these organisms **do** (function), and is the difference a **cause** or something else (causation)
 
-Back to the motivating question: patients have less *Faecalibacterium* → work through the possibilities **in order**
+## 1) Functional profiling {#w7-s5-1}
+
+-   Shotgun reads are matched to genes → genes are summed into pathways (HUMAnN) → a **pathway × sample** table, analysed like the taxa table
+-   💡 **Functional redundancy** — distantly related organisms often carry the same functions → two people with few taxa in common can have nearly the same pathway profile
+-   → For mechanism, *what the community can do* may matter more than *who is there*
+-   ⚠️ A gene being present ≠ the gene being used → expression needs metatranscriptomics, products need metabolomics ([§6](#w7-s6))
+-   16S reads no genes → function can only be *predicted* from the taxa (e.g. PICRUSt2) → treat it as a hypothesis
+
+![Two people share none of their top genera (a), yet their pathway profiles are nearly the same (b). Butyrate is made by *Faecalibacterium* in one and by *Roseburia* and *E. rectale* in the other. Illustrative numbers.](/assets/img/w7/functional_redundancy.png){fig-align="center"}
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 Going further — beyond the pathway table
+
+-   **MAGs** (metagenome-assembled genomes) — assemble reads and group the pieces into genomes → organisms that have never been cultured, and the genes each one carries
+-   **Strain tracking** (e.g. StrainPhlAn) — follows one strain between people: mother to infant, donor to recipient after FMT
+:::
+
+## 2) From association to causation {#w7-s5-2}
+
+-   Before calling a microbiome difference a cause, rule out **artifact → confounding → reverse causation**, in that order
+-   Back to the motivating question: patients have less *Faecalibacterium* → work through the possibilities **in order**
 
 ![](/assets/img/w7/causal_order.png){fig-align="center"}
 
-## 1) Artifact {#w7-s7-1}
+### ① Artifact {#w7-s5-2-1}
 
 -   Different extraction batch, collection protocol or sequencing run; contamination; unequal depth
--   → [§2](#w7-s2) covers this. Exclude it **first**
+-   → [§2](#w7-s2) and [§3](#w7-s3) cover this. Exclude it **first**
 
-## 2) Confounding {#w7-s7-2}
+### ② Confounding {#w7-s5-2-2}
 
 -   Cases differ from controls in many ways besides disease: diet · medication · BMI · transit time · age · geography
--   → The microbiome responds to most of them
+-   → The microbiome responds to most of them ([§2.5](#w7-s2-5))
 
-## 3) Reverse causation {#w7-s7-3}
+### ③ Reverse causation {#w7-s5-2-3}
 
 -   Disease itself changes the gut environment
 -   ⚠️ **A disease-associated microbiome is at least as likely to be a consequence as a cause** — cross-sectional designs cannot distinguish them
@@ -438,7 +499,7 @@ Back to the motivating question: patients have less *Faecalibacterium* → work 
 -   Reduced appetite → changed substrate availability
 :::
 
-## 4) Causation {#w7-s7-4}
+### ④ Causation {#w7-s5-2-4}
 
 What would actually establish it:
 
@@ -464,7 +525,7 @@ For most microbiome–disease associations in the current literature, **the dire
 
 ------------------------------------------------------------------------
 
-# 8. Beyond Bacteria, Beyond DNA 🔭 {#w7-s8}
+# 6. Beyond Bacteria, Beyond DNA 🔭 {#w7-s6}
 
 > 🔑 **Core idea** — bacterial DNA is only part of the picture: viruses and fungi live there too, and for mechanism, what is *expressed* and which molecules *reach the host* are often more informative
 
@@ -486,7 +547,7 @@ For most microbiome–disease associations in the current literature, **the dire
 
 ------------------------------------------------------------------------
 
-# 9. 🎓 Reading Any Omics Paper Critically {#w7-s9}
+# 7. 🎓 Reading Any Omics Paper Critically {#w7-s7}
 
 > 🔑 **Core idea** — whatever the assay, ask the same questions. This checklist pulls the whole course together
 
@@ -500,25 +561,25 @@ The course closes here, because everything in this chapter generalises
 -   What exactly is being compared, and what is the **unit of replication**? ([W1 §5.3](w1_intro.qmd#w1-s5-3), [W5 §6.2](w5_singlecell.qmd#w5-s6-2))
 -   How many biological replicates? Is that plausibly enough? ([W4 §4.3④](w4_transcriptomics.qmd#w4-s4-3-4))
 -   Are **batch and condition confounded**? Was randomisation described? ([W1 §4.3](w1_intro.qmd#w1-s4-3))
--   What covariates were collected — and which obvious ones were **not**? ([W3 §5.3](w3_epigenomics.qmd#w3-s5-3), [W7 §2.2](#w7-s2-2))
+-   What covariates were collected — and which obvious ones were **not**? ([W3 §5.3](w3_epigenomics.qmd#w3-s5-3), [W7 §2.5](#w7-s2-5))
 
 **Measurement**
 
 -   What does this assay actually measure, and what is it **blind to**? ([W2 §1.1](w2_genomics.qmd#w2-s1-1), [W6 §1](w6_proteomics.qmd#w6-s1))
--   Which reference, which annotation, **which version**? ([W1 §2.3](w1_intro.qmd#w1-s2-3))
--   What are the QC numbers — and are they shown? ([W3 §3.2①](w3_epigenomics.qmd#w3-s3-2-1), [W5 §3.3](w5_singlecell.qmd#w5-s3-3))
+-   Which reference, which annotation, **which version**? ([W1 §2.3](w1_intro.qmd#w1-s2-3), [W7 §3.3](#w7-s3-3))
+-   What are the QC numbers — and are they shown? ([W3 §3.2①](w3_epigenomics.qmd#w3-s3-2-1), [W5 §3.3](w5_singlecell.qmd#w5-s3-3), [W7 §3.1](#w7-s3-1))
 
 **Analysis**
 
--   How was the data normalised, and does that method's **assumption hold**? ([W4 §3.3](w4_transcriptomics.qmd#w4-s3-3), [W7 §6](#w7-s6))
+-   How was the data normalised, and does that method's **assumption hold**? ([W4 §3.3](w4_transcriptomics.qmd#w4-s3-3), [W7 §4.3](#w7-s4-3))
 -   Multiple testing: corrected how, at what threshold? ([W1 §4.2](w1_intro.qmd#w1-s4-2))
--   Would a **different reasonable tool** give the same answer? ([W4 §4.3](w4_transcriptomics.qmd#w4-s4-3), [W7 §6.3](#w7-s6-3))
--   How were missing values or zeros handled? ([W5 §3.2](w5_singlecell.qmd#w5-s3-2), [W6 §4](w6_proteomics.qmd#w6-s4))
+-   Would a **different reasonable tool** give the same answer? ([W4 §4.3](w4_transcriptomics.qmd#w4-s4-3), [W7 §4.5](#w7-s4-5))
+-   How were missing values or zeros handled? ([W5 §3.2](w5_singlecell.qmd#w5-s3-2), [W6 §3.6](w6_proteomics.qmd#w6-s3-6))
 
 **Interpretation**
 
 -   Is the **effect size** reported alongside the p-value? ([W1 §4.1](w1_intro.qmd#w1-s4-1))
--   Does the conclusion require **causality the design cannot support**? ([W2 §6.2](w2_genomics.qmd#w2-s6-2), [W7 §7](#w7-s7))
+-   Does the conclusion require **causality the design cannot support**? ([W2 §6.2](w2_genomics.qmd#w2-s6-2), [W7 §5.2](#w7-s5-2))
 -   Was anything validated independently — another cohort, another assay?
 -   Are data and code available? ([W1 §5.2](w1_intro.qmd#w1-s5-2))
 :::
@@ -533,14 +594,17 @@ Work through that list on a paper in your own field → this course has done its
 # 📝 Summary
 
 -   Body sites are separate ecosystems, and healthy people differ enormously → small studies are underpowered
+-   16S is cheap and reaches genus level; shotgun reaches species/strain and gives gene function, at \~10× the cost
 -   ⚠️ **Extraction protocol** = the largest technical variable; **diet and medication** = the largest biological confounders. Metformin is the cautionary tale
 -   ⚠️ In low-biomass samples the reagent kit may supply most of the DNA → **negative controls are mandatory**
--   16S is cheap and reaches genus level; shotgun reaches species/strain and gives gene function, at \~10× the cost. ASVs have replaced OTUs
--   Report both a richness and an evenness index; rarefaction is unsettled → be explicit. ⚠️ Report PERMANOVA **R²** alongside p
+-   Pre-processing turns reads into a feature table → check what each step kept. ASVs have replaced OTUs; names depend on the database and its version
+-   Rarefaction evens out depth by discarding reads → unsettled, so be explicit
+-   Report both a richness and an evenness index. ⚠️ Report PERMANOVA **R²** alongside p
 -   ⚠️ Sequencing measures **proportions**. CLR works on ratios; measuring total microbial load solves the problem properly
 -   ⚠️ **Differential abundance methods disagree substantially** on the same data → run more than one, report the intersection
+-   Different taxa can do the same jobs → function is often more stable than composition
 -   For most microbiome–disease associations, causality is unknown → exclude artifact, confounding and reverse causation first
--   🎓 The critical-reading checklist in [§9](#w7-s9) applies to **every chapter of this course**
+-   🎓 The critical-reading checklist in [§7](#w7-s7) applies to **every chapter of this course**
 -   You've now seen the major omics layers one by one. What really matters is [integrating]{.underline} them — **multi-omics**
 
 ![From genetic variation to actual players in pathogenesis](images/clipboard-959575580.png)
@@ -553,17 +617,19 @@ Work through that list on a paper in your own field → this course has done its
 |--------------------------|----------------------------------------------|
 | Microbiome / microbiota | The community, and its collective genomes |
 | 16S rRNA gene | Universal bacterial marker gene with variable regions |
-| OTU / ASV | 97%-similarity cluster / exact resolved sequence |
 | Shotgun metagenomics | Sequencing all DNA in a sample |
 | Kit-ome | Bacterial DNA contaminating reagents |
+| Feature table | Taxa (or pathways) × samples table of read counts |
+| OTU / ASV | 97%-similarity cluster / exact resolved sequence |
+| Rarefaction | Subsampling all samples to equal depth |
 | Alpha diversity | Diversity within one sample |
 | Beta diversity | Dissimilarity between samples |
-| Rarefaction | Subsampling all samples to equal depth |
 | PCoA | Ordination of a distance matrix |
 | PERMANOVA | Permutation test on community distances |
 | Compositional data | Data constrained to a fixed total |
 | CLR | Log of each taxon divided by the sample geometric mean |
 | Differential abundance | Testing which taxa differ between groups |
+| Functional redundancy | Different taxa carrying the same functions |
 | FMT | Faecal microbiota transplantation |
 
 ::: {.callout-note collapse="true" icon=false}
@@ -571,6 +637,8 @@ Work through that list on a paper in your own field → this course has done its
 
 | Term | One-line meaning |
 |--------------------------|----------------------------------------------|
+| Mock community | A known mix of strains, sequenced as a positive control |
+| Host read removal | Discarding reads that align to the human genome |
 | Functional profiling | Cataloguing genes and pathways, not just taxa |
 | MAG | Genome assembled from metagenomic reads |
 | Bray–Curtis / UniFrac | Abundance-based / phylogeny-aware distances |
@@ -587,9 +655,16 @@ Knight R, et al. [*Best practices for analysing microbiomes.*](https://pubmed.nc
 Sender R, Fuchs S, Milo R. [*Revised estimates for the number of human and bacteria cells in the body.*](https://pubmed.ncbi.nlm.nih.gov/?term=Revised+estimates+for+the+number+of+human+and+bacteria+cells+in+the+body) PLoS Biol. 2016.\
 Fischbach MA. [*Microbiome: focus on causation and mechanism.*](https://pubmed.ncbi.nlm.nih.gov/?term=Microbiome%3A+focus+on+causation+and+mechanism) Cell. 2018.
 
-### Methods and pitfalls
+### Pre-processing and profiling
 
 Callahan BJ, et al. [*DADA2: high-resolution sample inference from Illumina amplicon data.*](https://doi.org/10.1038/nmeth.3869) Nat Methods. 2016.\
+Blanco-Míguez A, et al. [*Extending and improving metagenomic taxonomic profiling with uncharacterized species using MetaPhlAn 4.*](https://pubmed.ncbi.nlm.nih.gov/?term=Extending+and+improving+metagenomic+taxonomic+profiling+with+uncharacterized+species+using+MetaPhlAn+4) Nat Biotechnol. 2023.\
+Beghini F, et al. [*Integrating taxonomic, functional, and strain-level profiling of diverse microbial communities with bioBakery 3.*](https://pubmed.ncbi.nlm.nih.gov/?term=Integrating+taxonomic%2C+functional%2C+and+strain-level+profiling+of+diverse+microbial+communities+with+bioBakery+3) eLife. 2021. (HUMAnN 3)\
+McMurdie PJ, Holmes S. [*Waste not, want not: why rarefying microbiome data is inadmissible.*](https://pubmed.ncbi.nlm.nih.gov/?term=Waste+not%2C+want+not%3A+why+rarefying+microbiome+data+is+inadmissible) PLoS Comput Biol. 2014.\
+Schloss PD. [*Rarefaction is currently the best approach to control for uneven sequencing effort in amplicon sequence analyses.*](https://pubmed.ncbi.nlm.nih.gov/?term=Rarefaction+is+currently+the+best+approach+to+control+for+uneven+sequencing+effort+in+amplicon+sequence+analyses) mSphere. 2024.
+
+### Methods and pitfalls
+
 Salter SJ, et al. [*Reagent and laboratory contamination can critically impact sequence-based microbiome analyses.*](https://pubmed.ncbi.nlm.nih.gov/?term=Reagent+and+laboratory+contamination+can+critically+impact+sequence-based+microbiome+analyses) BMC Biol. 2014.\
 Davis NM, et al. [*Simple statistical identification and removal of contaminant sequences.*](https://pubmed.ncbi.nlm.nih.gov/?term=Simple+statistical+identification+and+removal+of+contaminant+sequences) Microbiome. 2018. (decontam)\
 Gloor GB, et al. [*Microbiome datasets are compositional: and this is not optional.*](https://pubmed.ncbi.nlm.nih.gov/?term=Microbiome+datasets+are+compositional%3A+and+this+is+not+optional) Front Microbiol. 2017.\

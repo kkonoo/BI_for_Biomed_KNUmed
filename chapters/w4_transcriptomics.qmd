@@ -440,37 +440,54 @@ dist(t(assay(vsd)))                                  # sample-to-sample distance
 
 ## 2) Regression {#w4-s4-2}
 
-### ① Linear regression {#w4-s4-2-1}
+-   A regression model = two parts that answer two questions
+    -   **Mean model** — where is each group's average? → the coefficients β. **β₁ = the condition effect** (what we test)
+    -   **Variance model** — how far do values scatter around that average? → the size of the noise
+-   The test = "is the difference in means (β₁) large compared with the spread?" ([§4.1](#w4-s4-1)) → it needs both parts
+-   Variance decomposition links the two: take away what the mean model explains (condition, batch), and the residual left over → belongs to the variance model
 
--   Code the condition as a number (control = 0, case = 1) → expression = **a mean part** + **a noise part**
+![The two parts of a regression model. The mean model's coefficients (β₁ = the condition effect, β₂ = batch) explain part of the variation; the residual left over goes to the variance model (σ²) → this is variance decomposition.](/assets/img/w4/regression_parts.png){fig-align="center"}
+
+### ① Mean model {#w4-s4-2-1}
+
+-   The simplest regression = **linear regression**: code the condition as a number (control = 0, case = 1) → the mean follows a straight line
+-   β₀ = the control mean, **β₁ = the slope of the line = the condition effect**
+-   Variables such as batch can go in too, as β₂ → the condition effect is estimated separately from batch ([§4.4](#w4-s4-4))
+
+![Linear regression. The mean follows a straight line (slope β₁ = the condition effect), and both groups are assumed to share the same spread σ².](/assets/img/w4/linear_model.png){fig-align="center"}
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 Going further — linear regression as an equation
 
 $$
 y = \beta_0 + \beta_1 x + \varepsilon, \qquad \varepsilon \sim N(0, \sigma^2)
 $$
 
--   β₀ = the control mean, **β₁ = the condition effect** (what we test), ε = noise
--   ⚠️ Linear regression assumes the variance σ² is the same everywhere → this fails for count data ([§4.3①](#w4-s4-3-1))
+-   β₀ + β₁x = the mean model; ε ~ N(0, σ²) = the variance model
+-   x = 0 (control) → mean β₀; x = 1 (case) → mean β₀ + β₁ → the difference between the two means is β₁
+:::
 
-![Linear regression. The mean follows a straight line (slope β₁ = the condition effect), and both groups are assumed to share the same spread σ².](/assets/img/w4/linear_model.png){fig-align="center"}
+### ② Variance model and variance decomposition {#w4-s4-2-2}
 
-### ② Variance decomposition {#w4-s4-2-2}
-
--   Statistics = tracing where the variation comes from
-
-$$
-\text{Total variation} = \textbf{Condition} + \textbf{Batch} + \text{Residual}
-$$
-
--   **Condition** — the real biological effect
--   **Batch** — systematic noise you can control (day, instrument, operator)
--   **Residual** — random error left unexplained
--   → The strategy: put batch in the model to take it out → the condition signal shows (🔗 [§3.4②](#w4-s3-4-2))
+-   What the mean model cannot explain = the **residual** → the variance model = how far the residuals scatter
+-   Linear regression keeps the variance model simple: one spread σ², the same for every sample
+-   ⚠️ This assumption fails for count data → this is the part DESeq2 changes ([§4.3①](#w4-s4-3-1))
+-   **Variance decomposition** = splitting the total variation by source: total variation = **condition** + **batch** + residual
+    -   **Condition** — the real biological effect (explained by β₁)
+    -   **Batch** — systematic noise you can control: day, instrument, operator (explained by β₂)
+    -   **Residual** — random error left unexplained (left to the variance model)
+-   → The strategy: put batch in the mean model to take it out → the residual shrinks and the condition signal shows (🔗 [§3.4②](#w4-s3-4-2))
 
 ![Same data, different model. Leave batch out and its variation hides in the residual, so the noise looks large. Put it in and the residual shrinks, so the condition signal shows.](/assets/img/w4/variance_decomp.png){fig-align="center"}
 
 ## 3) The statistical model of DESeq2 {#w4-s4-3}
 
--   Keep the frame of linear regression and change two things for counts: the **distribution** (normal → negative binomial) and the **scale** (log)
+-   The same two parts as in linear regression, changed to suit counts
+    -   **Mean model** → a log scale (GLM) → β₁ = the **log₂ fold change (LFC)**
+    -   **Variance model** → negative binomial, with a dispersion α for each gene
+-   The LFC comes from the mean model, but how far to trust it (its standard error, the p-value) is set by the variance model → both parts must be estimated before you can test
+
+![DESeq2 has the same two parts. In the mean model β₁ is the LFC. The variance model is a negative binomial that adds sampling noise (μ) and biological variation (αμ²).](/assets/img/w4/nbglm_parts.png){fig-align="center"}
 -   💡 This chapter follows DESeq2. edgeR and limma-voom are also standard → they agree on large-effect genes and disagree at the margins → **if your conclusion depends on which one you used, you do not have a conclusion**
 
 ::: {.callout-note collapse="true" icon=false}
@@ -492,39 +509,45 @@ $$
 
 ![Counts vary across replicates far more than Poisson allows (dashed line), and the gap grows with expression.](/assets/img/w4/overdispersion.png){fig-align="center"}
 
-### ② The negative binomial distribution {#w4-s4-3-2}
+### ② Mean model: GLM {#w4-s4-3-2}
 
--   Adds one dispersion parameter α to the Poisson:
+-   The mean is a straight line on the **log scale** → effects become fold changes (β₁ = 1 means a doubling), and the predicted mean can never be negative
+-   = a **generalised linear model (GLM)**: the frame of linear regression + a distribution suited to counts (negative binomial, ③) + a log scale
+-   Each sample's size factor ([§3.3](#w4-s3-3)) enters the model as a depth correction → which is why the input is raw counts
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 Going further — the GLM as an equation
+
+$$
+\log_2 \mu = \beta_0 + \beta_1 \cdot \text{condition} + \beta_2 \cdot \text{batch} + \cdots
+$$
+
+-   μ = the count expected in that sample (corrected for depth by its size factor)
+-   β₁ = log₂(μ~case~ / μ~control~) = the log₂ fold change
+:::
+
+### ③ Variance model: negative binomial {#w4-s4-3-3}
+
+-   Poisson (sampling noise) plus extra variation between biological replicates
+-   The size of that extra variation = the **dispersion α** → the larger it is, the more replicates disagree
+-   Unlike linear regression (one σ²), **the variance differs from gene to gene** (each gene has its own α) and grows with expression
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 Going further — the equation, and reading α
 
 $$
 \text{Var}(Y) = \mu + \alpha \mu^2
 $$
 
 -   μ = sampling noise (the Poisson part), αμ² = the extra variation between biological replicates
-
-::: {.callout-note collapse="true" icon=false}
-## 🔍 Going further — reading α
-
 -   α = 0 → recovers Poisson
 -   For highly expressed genes, √α ≈ the coefficient of variation (CV) between replicates. E.g. α = 0.04 → about 20% biological variation
 -   Estimating α honestly is what separates a valid analysis from an optimistic one
 :::
 
-### ③ GLM {#w4-s4-3-3}
-
--   The mean is linear on the log scale:
-
-$$
-\log_2 \mu = \beta_0 + \beta_1 \cdot \text{condition} + \beta_2 \cdot \text{batch} + \cdots
-$$
-
--   = a **generalised linear model (GLM)**: the frame of linear regression + a distribution suited to counts (negative binomial) + a log scale
--   Unlike linear regression, **the variance differs from gene to gene** (each gene has its own α)
--   Each sample's size factor ([§3.3](#w4-s3-3)) enters the model as a depth correction → which is why the input is raw counts
-
 ### ④ Dispersion estimation and shrinkage {#w4-s4-3-4}
 
--   ⚠️ Three numbers give a terrible variance estimate → you cannot estimate a gene's α from n = 3
+-   ⚠️ The variance model needs an α for every gene → but three numbers give a terrible variance estimate → you cannot estimate a gene's α from n = 3
 -   ✅ The solution — **borrow information across genes** (shrinkage):
     1.  Estimate α for each gene (noisy)
     2.  Fit a trend of α against mean expression using all genes
@@ -559,12 +582,20 @@ For human tissue with real between-individual variability, three replicates are 
 
 ### ⑤ LFC and the statistical test {#w4-s4-3-5}
 
--   **β₁ = log₂ fold change (LFC)** = log₂(μ~case~ / μ~control~). 1 = a doubling, −1 = a halving
--   **Wald test** — z = β₁ / SE(β₁) → p-value. The default for two groups
+-   **LFC = β₁** (the mean model, ②). 1 = a doubling, −1 = a halving
+-   **Wald test** — how far the LFC is from 0 relative to its uncertainty (the standard error, which comes from the variance model) → p-value. The default for two groups
 -   **LRT** (likelihood ratio test) — compares with a model that leaves the variable out. Three or more groups, time courses
 -   One test per gene → multiple-testing correction → **padj** (🔗 [W1 §4.2](w1_intro.qmd#w1-s4-2))
 
 ![On the log scale the control mean is β₀ and the case mean is β₀ + β₁ → the gap β₁ is the log₂ fold change. The Wald test asks how far β₁ is from 0 relative to its standard error.](/assets/img/w4/glm_lfc.png){fig-align="center"}
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 Going further — the LFC and the Wald test as equations
+
+-   LFC: β₁ = log₂(μ~case~ / μ~control~)
+-   Wald test: z = β₁ / SE(β₁) → p-value from the standard normal
+-   SE(β₁) grows with α and shrinks with more replicates → the same LFC can give a larger p-value
+:::
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — LFC shrinkage
@@ -807,6 +838,8 @@ res <- results(dds, contrast = c("condition", "case", "control"))
 | VST / rlog | DESeq2 transformations that even out the spread across expression levels; for plots and EDA only |
 | Batch effect | A systematic difference from processing day or batch, not biology |
 | DEG | A gene whose expression differs significantly between conditions |
+| Mean model | The part of a regression model that sets where each group's average sits; its coefficients β (e.g. the LFC) |
+| Variance model | The part that sets how far values scatter around that average; σ² in linear regression, the dispersion α in DESeq2 |
 | Design formula | The variables put into the model (e.g. `~ batch + condition`) |
 | log₂ fold change | Effect size on a log scale |
 | Volcano / MA plot | Significance vs. effect / effect vs. expression |

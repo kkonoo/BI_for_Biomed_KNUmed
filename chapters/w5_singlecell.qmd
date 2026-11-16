@@ -49,7 +49,7 @@ By the end of this chapter you should be able to:
 ## 🔍 Going further — ③ composition shifts are more common than you think
 
 -   ⚠️ Common in inflamed, fibrotic or infiltrated tissue — exactly the tissue clinicians study — and routinely written up as if it were ①
--   The same problem in other guises: bulk tissue deconvolution (🔗 [W4 §7.2](w4_transcriptomics.qmd#w4-s7-2)), epigenomics (🔗 [W3 §5.3](w3_epigenomics.qmd#w3-s5-3))
+-   The same problem in other guises: bulk tissue deconvolution (🔗 [W4 §6.2](w4_transcriptomics.qmd#w4-s6-2)), epigenomics (🔗 [W3 §5.3](w3_epigenomics.qmd#w3-s5-3))
 :::
 
 ## 2) When to use single cell {#w5-s1-2}
@@ -527,7 +527,7 @@ Clusters can equally reflect:
 
 ## 2) Pseudobulk {#w5-s6-2}
 
--   Sum the counts for each **donor × cell type** → analyse with DESeq2 or edgeR like bulk RNA-seq (🔗 [W4 §5](w4_transcriptomics.qmd#w4-s5))
+-   Sum the counts for each **donor × cell type** → analyse with DESeq2 or edgeR like bulk RNA-seq (🔗 [W4 §4](w4_transcriptomics.qmd#w4-s4))
 -   Three patients vs. three controls = **n = 3**, whether you sequenced 3,000 cells or 300,000
 
 ::: {.callout-tip collapse="true"}
@@ -561,7 +561,7 @@ Unit of replication = the donor → **the number of donors is your n** (§2.4)
 ## 🔍 Going further — compositional data
 
 -   Proportions are **compositional data** — one cell type expands → all others' proportions fall by arithmetic, with no biological change
--   The same problem: 🔗 [W4 §4.2](w4_transcriptomics.qmd#w4-s4-2), and in a different guise 🔗 [W7 §6](w7_metagenomics.qmd#w7-s6)
+-   The same problem: 🔗 [W4 §3.3②](w4_transcriptomics.qmd#w4-s3-3-2), and in a different guise 🔗 [W7 §6](w7_metagenomics.qmd#w7-s6)
 -   ✅ Methods that handle it: `scCODA`, `miloR`, `propeller`, Dirichlet-multinomial models
 -   n is the number of donors here too
 :::

@@ -13,10 +13,12 @@ execute:
 
 By the end of this chapter you should be able to:
 
--   Say what RNA-seq measures — and what it does not
+-   Explain how RNA-seq works, and say what it measures — and what it does not
 -   Choose between poly(A) selection and rRNA depletion for a given question
+-   Spot a problem sample from its QC metrics
 -   Explain why raw counts cannot be compared directly, and what normalisation corrects
--   Explain why count data needs a negative binomial model, not a t-test
+-   Use VST and PCA to look at the samples before testing, and recognise a batch effect
+-   Explain why count data needs a negative binomial model, not a t-test, and read a DESeq2 design formula
 -   Read a volcano plot and an MA plot
 -   Tell ORA from GSEA, and name the commonest misuses of enrichment analysis
 -   ⚠️ Recognise when a "differential expression" result is really a change in cell composition
@@ -32,11 +34,29 @@ By the end of this chapter you should be able to:
 
 ------------------------------------------------------------------------
 
-# 1. What RNA-seq Measures 📏 {#w4-s1}
+# 1. What RNA-seq Is 🧬 {#w4-s1}
 
-> 🔑 **Core idea** — RNA-seq = a snapshot of how much of each RNA was in the tube when you lysed it. Not synthesis rate, not protein, not any single cell
+> 🔑 **Core idea** — turn RNA into cDNA, sequence it, and count the reads for each gene → the more of an RNA was there, the higher its count
 
-## 1) Steady-state abundance, not synthesis {#w4-s1-1}
+## 1) How it works {#w4-s1-1}
+
+-   Most RNA in a cell is **rRNA** (ribosomal RNA, \~80–90%). The mRNA you want is a small part
+-   mRNA ends in a **poly(A) tail** (a run of tens to hundreds of A's) → beads carrying a run of T's (oligo-dT) pull out only the mRNA = **poly(A) selection**
+-   Fragment the captured RNA → copy it into cDNA (reverse transcription) → add adapters to both ends → sequence
+-   Match each read to the genome (or transcriptome) and count per gene → a **genes × samples count table**
+-   💡 The basic logic — more copies of an RNA in the tube → more fragments → more reads → a higher count
+
+![The five steps of RNA-seq. ② Only mRNA with a poly(A) tail sticks to the bead; rRNA has no tail and is washed away. ⑤ The more reads land on a gene, the higher its count.](/assets/img/w4/rnaseq_principle.png){fig-align="center"}
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 Going further — RNA without a poly(A) tail
+
+-   Histone mRNAs, many lncRNAs, circRNAs and not-yet-processed nascent RNA have no tail, or a short one
+-   Degraded RNA → only the 3′ fragment that carries the tail survives
+-   → if these RNAs matter, use rRNA depletion, which removes only rRNA, instead of poly(A) selection ([§2.1](#w4-s2-1))
+:::
+
+## 2) Steady-state abundance, not synthesis {#w4-s1-2}
 
 -   RNA-seq counts the transcripts present **at the moment you lysed the sample**
 -   That number = the balance of two rates: **transcription** (making) and **degradation** (breaking down)
@@ -50,34 +70,55 @@ By the end of this chapter you should be able to:
 If the distinction matters to your hypothesis, you need a different assay:
 
 -   **Nascent transcription** — GRO-seq, TT-seq
+    -   Label only the RNA made in the last few minutes (BrU, 4sU) → pull out the labelled RNA and sequence it
+    -   → measures the **rate of synthesis**, not the accumulated level
+
+![Catch only new RNA. Gene A (transcription ×2) and gene B (half-life ×2), identical in RNA-seq, differ in nascent RNA.](/assets/img/w4/nascent_rna.png){fig-align="center"}
+
 -   **Metabolic labelling** — SLAM-seq
--   **Translation** — ribosome profiling
+    -   Label new RNA with 4sU → after a chemical treatment, that position reads as C instead of T
+    -   → new and old RNA are told apart inside one library, without a pull-down. Measured over time, this estimates **synthesis and decay (half-life)** separately
+
+![A read with a T-to-C change = RNA made after labelling began. If the share of new RNA rises fast with labelling time, the RNA has a short half-life.](/assets/img/w4/slam_seq.png){fig-align="center"}
+
+-   **Translation** — ribosome profiling (Ribo-seq)
+    -   Stop ribosomes where they sit on the mRNA → digest the RNA no ribosome covers → sequence only the \~30 nt fragments that were covered (footprints)
+    -   → how many ribosomes sit on each mRNA = **translation**. Measured alongside RNA-seq, this gives translation efficiency (TE)
+
+![Read only ribosome footprints. Genes P and Q have the same mRNA level but different numbers of footprints → translation efficiency (TE) = Ribo-seq ÷ RNA-seq.](/assets/img/w4/ribo_seq.png){fig-align="center"}
 :::
 
-## 2) ⚠️ RNA is not protein {#w4-s1-2}
+## 3) ⚠️ RNA is not protein {#w4-s1-3}
 
 -   Transcript and protein abundance correlate at **r ≈ 0.4** across genes
 -   A real correlation — but nowhere near enough to treat mRNA as a proxy for protein for any individual gene
--   Missing from RNA-seq: translation efficiency, protein half-life, post-translational regulation (🔗 W6)
 
 ![Across genes, mRNA and protein levels correlate at only r ≈ 0.4 (schematic). Two genes with the same mRNA level can differ tens of times in protein.](/assets/img/w4/rna_protein.png){fig-align="center"}
 
-## 3) A snapshot, of a mixture {#w4-s1-3}
+-   Missing from RNA-seq (🔗 W6):
+    -   **Translation efficiency** — how many proteins one mRNA makes
+    -   **Protein half-life** — some proteins last minutes, others weeks
+    -   **Post-translational regulation** — modifications such as phosphorylation, cleavage, location in the cell → the same amount, different activity
 
+![Three steps after the mRNA. More ribosomes make more protein, faster decay leaves less, and phosphorylation changes activity at the same amount.](/assets/img/w4/mrna_to_protein.png){fig-align="center"}
+
+## 4) In short: a snapshot, of a mixture {#w4-s1-4}
+
+-   RNA-seq = a **snapshot** of how much of each RNA was in the tube when you lysed it. Not synthesis rate, not protein, not any single cell
 -   ⚠️ **One time point** — responses are dynamic. A single harvest can miss an effect entirely, or catch a transient one and misread it as steady state
--   ⚠️ **A mixture of cells** — bulk RNA-seq averages over every cell in the tube → [§7.2](#w4-s7-2) shows how badly that misleads; 🔗 W5 is the response
-
-![The bench workflow. Every decision on this line constrains what the analysis can do.](/assets/img/w4/rnaseq_workflow.png){fig-align="center"}
+-   ⚠️ **A mixture of cells** — bulk RNA-seq averages over every cell in the tube → [§6.2](#w4-s6-2) shows how badly that misleads; 🔗 W5 is the response
 
 ------------------------------------------------------------------------
 
-# 2. Experimental Choices That Change Your Results ⚙️ {#w4-s2}
+# 2. Before You Sequence ⚙️ {#w4-s2}
 
 > 🔑 **Core idea** — choices made at the bench (library type, replicates, batch layout) set the limits of every later analysis. None can be undone in analysis
 
+![The bench workflow. Each step has decisions to make, and they constrain what the analysis can do.](/assets/img/w4/rnaseq_workflow.png){fig-align="center"}
+
 ## 1) Poly(A) selection vs. rRNA depletion {#w4-s2-1}
 
--   Ribosomal RNA (rRNA) = \~80–90% of total RNA → sequence total RNA as is, and most of the budget buys rRNA → every protocol removes it, one of two ways
+-   There are two ways to remove rRNA (🔗 [§1.1](#w4-s1-1))
 -   **Poly(A) selection** — oligo-dT beads capture transcripts with a poly(A) tail. Clean, cheap, the default for DE studies
 -   **rRNA depletion** — probes remove rRNA and keep everything else: RNA without a poly(A) tail, newly made (nascent) unspliced RNA, degraded fragments
 
@@ -105,7 +146,7 @@ If the distinction matters to your hypothesis, you need a different assay:
 
 -   Plain gene-level DE → single-end is often sufficient; longer reads add little
 -   Isoforms, splice junctions, fusions, novel transcripts → longer and paired-end reads
--   Depth saturates much earlier than people expect ([§5.4](#w4-s5-4))
+-   Depth saturates much earlier than people expect ([§4.3④](#w4-s4-3-4))
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — read length, paired-end and depth at a glance
@@ -114,7 +155,7 @@ If the distinction matters to your hypothesis, you need a different assay:
 |------------------------------------|------------------------------------|
 | **Longer reads** (2×150 vs 1×50) | Isoform and splice junction work; less benefit for plain gene-level counting |
 | **Paired-end** | Isoforms, fusion detection, novel transcripts. For gene-level DE, single-end is often sufficient |
-| **Depth** | See [§5.4](#w4-s5-4) — saturates much earlier than people expect |
+| **Depth** | See [§4.3④](#w4-s4-3-4) — saturates much earlier than people expect |
 :::
 
 ## 4) Biological vs. technical replicates {#w4-s2-4}
@@ -132,16 +173,16 @@ If the distinction matters to your hypothesis, you need a different assay:
 -   Three flasks from the same passage, split on the same day → closer to technical than biological, whatever the methods section calls them
 :::
 
-## 5) ✅ Design checklist {#w4-s2-5}
+## 5) What to consider in study design {#w4-s2-5}
 
 Before samples leave the bench (🔗 [W1 §5.3](w1_intro.qmd#w1-s5-3)):
 
--   ✅ **Randomise across batches** — all cases in batch 1 and all controls in batch 2 → unrecoverable
--   ✅ **Record RIN** (RNA quality) and everything else you might adjust for — age, sex, tissue site, time of collection
--   ✅ **Decide n before you start** ([§5.4](#w4-s5-4)), and **keep the design balanced**
+-   **Randomise across batches** — all cases in batch 1 and all controls in batch 2 → unrecoverable. Only when they are mixed can the analysis separate batch out ([§3.4②](#w4-s3-4-2), [§4.4](#w4-s4-4))
+-   **Record RIN** (RNA quality) and everything else you might adjust for — age, sex, tissue site, time of collection
+-   **Decide n before you start** ([§4.3④](#w4-s4-3-4)), and **keep the design balanced**
 
 ::: {.callout-note collapse="true" icon=false}
-## 🔍 Going further — the checklist in detail
+## 🔍 Going further — each point in detail
 
 -   **Batches** = extraction day, library prep batch, sequencing run
 -   **RIN** — RNA quality shifts measurements systematically → treat it as a covariate
@@ -150,23 +191,55 @@ Before samples leave the bench (🔗 [W1 §5.3](w1_intro.qmd#w1-s5-3)):
 
 ------------------------------------------------------------------------
 
-# 3. From Reads to Counts 🔢 {#w4-s3}
+# 3. Pre-processing: From Reads to Counts 🔢 {#w4-s3}
 
-> 🔑 **Core idea** — reads are matched to genes and counted → a genes × samples count matrix. Every count matrix carries invisible decisions made along the way
+> 🔑 **Core idea** — check the samples (QC) → assign reads to genes to build the count matrix → normalise → look at the samples as a whole before testing (EDA)
 
-![Four decisions hidden in every count matrix. (a) Spliced alignment. (b) Pseudo-alignment. (c) Summing transcripts to genes. (d) Handling multi-mapping reads.](/assets/img/w4/read_to_count.png){fig-align="center"}
+## 1) QC {#w4-s3-1}
 
-## 1) Spliced alignment {#w4-s3-1}
+-   **Raw read QC** — FastQC checks base quality, leftover adapters and GC content → MultiQC collects many samples into one report
+-   **Where did the reads go?** — the share that aligns to the genome (mapping rate), lands in exons, or is rRNA → be suspicious of one sample that stands out
+-   **Gene-body coverage** — reads should cover each transcript evenly from 5′ to 3′. ⚠️ A pile-up toward 3′ = a sign of degraded RNA (low RIN) in a poly(A) library
+
+![(a) Where each sample's reads went. Only S5 has a lot of rRNA and few aligned reads → find the cause, then decide whether to drop it. (b) Degraded RNA keeps only the 3′ fragments near the poly(A) tail, so coverage piles up at the 3′ end.](/assets/img/w4/rnaseq_qc.png){fig-align="center"}
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 Going further — the QC metrics in detail
+
+| Metric | What it shows | Warning sign |
+|------------------------|------------------------|------------------------|
+| **Mapping rate** | Share of reads aligned to the genome | Clearly lower than other samples → contamination, wrong species, adapters |
+| **Exonic / intronic share** | Whether reads came from mRNA | High intronic share in a poly(A) library → nuclear RNA or DNA contamination |
+| **rRNA share** | Whether rRNA removal worked | Higher than other samples → removal failed |
+| **Gene-body coverage** | Whether the RNA was intact | 3′ pile-up → degradation |
+| **Library size, genes detected** | Depth | Far fewer than other samples |
+| **Duplication** | PCR duplicates | Naturally high for highly expressed genes in RNA-seq → not a reason to remove reads on its own |
+| **Strandedness** | Whether it matches the lab record | Mismatch → wrong counting settings |
+
+-   **Comparison with the other samples in the same experiment** matters more than any absolute cut-off
+-   Tools: FastQC, MultiQC, RSeQC, Qualimap. Pipelines such as nf-core/rnaseq run them all at once
+:::
+
+## 2) From reads to counts {#w4-s3-2}
+
+-   Reads are matched to genes and counted → a genes × samples count matrix
+-   ⚠️ Every count matrix carries four invisible decisions made along the way (①–④)
+
+### ① Spliced alignment {#w4-s3-2-1}
 
 -   **The problem** — reads come from mature mRNA (introns removed), but you align to the genome → a read crossing an exon–exon junction will not align in one piece
 -   **The fix** — spliced aligners (STAR, HISAT2) allow large gaps at annotated or novel junctions
 -   Use this route when read **position** matters: novel transcripts, splicing, fusions, allele-specific expression, viewing in a genome browser
 
-## 2) Pseudo-alignment {#w4-s3-2}
+![The read comes from mRNA with the intron removed, so on the genome it splits across exon 1 and exon 2 with an intron-sized gap.](/assets/img/w4/spliced_alignment.png){fig-align="center"}
+
+### ② Pseudo-alignment {#w4-s3-2-2}
 
 -   **Salmon** and **kallisto** skip base-level alignment → ask only which transcripts a read is *compatible with*
 -   ✅ \~10× faster, far less memory
 -   ❌ No BAM file → cannot inspect alignments
+
+![The read is broken into short pieces (k-mers), and the only question is which transcripts they fit. This read is compatible with T1 and T2, not with T3.](/assets/img/w4/pseudo_alignment.png){fig-align="center"}
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — pseudo-alignment in detail
@@ -176,10 +249,12 @@ Before samples leave the bench (🔗 [W1 §5.3](w1_intro.qmd#w1-s5-3)):
 -   ❌ Can only quantify transcripts already in the annotation
 :::
 
-## 3) Gene level vs. transcript level {#w4-s3-3}
+### ③ Gene level vs. transcript level {#w4-s3-2-3}
 
 -   Most genes produce several isoforms (different transcripts from the same gene)
 -   💡 **The pragmatic standard** — quantify at transcript level, then **sum to gene level** (the `tximport` route)
+
+![Estimates for each isoform (60, 40) are summed to the gene (100). The split between isoforms is uncertain; the total is stable.](/assets/img/w4/tx_to_gene.png){fig-align="center"}
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — why sum to gene level
@@ -188,10 +263,12 @@ Before samples leave the bench (🔗 [W1 §5.3](w1_intro.qmd#w1-s5-3)):
 -   Gene-level results are more robust, and you keep the option of looking at isoforms later
 :::
 
-## 4) Multi-mapping reads {#w4-s3-4}
+### ④ Multi-mapping reads {#w4-s3-2-4}
 
 -   Some reads map equally well to several places — paralogues, repeats, pseudogenes
 -   ⚠️ How they are handled = one of the invisible decisions baked into any count matrix you download from GEO (🔗 [W1 §2.2④](w1_intro.qmd#w1-s2-2-4))
+
+![A read that fits two near-identical places (gene A and its paralogue A′) equally well. Dropping it under-counts gene families; splitting it adds uncertainty.](/assets/img/w4/multimapping.png){fig-align="center"}
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — discard or distribute?
@@ -200,23 +277,21 @@ Before samples leave the bench (🔗 [W1 §5.3](w1_intro.qmd#w1-s5-3)):
 -   **Distribute probabilistically** → better, but introduces its own uncertainty
 :::
 
-------------------------------------------------------------------------
+## 3) Normalization {#w4-s3-3}
 
-# 4. Normalization ⚖️ {#w4-s4}
+-   A raw count reflects sequencing depth, gene length and library composition, not only biology → normalise before comparing samples
 
-> 🔑 **Core idea** — a raw count reflects sequencing depth, gene length and library composition, not only biology → normalise before comparing samples
-
-## 1) Why raw counts cannot be compared {#w4-s4-1}
+### ① Why raw counts cannot be compared {#w4-s3-3-1}
 
 A count depends on three things that have nothing to do with biology:
 
 1.  **Library size (depth)** — sequence twice as deeply → every gene doubles
 2.  **Gene length** — a 10 kb transcript generates more fragments than a 1 kb transcript at the same molar concentration
-3.  **Library composition** — the subtle one (§4.2)
+3.  **Library composition** — the subtle one ([②](#w4-s3-3-2))
 
 ![Three things besides biology that change a raw count. ① Depth and ② gene length are the obvious ones; ③ composition is the one that motivates TMM and RLE. Bottom: what each unit corrects.](/assets/img/w4/normalization.png){fig-align="center"}
 
-## 2) ⚠️ The composition effect {#w4-s4-2}
+### ② ⚠️ The composition effect {#w4-s3-3-2}
 
 -   **Sequencing measures proportions, not absolute amounts** — the total is fixed by how many reads you bought
 -   One gene (or a handful) becomes enormously abundant in one condition → takes a larger share of the library → **every other gene's proportion falls, though nothing happened to it**
@@ -246,7 +321,7 @@ Both assume **the majority of genes do not change**. Usually safe
 → in those cases you need spike-in controls (ERCC) to anchor the scale
 :::
 
-## 3) Which measure, when {#w4-s4-3}
+### ③ Which measure, when {#w4-s3-3-3}
 
 -   **Raw counts** → input to DESeq2 / edgeR — do not pre-normalise
 -   **TPM** → reporting expression levels, heatmaps
@@ -275,51 +350,100 @@ A common and quiet error
 | **TMM / RLE** | depth + **composition** | between samples | **Differential expression — the standard** |
 :::
 
+## 4) Exploratory data analysis (EDA): look at the samples first {#w4-s3-4}
+
+-   Before testing genes one by one, look at **the samples as a whole**
+-   What to check: are replicates alike? Do the groups separate? Is one sample an outlier? Is there a batch?
+
+### ① Transformation: VST and rlog {#w4-s3-4-1}
+
+-   Put raw counts or log₂(count + 1) straight into PCA → noise from low-count genes dominates the result
+-   DESeq2's **VST** (variance stabilizing transformation) and **rlog** (regularized log) → make the spread roughly the same at every expression level
+-   ⚠️ **For plots and EDA only**. Differential expression testing still takes raw counts ([§3.3③](#w4-s3-3-3))
+
+![(a) With log₂(count + 1), low-count genes vary most between samples, and PCA is pulled toward that noise. (b) After VST the spread is roughly constant at every expression level.](/assets/img/w4/vst_meansd.png){fig-align="center"}
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 Going further — VST vs. rlog, and the code
+
+-   **VST** `vst()` — fast. The default for larger datasets (roughly 30+ samples)
+-   **rlog** `rlog()` — a little better with few samples and very different depths between them. Slower
+-   Both return values on the log₂ scale → for highly expressed genes, almost the same as log₂ normalised counts
+-   `blind = TRUE` (the default) — transforms without knowing the design → suits QC. For experiments with very large group differences, use `blind = FALSE`
+
+``` r
+vsd <- vst(dds, blind = TRUE)                        # or rlog(dds)
+plotPCA(vsd, intgroup = c("condition", "batch"))     # PCA
+dist(t(assay(vsd)))                                  # sample-to-sample distances → heatmap
+```
+:::
+
+### ② PCA and batch effects {#w4-s3-4-2}
+
+-   **PCA** — summarises the variation of thousands of genes as a few axes that best separate the samples (🔗 [W2 §3.2②](w2_genomics.qmd#w2-s3-2-2))
+-   ✅ What you hope to see — the groups separate on PC1, and replicates of a group sit together
+-   ⚠️ **Batch effect** — the samples split by processing day, library batch or sequencing run, not by biology (🔗 [§2.5](#w4-s2-5), [W1 §4.3](w1_intro.qmd#w1-s4-3))
+-   What to do — do not alter the counts; put batch **in the design formula** → the model takes out batch's share ([§4.2②](#w4-s4-2-2), [§4.4](#w4-s4-4))
+
+![(a) What you hope to see: condition drives PC1. (b) A batch effect: processing day drives PC1 and condition is pushed to PC2. Colour = condition, fill = batch.](/assets/img/w4/eda_pca.png){fig-align="center"}
+
+::: {.callout-warning collapse="true"}
+## Batch-removed values are for plots only
+
+-   Values with batch removed (e.g. `limma::removeBatchEffect()`) → **for PCA and heatmap figures only**
+-   For testing: raw counts + `~ batch + condition`. Testing values that already had batch removed drops the uncertainty of that correction → over-optimistic p-values
+-   ⚠️ If batch and condition overlap completely (all cases in batch 1, all controls in batch 2) → no model can separate them ([§2.5](#w4-s2-5))
+-   An outlier sample → go back to the QC metrics ([§3.1](#w4-s3-1)) to find the cause. Do not drop it without a reason
+:::
+
 ------------------------------------------------------------------------
 
-# 5. Differential Expression 📊 {#w4-s5}
+# 4. Analysis: Testing for Differential Expression 📊 {#w4-s4}
 
-> 🔑 **Core idea** — counts vary a lot between biological replicates → DE tools model that variation (negative binomial) and borrow information across genes. Nothing replaces enough biological replicates
+> 🔑 **Core idea** — for each gene, test "is the difference between groups larger than the noise?" DESeq2 = a regression model built for counts (negative binomial GLM) + borrowing information across genes. Nothing replaces enough biological replicates
 
-## 1) Why counts need a negative binomial model {#w4-s5-1}
+## 1) What is a DEG? {#w4-s4-1}
 
--   **Pure random sampling** → counts would be **Poisson**: variance = mean. Technical replicates roughly behave this way
--   **Biological replicates** → far more variable = **overdispersed**; the excess variance grows with expression level
--   → a t-test on counts produces false positives; DE tools use a **negative binomial** model that allows for the extra variance
+-   **DEG** (differentially expressed gene) = a gene whose expression differs significantly between conditions (e.g. case vs. control)
+-   The difficulty — observed expression mixes biological signal, technical noise and differences between individuals
+-   → The goal: pick out **only the biological signal** from the total variation = is the difference between groups large enough compared with the spread within groups?
 
-![(a) Counts vary across replicates far more than Poisson allows (overdispersion), so a negative binomial model is needed. (b) With n = 3 a single gene's dispersion is noisy, so it is pulled toward the trend fitted from all genes.](/assets/img/w4/mean_variance.png){fig-align="center"}
+![The mean difference is the same. Gene X, with a small spread within groups, is a DEG; gene Y, with a large spread, cannot be told from chance.](/assets/img/w4/deg_signal_noise.png){fig-align="center"}
 
-::: {.callout-note collapse="true" icon=false}
-## 🔍 Going further — the negative binomial in one line
+## 2) Seeing it as regression {#w4-s4-2}
 
-The **negative binomial** adds a dispersion parameter φ:
+### ① Linear regression {#w4-s4-2-1}
+
+-   Code the condition as a number (control = 0, case = 1) → expression = **a mean part** + **a noise part**
 
 $$
-\text{Var}(Y) = \mu + \phi \mu^2
+y = \beta_0 + \beta_1 x + \varepsilon, \qquad \varepsilon \sim N(0, \sigma^2)
 $$
 
--   φ = 0 → recovers Poisson
--   Estimating φ honestly is what separates a valid analysis from an optimistic one
-:::
+-   β₀ = the control mean, **β₁ = the condition effect** (what we test), ε = noise
+-   ⚠️ Linear regression assumes the variance σ² is the same everywhere → this fails for count data ([§4.3①](#w4-s4-3-1))
 
-## 2) Dispersion, shrinkage, and why n = 3 works at all {#w4-s5-2}
+![Linear regression. The mean follows a straight line (slope β₁ = the condition effect), and both groups are assumed to share the same spread σ².](/assets/img/w4/linear_model.png){fig-align="center"}
 
--   ⚠️ Three numbers give a terrible variance estimate → you cannot estimate a gene's variance from n = 3
--   ✅ The solution — **borrow information across genes** (shrinkage)
--   💡 The single most important methodological idea in bulk RNA-seq → why the standard tools outperform a per-gene t-test so decisively at small n
+### ② Variance decomposition {#w4-s4-2-2}
 
-::: {.callout-note collapse="true" icon=false}
-## 🔍 Going further — how shrinkage works
+-   Statistics = tracing where the variation comes from
 
--   Fit a smooth trend of dispersion vs. mean expression using **all** genes
--   Shrink each gene's noisy individual estimate toward that trend
-:::
+$$
+\text{Total variation} = \textbf{Condition} + \textbf{Batch} + \text{Residual}
+$$
 
-## 3) The three standard tools {#w4-s5-3}
+-   **Condition** — the real biological effect
+-   **Batch** — systematic noise you can control (day, instrument, operator)
+-   **Residual** — random error left unexplained
+-   → The strategy: put batch in the model to take it out → the condition signal shows (🔗 [§3.4②](#w4-s3-4-2))
 
--   **DESeq2**, **edgeR**, **limma-voom** — the three standard tools
--   In benchmark after benchmark they agree on large-effect genes and disagree at the margins
--   → **If your conclusion depends on which one you used, you do not have a conclusion**
+![Same data, different model. Leave batch out and its variation hides in the residual, so the noise looks large. Put it in and the residual shrinks, so the condition signal shows.](/assets/img/w4/variance_decomp.png){fig-align="center"}
+
+## 3) The statistical model of DESeq2 {#w4-s4-3}
+
+-   Keep the frame of linear regression and change two things for counts: the **distribution** (normal → negative binomial) and the **scale** (log)
+-   💡 This chapter follows DESeq2. edgeR and limma-voom are also standard → they agree on large-effect genes and disagree at the margins → **if your conclusion depends on which one you used, you do not have a conclusion**
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — how the three tools differ
@@ -331,27 +455,140 @@ $$
 | **limma-voom** | Transforms counts, models precision weights, then linear models | Fastest at large n; most flexible for complex designs |
 :::
 
-## 4) ⚠️ Sample size — the weakest link {#w4-s5-4}
+### ① What count data looks like {#w4-s4-3-1}
 
--   n = 3 is a convention → detects only large, consistent changes
+-   **Integers** including 0, never negative
+-   **Pure random sampling** → counts would be **Poisson**: variance = mean. Technical replicates roughly behave this way
+-   **Biological replicates** → far more variable = **overdispersed**; the excess variance grows with expression level
+-   → The constant-variance assumption of linear regression fails. A t-test on counts produces false positives
+
+![Counts vary across replicates far more than Poisson allows (dashed line), and the gap grows with expression.](/assets/img/w4/overdispersion.png){fig-align="center"}
+
+### ② The negative binomial distribution {#w4-s4-3-2}
+
+-   Adds one dispersion parameter α to the Poisson:
+
+$$
+\text{Var}(Y) = \mu + \alpha \mu^2
+$$
+
+-   μ = sampling noise (the Poisson part), αμ² = the extra variation between biological replicates
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 Going further — reading α
+
+-   α = 0 → recovers Poisson
+-   For highly expressed genes, √α ≈ the coefficient of variation (CV) between replicates. E.g. α = 0.04 → about 20% biological variation
+-   Estimating α honestly is what separates a valid analysis from an optimistic one
+:::
+
+### ③ GLM {#w4-s4-3-3}
+
+-   The mean is linear on the log scale:
+
+$$
+\log_2 \mu = \beta_0 + \beta_1 \cdot \text{condition} + \beta_2 \cdot \text{batch} + \cdots
+$$
+
+-   = a **generalised linear model (GLM)**: the frame of linear regression + a distribution suited to counts (negative binomial) + a log scale
+-   Unlike linear regression, **the variance differs from gene to gene** (each gene has its own α)
+-   Each sample's size factor ([§3.3](#w4-s3-3)) enters the model as a depth correction → which is why the input is raw counts
+
+### ④ Dispersion estimation and shrinkage {#w4-s4-3-4}
+
+-   ⚠️ Three numbers give a terrible variance estimate → you cannot estimate a gene's α from n = 3
+-   ✅ The solution — **borrow information across genes** (shrinkage):
+    1.  Estimate α for each gene (noisy)
+    2.  Fit a trend of α against mean expression using all genes
+    3.  Pull each gene's estimate toward the trend
+-   💡 The single most important methodological idea in bulk RNA-seq → why the standard tools outperform a per-gene t-test so decisively at small n
+
+![With n = 3 a single gene's dispersion (open dot) is noisy, so it is pulled toward the trend fitted from all genes (line) before use (filled dot).](/assets/img/w4/dispersion_shrinkage.png){fig-align="center"}
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 Going further — shrinkage in detail
+
+-   How far to pull = how uncertain that gene's estimate is. More replicates → less pulling
+-   Genes far above the trend (genuinely variable genes) are left as they are → avoids false positives
+-   See it yourself with `plotDispEsts(dds)`
+:::
+
+::: {.callout-warning collapse="true"}
+## Sample size — n = 3 is a convention
+
+-   Shrinkage makes n = 3 analysable → but it detects only large, consistent changes
 -   **Depth saturates, replicates do not** (right-hand panel) → 20–30 M reads per sample is enough for most DE questions
 -   → money spent beyond that would buy more power as **additional samples**
 
 ![(a) Power depends strongly on the number of replicates; n = 3 catches only large changes. (b) Depth saturates at about 20–30 M reads, while adding replicates lifts every curve.](/assets/img/w4/power_replicates.png){fig-align="center"}
 
-::: {.callout-warning collapse="true"}
-## n = 3 is a convention, not a justification
-
-For human tissue with real between-individual variability, three replicates are usually insufficient
-
-Rough orientation:
+For human tissue with real between-individual variability, three replicates are usually insufficient. Rough orientation:
 
 -   **Cell lines, clean perturbation** — n = 3–4 may be acceptable
 -   **Mouse tissue** — n = 5–8
 -   **Human tissue / clinical samples** — n = 10–20 minimum, more if the phenotype is heterogeneous
 :::
 
-## 5) Reading a results table {#w4-s5-5}
+### ⑤ LFC and the statistical test {#w4-s4-3-5}
+
+-   **β₁ = log₂ fold change (LFC)** = log₂(μ~case~ / μ~control~). 1 = a doubling, −1 = a halving
+-   **Wald test** — z = β₁ / SE(β₁) → p-value. The default for two groups
+-   **LRT** (likelihood ratio test) — compares with a model that leaves the variable out. Three or more groups, time courses
+-   One test per gene → multiple-testing correction → **padj** (🔗 [W1 §4.2](w1_intro.qmd#w1-s4-2))
+
+![On the log scale the control mean is β₀ and the case mean is β₀ + β₁ → the gap β₁ is the log₂ fold change. The Wald test asks how far β₁ is from 0 relative to its standard error.](/assets/img/w4/glm_lfc.png){fig-align="center"}
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 Going further — LFC shrinkage
+
+-   Low-count genes → β₁ estimates swing widely → chance large LFCs rise to the top of the ranking
+-   `lfcShrink()` (e.g. `type = "apeglm"`) → pulls uncertain LFCs toward 0 → use these for ranking and plots
+-   p-values and padj do not change; only the effect-size estimate does
+:::
+
+## 4) The design matrix {#w4-s4-4}
+
+-   Sample table → **design formula** → a **design matrix** of 0s and 1s → one coefficient (β) per column
+-   Example: `~ batch + condition` → the coefficient of the condition column (case = 1, control = 0), β₁, is the log₂ fold change adjusted for batch
+-   **Put the variables to adjust for (batch, confounders) first and the variable of interest (condition) last** → `results()` uses the last variable by default
+-   Set the reference group with `relevel()` beforehand, or with `results(contrast = ...)`
+
+![The sample table becomes a 0/1 matrix through the design formula. Control and batch A are the reference (0). The coefficient of the condition column, β₁, is the log₂ fold change being tested.](/assets/img/w4/design_matrix.png){fig-align="center"}
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 Going further — DESeq2 code
+
+``` r
+library(DESeq2)
+dds <- DESeqDataSetFromMatrix(countData = counts,    # raw counts (not normalised)
+                              colData   = coldata,   # sample table
+                              design    = ~ batch + condition)
+dds$condition <- relevel(dds$condition, ref = "control")
+dds <- DESeq(dds)                                    # size factors → dispersion → Wald test
+res <- results(dds, contrast = c("condition", "case", "control"))
+```
+:::
+
+::: {.callout-note collapse="true" icon=false}
+## 🔍 Going further — more complex designs
+
+| Situation | Example | Design formula |
+|------------------------|------------------------|------------------------|
+| **Paired samples** | Tumour vs. normal from the same patient, before vs. after treatment | `~ patient + treatment` |
+| **Interaction** | Does drug response differ by disease subtype? | `~ subtype + drug + subtype:drug` |
+| **Time course** | Several time points | `~ time`, tested with LRT |
+| **Random effects** | Several tissues from one person | Not possible in DESeq2 → limma-voom |
+| **Unrecorded batch** | Hidden variation | Estimate surrogate variables with `sva` → `~ SV1 + SV2 + condition` |
+:::
+
+::: {.callout-warning collapse="true"}
+## Collinearity: variables that cannot go in together
+
+-   In a paired design `~ patient + condition`, do not add age or sex → they do not change within a patient, so patient already explains them
+-   Batch and condition overlap completely → two columns of the design matrix are identical → the two cannot be separated (🔗 [§2.5](#w4-s2-5))
+:::
+
+## 5) Reading a results table {#w4-s4-5}
 
 ![Two views of the same result. Most papers show only the first. Both cut-off lines are conventions, and the MA plot reveals whether hits pile up at low counts.](/assets/img/w4/volcano_ma.png){fig-align="center"}
 
@@ -385,11 +622,11 @@ Rough orientation:
 
 ------------------------------------------------------------------------
 
-# 6. Making Biological Sense of a Gene List 🧠 {#w4-s6}
+# 5. Downstream Analysis: Making Biological Sense of a Gene List 🧠 {#w4-s5}
 
 > 🔑 **Core idea** — a list of 847 genes is not a result. Enrichment analysis asks **what they have in common** — it describes the list, it does not show a mechanism
 
-## 1) ORA vs. GSEA {#w4-s6-1}
+## 1) ORA vs. GSEA {#w4-s5-1}
 
 ![Two ways to ask the same question. They are not equivalent. GSEA uses the whole ranked list; ORA keeps only the genes past a cut-off and runs Fisher's exact test on a 2×2 table.](/assets/img/w4/ora_vs_gsea.png){fig-align="center"}
 
@@ -397,7 +634,7 @@ Rough orientation:
 -   **GSEA** — take *all* genes ranked by some statistic → do a pathway's members cluster toward one end? **No threshold applied**
 -   💡 **GSEA's specific advantage** — it detects a pathway where fifty genes each shift by 1.3×. Coordinated, biologically meaningful, and **invisible to any threshold-based method**
 
-## 2) Which databases {#w4-s6-2}
+## 2) Which databases {#w4-s5-2}
 
 -   Gene sets come from curated databases: **GO**, **KEGG**, **Reactome**, **MSigDB Hallmark**
 -   💡 **MSigDB Hallmark** = the best starting point — 50 refined, non-redundant gene sets
@@ -413,7 +650,7 @@ Rough orientation:
 | **MSigDB Hallmark** | 50 refined, non-redundant gene sets | 💡 The best starting point — designed to reduce redundancy |
 :::
 
-## 3) ⚠️ The three commonest misuses {#w4-s6-3}
+## 3) ⚠️ The three commonest misuses {#w4-s5-3}
 
 -   ① **Wrong background set** — the background = genes expressed in your tissue, not the full annotation
 -   ② **Threshold sensitivity** — a different padj cutoff can change the top pathway
@@ -443,11 +680,11 @@ Rough orientation:
 
 ------------------------------------------------------------------------
 
-# 7. Beyond Differential Expression 🌐 {#w4-s7}
+# 6. Beyond Differential Expression 🌐 {#w4-s6}
 
 > 🔑 **Core idea** — the same data can answer other questions: gene modules, cell composition, splicing, genetics. ⚠️ Bulk "differential expression" is frequently a change in cell composition
 
-## 1) Co-expression networks {#w4-s7-1}
+## 1) Co-expression networks {#w4-s6-1}
 
 -   Instead of comparing conditions → ask which genes vary *together* across samples
 -   **WGCNA** clusters genes into modules of correlated expression, then relates module summaries to traits
@@ -463,7 +700,7 @@ Rough orientation:
 -   ⚠️ Needs many samples because it is estimating a correlation structure
 :::
 
-## 2) ⚠️ Deconvolution — the composition problem again {#w4-s7-2}
+## 2) ⚠️ Deconvolution — the composition problem again {#w4-s6-2}
 
 -   Bulk expression = the **weighted average** of the cell types present
 -   Disease changes the mixture (neuron loss, immune infiltration, fibrosis) → coherent, highly significant "differential expression" → **without a single cell changing what it transcribes**
@@ -483,7 +720,7 @@ Rough orientation:
 -   ✅ Or measure single cells directly (🔗 W5)
 :::
 
-## 3) Splicing and isoforms {#w4-s7-3}
+## 3) Splicing and isoforms {#w4-s6-3}
 
 -   **Differential expression** — did the gene's total output change?
 -   **Differential splicing** — did the *proportions* of its isoforms change?
@@ -498,7 +735,7 @@ Rough orientation:
 -   ⚠️ All need more depth and more replicates than gene-level DE. Paired-end reads help substantially
 :::
 
-## 4) Expression as a genetic trait {#w4-s7-4}
+## 4) Expression as a genetic trait {#w4-s6-4}
 
 -   **eQTL** — a genetic variant associated with a gene's expression level
 -   **GTEx** — eQTLs across 54 human tissues from hundreds of donors
@@ -511,12 +748,14 @@ Rough orientation:
 
 # 📝 Summary
 
--   RNA-seq measures steady-state abundance, in a mixture of cells, at one moment — not synthesis rate, not protein, not any single cell
+-   RNA-seq turns RNA into cDNA and counts reads per gene. What it measures = steady-state abundance, in a mixture of cells, at one moment — not synthesis rate, not protein, not any single cell
 -   Poly(A) selection = the default; rRNA depletion for FFPE, non-coding RNA and nascent transcription
+-   QC: mapping rate, rRNA share, gene-body coverage → compare with the other samples in the same experiment
 -   Pseudo-alignment is fast and accurate for quantification; spliced alignment when read position matters
 -   Raw counts are biased by depth, gene length and **composition** → TMM / RLE correct composition = the standard for DE
 -   ⚠️ **Never feed normalised values into DESeq2 or edgeR**
--   Counts are overdispersed → a negative binomial model is required. Shrinkage across genes makes small-n analysis possible
+-   Before testing, look at the samples with VST or rlog + PCA. Handle a batch effect in the design formula, not by altering the counts
+-   DESeq2 = a negative binomial GLM. Counts are overdispersed → a negative binomial model is required. Shrinkage across genes makes small-n analysis possible
 -   ⚠️ n = 3 is a convention. Depth saturates around 20–30 M reads; replicates do not
 -   The **MA plot** is a better diagnostic than the volcano plot
 -   GSEA uses the whole ranked list; ORA throws it away. ⚠️ A wrong background set = the commonest error in enrichment analysis
@@ -532,10 +771,15 @@ Rough orientation:
 | rRNA depletion | Removing ribosomal RNA with probes |
 | Stranded library | Records which strand a transcript came from |
 | Count matrix | Genes × samples table of read counts |
+| Gene-body coverage | How reads spread along transcripts from 5′ to 3′; a 3′ pile-up = degraded RNA |
 | Library size | Total reads for a sample |
 | Composition effect | One gene's rise lowering every other proportion |
 | CPM / TPM / FPKM | Depth- and length-normalised expression units |
 | TMM / RLE | Composition-aware size factors (edgeR / DESeq2) |
+| VST / rlog | DESeq2 transformations that even out the spread across expression levels; for plots and EDA only |
+| Batch effect | A systematic difference from processing day or batch, not biology |
+| DEG | A gene whose expression differs significantly between conditions |
+| Design formula | The variables put into the model (e.g. `~ batch + condition`) |
 | log₂ fold change | Effect size on a log scale |
 | Volcano / MA plot | Significance vs. effect / effect vs. expression |
 | ORA | Fisher test on a thresholded gene list |
@@ -551,7 +795,10 @@ Rough orientation:
 | Spliced alignment | Alignment allowing exon–exon junction gaps |
 | Pseudo-alignment | Transcript compatibility without base-level alignment |
 | Overdispersion | Variance exceeding the Poisson expectation |
-| Dispersion (φ) | The extra-Poisson variance parameter |
+| Dispersion (α) | The extra-Poisson variance parameter |
+| GLM | Linear regression's frame plus a count distribution and a log scale |
+| Design matrix | The design formula written as 0s and 1s; one coefficient per column |
+| Wald test | Tests whether a coefficient is 0 by dividing it by its standard error |
 | Shrinkage | Pulling noisy per-gene estimates toward a global trend |
 | WGCNA | Clustering genes into co-expression modules |
 :::
@@ -566,8 +813,17 @@ Conesa A, et al. [*A survey of best practices for RNA-seq data analysis.*](https
 Stark R, Grzelak M, Hadfield J. [*RNA sequencing: the teenage years.*](https://doi.org/10.1038/s41576-019-0150-2) Nat Rev Genet. 2019.\
 Soneson C, Love MI, Robinson MD. [*Differential analyses for RNA-seq: transcript-level estimates improve gene-level inferences.*](https://doi.org/10.12688/f1000research.7563.2) F1000Res. 2015. (tximport)
 
-### Quantification
+### Assays beyond RNA-seq
 
+Core LJ, Waterfall JJ, Lis JT. [*Nascent RNA sequencing reveals widespread pausing and divergent initiation at human promoters.*](https://doi.org/10.1126/science.1162228) Science. 2008. (GRO-seq)\
+Schwalb B, et al. [*TT-seq maps the human transient transcriptome.*](https://pubmed.ncbi.nlm.nih.gov/27257258/) Science. 2016.\
+Herzog VA, et al. [*Thiol-linked alkylation of RNA to assess expression dynamics.*](https://doi.org/10.1038/nmeth.4435) Nat Methods. 2017. (SLAM-seq)\
+Ingolia NT, et al. [*Genome-wide analysis in vivo of translation with nucleotide resolution using ribosome profiling.*](https://doi.org/10.1126/science.1168978) Science. 2009.
+
+### QC and quantification
+
+Ewels P, et al. [*MultiQC: summarize analysis results for multiple tools and samples in a single report.*](https://doi.org/10.1093/bioinformatics/btw354) Bioinformatics. 2016.\
+Wang L, Wang S, Li W. [*RSeQC: quality control of RNA-seq experiments.*](https://pubmed.ncbi.nlm.nih.gov/22743226/) Bioinformatics. 2012.\
 Dobin A, et al. [*STAR: ultrafast universal RNA-seq aligner.*](https://doi.org/10.1093/bioinformatics/bts635) Bioinformatics. 2013.\
 Patro R, et al. [*Salmon provides fast and bias-aware quantification of transcript expression.*](https://doi.org/10.1038/nmeth.4197) Nat Methods. 2017.\
 Bray NL, et al. [*Near-optimal probabilistic RNA-seq quantification.*](https://doi.org/10.1038/nbt.3519) Nat Biotechnol. 2016. (kallisto)
@@ -576,6 +832,7 @@ Bray NL, et al. [*Near-optimal probabilistic RNA-seq quantification.*](https://d
 
 Robinson MD, Oshlack A. [*A scaling normalization method for differential expression analysis of RNA-seq data.*](https://doi.org/10.1186/gb-2010-11-3-r25) Genome Biol. 2010. (TMM)\
 Love MI, Huber W, Anders S. [*Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2.*](https://doi.org/10.1186/s13059-014-0550-8) Genome Biol. 2014.\
+Love MI, Anders S, Kim V, Huber W. [*RNA-Seq workflow: gene-level exploratory analysis and differential expression.*](https://doi.org/10.12688/f1000research.7035.1) F1000Res. 2015. (VST, PCA, design)\
 Robinson MD, McCarthy DJ, Smyth GK. [*edgeR: a Bioconductor package for differential expression analysis of digital gene expression data.*](https://doi.org/10.1093/bioinformatics/btp616) Bioinformatics. 2010.\
 Law CW, et al. [*voom: precision weights unlock linear model analysis tools for RNA-seq read counts.*](https://doi.org/10.1186/gb-2014-15-2-r29) Genome Biol. 2014.
 

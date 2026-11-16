@@ -221,7 +221,7 @@ Dozens exist. Six do most of the work in genomics. For many more, see the table 
 -   The principle (MACS2): estimate the local background level λ from the input → in each window, is the ChIP read count far above what Poisson(λ) predicts? → p-value → multiple-testing correction (q-value) → peak
 -   → A bump that is equally present in the input is not a peak
 -   Parameters matter: **narrow** mode for point-source marks (H3K4me3), **broad** mode for domains (H3K27me3)
--   **Comparing groups** — differential binding (DiffBind, csaw): a sample × peak count matrix → the same count models as RNA-seq (🔗 [W4 §5](w4_transcriptomics.qmd#w4-s5))
+-   **Comparing groups** — differential binding (DiffBind, csaw): a sample × peak count matrix → the same count models as RNA-seq (🔗 [W4 §4](w4_transcriptomics.qmd#w4-s4))
 
 ## 4) Results: the histone code — reading combinations {#w3-s2-4}
 
@@ -345,7 +345,7 @@ The single most common figure in the epigenomics literature. Work top to bottom,
 ### ② Statistical tests {#w3-s3-2-2}
 
 -   **Peak calling** — are there significantly more reads here than in the surrounding background? → MACS2/MACS3. Same principle as for ChIP-seq (🔗 [§2.3②](#w3-s2-3-2)), except ATAC has no input, so only the local background is used
--   **Differential accessibility** — merge all samples' peaks into a consensus set → a sample × peak count matrix → the same count models as RNA-seq (DESeq2, edgeR, DiffBind; 🔗 [W4 §5](w4_transcriptomics.qmd#w4-s5))
+-   **Differential accessibility** — merge all samples' peaks into a consensus set → a sample × peak count matrix → the same count models as RNA-seq (DESeq2, edgeR, DiffBind; 🔗 [W4 §4](w4_transcriptomics.qmd#w4-s4))
 -   ⚠️ Do not compare the **number of peaks** between groups → the number depends on sequencing depth and QC. Compare counts over one shared peak set
 
 ## 3) Results: open chromatin and footprints {#w3-s3-3}
@@ -570,7 +570,7 @@ Not hypothetical. Disease, infection, medication, age, and smoking all shift blo
 -   ✅ Reference-free methods (RefFreeEWAS, ReFACTor, SVA) for tissues without reference panels — at the cost of possibly removing real signal too
 -   ✅ **State exactly what you did.** "We adjusted for cell composition" with no detail is not enough
 
-🔗 This continues the confounding thread from [W1 §4.3](w1_intro.qmd#w1-s4-3), which runs across chapters. It returns in [W4 §7.2](w4_transcriptomics.qmd#w4-s7-2) as bulk tissue deconvolution, and in [W5 §6.3](w5_singlecell.qmd#w5-s6-3) as differential abundance
+🔗 This continues the confounding thread from [W1 §4.3](w1_intro.qmd#w1-s4-3), which runs across chapters. It returns in [W4 §6.2](w4_transcriptomics.qmd#w4-s6-2) as bulk tissue deconvolution, and in [W5 §6.3](w5_singlecell.qmd#w5-s6-3) as differential abundance
 :::
 
 ## 4) Epigenetic clocks ⏳ {#w3-s5-4}

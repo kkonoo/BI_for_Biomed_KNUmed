@@ -49,7 +49,7 @@ execute:
 ## 🔍 더 알아보기 — ③ 조성 변화는 생각보다 흔함
 
 -   ⚠️ 염증·섬유화·침윤 조직 — 임상에서 주로 연구하는 바로 그 조직 — 에서 흔함. 그런데 논문에는 흔히 ①처럼 기술됨
--   같은 문제의 다른 모습: bulk 조직 deconvolution(🔗 [W4 §7.2](w4_transcriptomics.qmd#w4-s7-2)), 후성유전체(🔗 [W3 §5.3](w3_epigenomics.qmd#w3-s5-3))
+-   같은 문제의 다른 모습: bulk 조직 deconvolution(🔗 [W4 §6.2](w4_transcriptomics.qmd#w4-s6-2)), 후성유전체(🔗 [W3 §5.3](w3_epigenomics.qmd#w3-s5-3))
 :::
 
 ## 2) 언제 single cell을 쓰나 {#w5-s1-2}
@@ -527,7 +527,7 @@ Cluster에 반영될 수 있는 것:
 
 ## 2) Pseudobulk {#w5-s6-2}
 
--   **기증자 × 세포 유형**별로 세포들의 count를 합침 → bulk RNA-seq처럼 DESeq2·edgeR로 분석 (🔗 [W4 §5](w4_transcriptomics.qmd#w4-s5))
+-   **기증자 × 세포 유형**별로 세포들의 count를 합침 → bulk RNA-seq처럼 DESeq2·edgeR로 분석 (🔗 [W4 §4](w4_transcriptomics.qmd#w4-s4))
 -   환자 3명 vs 대조군 3명 = 세포를 3,000개 읽든 300,000개 읽든 **n = 3**
 
 ::: {.callout-tip collapse="true"}
@@ -561,7 +561,7 @@ Cluster에 반영될 수 있는 것:
 ## 🔍 더 알아보기 — 조성 자료(compositional data)
 
 -   비율 = **조성 자료**. 한 세포 유형이 늘면 생물학적 변화가 없어도 산술적으로 나머지 비율이 모두 줄어듦
--   같은 문제: 🔗 [W4 §4.2](w4_transcriptomics.qmd#w4-s4-2), 다른 형태로 🔗 [W7 §6](w7_metagenomics.qmd#w7-s6)
+-   같은 문제: 🔗 [W4 §3.3②](w4_transcriptomics.qmd#w4-s3-3-2), 다른 형태로 🔗 [W7 §6](w7_metagenomics.qmd#w7-s6)
 -   ✅ 이를 다루는 방법: `scCODA`, `miloR`, `propeller`, Dirichlet-multinomial model
 -   n은 여기서도 기증자 수
 :::

@@ -144,9 +144,13 @@ If the distinction matters to your hypothesis, you need a different assay:
 
 ## 3) Read length, depth, and paired-end {#w4-s2-3}
 
+-   **Single-end** = read one end of each fragment; **paired-end** = read both ends (🔗 [W1 §2.1②](w1_intro.qmd#w1-s2-1-2))
 -   Plain gene-level DE → single-end is often sufficient; longer reads add little
 -   Isoforms, splice junctions, fusions, novel transcripts → longer and paired-end reads
+-   💡 **Long reads** (PacBio, Nanopore; 🔗 [W1 §2.1③](w1_intro.qmd#w1-s2-1-3)) → one read covers a whole transcript from end to end → isoforms and fusions are seen directly, not pieced together
 -   Depth saturates much earlier than people expect ([§4.3④](#w4-s4-3-4))
+
+![(a) A 150 bp short read covers only one or two exons, so it cannot tell which exons sat on the same molecule. A long read reads the whole molecule. (b) With short reads, a fusion shows up only in the few reads or paired-end mates that straddle the breakpoint. A long read holds both genes in one read.](/assets/img/w4/long_read.png){fig-align="center"}
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — read length, paired-end and depth at a glance
@@ -155,6 +159,7 @@ If the distinction matters to your hypothesis, you need a different assay:
 |------------------------------------|------------------------------------|
 | **Longer reads** (2×150 vs 1×50) | Isoform and splice junction work; less benefit for plain gene-level counting |
 | **Paired-end** | Isoforms, fusion detection, novel transcripts. For gene-level DE, single-end is often sufficient |
+| **Long reads** (PacBio, Nanopore) | Full-length isoforms, fusions, novel transcripts. Fewer reads at higher cost → gene-level quantification (DE) still relies mostly on short reads |
 | **Depth** | See [§4.3④](#w4-s4-3-4) — saturates much earlier than people expect |
 :::
 
@@ -191,36 +196,59 @@ Before samples leave the bench (🔗 [W1 §5.3](w1_intro.qmd#w1-s5-3)):
 
 ------------------------------------------------------------------------
 
-# 3. Pre-processing: From Reads to Counts 🔢 {#w4-s3}
+# 3. Pre-processing 🔢 {#w4-s3}
 
 > 🔑 **Core idea** — check the samples (QC) → assign reads to genes to build the count matrix → normalise → look at the samples as a whole before testing (EDA)
 
+![An example bulk RNA-seq pipeline from our lab: FastQC → TrimGalore → salmon → tximport → DESeq2. QC metrics are checked at each step (§3.1), then the statistical test (§4) leads into downstream analysis (§5).](/assets/img/w4/rnaseq_pipeline.png){fig-align="center"}
+
 ## 1) QC {#w4-s3-1}
 
--   **Raw read QC** — FastQC checks base quality, leftover adapters and GC content → MultiQC collects many samples into one report
--   **Where did the reads go?** — the share that aligns to the genome (mapping rate), lands in exons, or is rRNA → be suspicious of one sample that stands out
+-   Check each step separately: raw reads → alignment → count matrix (the shape of the samples as a whole is EDA, [§3.4](#w4-s3-4))
+-   💡 **Comparison with the other samples in the same experiment** matters more than any absolute cut-off
+
+### ① Raw sequencing reads {#w4-s3-1-1}
+
+-   **FastQC** — base quality, leftover adapters, GC content, overrepresented sequences → MultiQC collects many samples into one report
+-   Adapters and low-quality bases → trimming (TrimGalore, cutadapt)
+-   ⚠️ Duplication — naturally high for highly expressed genes in RNA-seq → not a reason to remove reads on its own
+
+### ② Read alignment {#w4-s3-1-2}
+
+-   **Mapping rate** — the share of reads aligned to the genome (or transcriptome)
+-   **Where the reads landed** — exon, intron, intergenic, rRNA → be suspicious of one sample that stands out
 -   **Gene-body coverage** — reads should cover each transcript evenly from 5′ to 3′. ⚠️ A pile-up toward 3′ = a sign of degraded RNA (low RIN) in a poly(A) library
+-   **Strandedness** — whether it matches the lab record
 
 ![(a) Where each sample's reads went. Only S5 has a lot of rRNA and few aligned reads → find the cause, then decide whether to drop it. (b) Degraded RNA keeps only the 3′ fragments near the poly(A) tail, so coverage piles up at the 3′ end.](/assets/img/w4/rnaseq_qc.png){fig-align="center"}
 
+💡 salmon (pseudo-alignment) reports only the mapping rate → check read distribution and gene-body coverage on a genome alignment (e.g. STAR) with RSeQC or Qualimap
+
+### ③ Count matrix {#w4-s3-1-3}
+
+-   **Library size** (a sample's total count) and **genes detected** → be suspicious of a sample with far fewer than the others
+-   Check that a handful of genes do not take most of the counts (e.g. haemoglobin genes in whole blood)
+-   The shape of the samples as a whole → EDA ([§3.4](#w4-s3-4))
+
 ::: {.callout-note collapse="true" icon=false}
-## 🔍 Going further — the QC metrics in detail
+## 🔍 Going further — QC metrics by step
 
-| Metric | What it shows | Warning sign |
+| Step | Metric | Warning sign |
 |------------------------|------------------------|------------------------|
-| **Mapping rate** | Share of reads aligned to the genome | Clearly lower than other samples → contamination, wrong species, adapters |
-| **Exonic / intronic share** | Whether reads came from mRNA | High intronic share in a poly(A) library → nuclear RNA or DNA contamination |
-| **rRNA share** | Whether rRNA removal worked | Higher than other samples → removal failed |
-| **Gene-body coverage** | Whether the RNA was intact | 3′ pile-up → degradation |
-| **Library size, genes detected** | Depth | Far fewer than other samples |
-| **Duplication** | PCR duplicates | Naturally high for highly expressed genes in RNA-seq → not a reason to remove reads on its own |
-| **Strandedness** | Whether it matches the lab record | Mismatch → wrong counting settings |
+| **Raw reads** | Base quality | Drops sharply toward the read end → trim |
+| **Raw reads** | Adapter content | High → short fragments, trimming needed |
+| **Raw reads** | Duplication | Can be high and still normal in RNA-seq |
+| **Alignment** | Mapping rate | Clearly lower than other samples → contamination, wrong species, adapters |
+| **Alignment** | Exonic / intronic share | High intronic share in a poly(A) library → nuclear RNA or DNA contamination |
+| **Alignment** | rRNA share | Higher than other samples → removal failed |
+| **Alignment** | Gene-body coverage | 3′ pile-up → degradation |
+| **Alignment** | Strandedness | Does not match the record → wrong counting settings |
+| **Count matrix** | Library size, genes detected | Far fewer than other samples |
 
--   **Comparison with the other samples in the same experiment** matters more than any absolute cut-off
 -   Tools: FastQC, MultiQC, RSeQC, Qualimap. Pipelines such as nf-core/rnaseq run them all at once
 :::
 
-## 2) From reads to counts {#w4-s3-2}
+## 2) Alignment and quantification {#w4-s3-2}
 
 -   Reads are matched to genes and counted → a genes × samples count matrix
 -   ⚠️ Every count matrix carries four invisible decisions made along the way (①–④)
@@ -239,7 +267,7 @@ Before samples leave the bench (🔗 [W1 §5.3](w1_intro.qmd#w1-s5-3)):
 -   ✅ \~10× faster, far less memory
 -   ❌ No BAM file → cannot inspect alignments
 
-![The read is broken into short pieces (k-mers), and the only question is which transcripts they fit. This read is compatible with T1 and T2, not with T3.](/assets/img/w4/pseudo_alignment.png){fig-align="center"}
+![The read is broken into short pieces (k-mers), and the only question is which transcripts they fit. This read comes from the end of exon 1 and the start of exon 2 → it fits T1 and T2, where exon 1 is joined to exon 2, but not T3, which lacks exon 2.](/assets/img/w4/pseudo_alignment.png){fig-align="center"}
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — pseudo-alignment in detail
@@ -281,7 +309,7 @@ Before samples leave the bench (🔗 [W1 §5.3](w1_intro.qmd#w1-s5-3)):
 
 -   A raw count reflects sequencing depth, gene length and library composition, not only biology → normalise before comparing samples
 
-### ① Why raw counts cannot be compared {#w4-s3-3-1}
+### ① Depth, gene length and composition {#w4-s3-3-1}
 
 A count depends on three things that have nothing to do with biology:
 
@@ -321,7 +349,7 @@ Both assume **the majority of genes do not change**. Usually safe
 → in those cases you need spike-in controls (ERCC) to anchor the scale
 :::
 
-### ③ Which measure, when {#w4-s3-3-3}
+### ③ Expression units {#w4-s3-3-3}
 
 -   **Raw counts** → input to DESeq2 / edgeR — do not pre-normalise
 -   **TPM** → reporting expression levels, heatmaps
@@ -350,7 +378,7 @@ A common and quiet error
 | **TMM / RLE** | depth + **composition** | between samples | **Differential expression — the standard** |
 :::
 
-## 4) Exploratory data analysis (EDA): look at the samples first {#w4-s3-4}
+## 4) Exploratory data analysis (EDA) {#w4-s3-4}
 
 -   Before testing genes one by one, look at **the samples as a whole**
 -   What to check: are replicates alike? Do the groups separate? Is one sample an outlier? Is there a batch?
@@ -402,7 +430,7 @@ dist(t(assay(vsd)))                                  # sample-to-sample distance
 
 > 🔑 **Core idea** — for each gene, test "is the difference between groups larger than the noise?" DESeq2 = a regression model built for counts (negative binomial GLM) + borrowing information across genes. Nothing replaces enough biological replicates
 
-## 1) What is a DEG? {#w4-s4-1}
+## 1) DEGs {#w4-s4-1}
 
 -   **DEG** (differentially expressed gene) = a gene whose expression differs significantly between conditions (e.g. case vs. control)
 -   The difficulty — observed expression mixes biological signal, technical noise and differences between individuals
@@ -410,7 +438,7 @@ dist(t(assay(vsd)))                                  # sample-to-sample distance
 
 ![The mean difference is the same. Gene X, with a small spread within groups, is a DEG; gene Y, with a large spread, cannot be told from chance.](/assets/img/w4/deg_signal_noise.png){fig-align="center"}
 
-## 2) Seeing it as regression {#w4-s4-2}
+## 2) Regression {#w4-s4-2}
 
 ### ① Linear regression {#w4-s4-2-1}
 
@@ -588,7 +616,7 @@ res <- results(dds, contrast = c("condition", "case", "control"))
 -   Batch and condition overlap completely → two columns of the design matrix are identical → the two cannot be separated (🔗 [§2.5](#w4-s2-5))
 :::
 
-## 5) Reading a results table {#w4-s4-5}
+## 5) Results table and plots {#w4-s4-5}
 
 ![Two views of the same result. Most papers show only the first. Both cut-off lines are conventions, and the MA plot reveals whether hits pile up at low counts.](/assets/img/w4/volcano_ma.png){fig-align="center"}
 
@@ -750,7 +778,7 @@ res <- results(dds, contrast = c("condition", "case", "control"))
 
 -   RNA-seq turns RNA into cDNA and counts reads per gene. What it measures = steady-state abundance, in a mixture of cells, at one moment — not synthesis rate, not protein, not any single cell
 -   Poly(A) selection = the default; rRNA depletion for FFPE, non-coding RNA and nascent transcription
--   QC: mapping rate, rRNA share, gene-body coverage → compare with the other samples in the same experiment
+-   QC step by step: raw reads (FastQC) → alignment (mapping rate, rRNA share, gene-body coverage) → count matrix. Compare with the other samples in the same experiment
 -   Pseudo-alignment is fast and accurate for quantification; spliced alignment when read position matters
 -   Raw counts are biased by depth, gene length and **composition** → TMM / RLE correct composition = the standard for DE
 -   ⚠️ **Never feed normalised values into DESeq2 or edgeR**

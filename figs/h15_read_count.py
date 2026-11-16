@@ -32,18 +32,23 @@ fig.savefig(OUT + "spliced_alignment.png"); plt.close(fig)
 
 # 2 — pseudo-alignment
 fig, b = new("Pseudo-alignment asks which transcripts a read fits")
+EXON = {0.9: "exon 1", 3.2: "exon 2", 5.6: "exon 3", 7.8: "exon 4"}
 tx = [("T1", [(0.9, 2.6), (3.2, 4.8), (5.6, 7.2)], True), ("T2", [(0.9, 2.6), (3.2, 4.8), (7.8, 9.2)], True),
       ("T3", [(0.9, 2.6), (5.6, 7.2), (7.8, 9.2)], False)]
 for k, (name, exs, ok) in enumerate(tx):
     yy = 3.3 - k * 0.9
     b.plot([exs[0][0], exs[-1][1]], [yy, yy], color=LINE, lw=1)
-    for x0, x1 in exs: exon(b, x0, x1, yy, c=EX if ok else GREYF, h=0.34)
+    for x0, x1 in exs:
+        exon(b, x0, x1, yy, c=EX if ok else GREYF, h=0.42)
+        b.text((x0 + x1) / 2, yy, EXON[x0], ha="center", va="center", fontsize=8.6, zorder=4,
+               color="white" if ok else TEXT, fontweight="semibold")
     b.text(0.55, yy, name, ha="right", va="center", fontsize=10, fontweight="semibold", color=TEXT)
     b.text(9.55, yy, "✓" if ok else "✕", ha="left", va="center", fontsize=11, color=CRIMSON if ok else DARK, fontweight="bold")
 for i in range(4):                                            # the read as k-mers spanning exon 1 → exon 2
     b.add_patch(mp.Rectangle((2.0 + i * 0.55, 4.45), 0.5, 0.28, fc=tint(0.55), ec="white", lw=1))
-b.text(4.4, 4.59, "read → k-mers (exon 1 | exon 2)", ha="left", va="center", fontsize=9.3, color=TEXT)
-b.text(0.3, 0.5, "Salmon, kallisto · compatible with {T1, T2} · no base-by-base alignment",
+b.text(4.4, 4.59, "read → k-mers (end of exon 1 | start of exon 2)", ha="left", va="center", fontsize=9.3,
+       color=TEXT)
+b.text(0.3, 0.5, "Salmon, kallisto · only T1 and T2 have exon 1 next to exon 2 · no base-by-base alignment",
        ha="left", fontsize=9, color=TEXT2)
 fig.savefig(OUT + "pseudo_alignment.png"); plt.close(fig)
 

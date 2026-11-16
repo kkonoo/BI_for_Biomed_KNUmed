@@ -99,13 +99,12 @@ editor: visual
 
 > **RNA-seq returns 847 genes. Which of them actually matter?**
 
-1.  What RNA-seq Measures 📏 — abundance, not synthesis; and not protein
-2.  Experimental Choices ⚙️ — poly(A) vs rRNA depletion, strandedness, replicates, design checklist
-3.  From Reads to Counts 🔢 — spliced alignment vs pseudo-alignment; gene vs transcript level
-4.  Normalization ⚖️ — library size, gene length, and the composition effect; CPM/TPM/TMM/RLE
-5.  Differential Expression 📊 — the negative binomial model, shrinkage, sample size, volcano and MA plots
-6.  Making Sense of a Gene List 🧠 — ORA vs GSEA and the three commonest misuses
-7.  Beyond Differential Expression 🌐 — WGCNA, deconvolution, splicing, eQTLs
+1.  What RNA-seq Is 🧬 — how it works; abundance, not synthesis; not protein; a snapshot
+2.  Before You Sequence ⚙️ — poly(A) vs rRNA depletion, strandedness, read length and long reads, replicates, study design
+3.  Pre-processing 🔢 — the pipeline, QC by step, alignment and quantification, normalisation, EDA (VST, PCA, batch effects)
+4.  Analysis: Testing for Differential Expression 📊 — regression, DESeq2's negative binomial GLM, shrinkage, the design matrix, volcano and MA plots
+5.  Downstream Analysis 🧠 — ORA vs GSEA and the three commonest misuses
+6.  Beyond Differential Expression 🌐 — WGCNA, deconvolution, splicing, eQTLs
 
 ⚠️ **The trap** — bulk differential expression often reflects a composition difference
 
@@ -118,12 +117,12 @@ editor: visual
 > **Every cell changing a little, or 5% of cells changing a lot?**
 
 1.  Why Single Cell 🔬 — what averaging destroys, and when bulk is still better
-2.  Decisions Made Before the Machine 🧫 — droplet vs plate vs combinatorial; 3′ vs 5′; cells vs nuclei; dissociation bias; donor-level design
-3.  From Droplets to a Count Matrix 🧮 — barcodes, UMIs, zeros, cell calling, ambient RNA, doublets, QC, PCA
-4.  Finding Cell Types 🗺️ — the neighbour graph, clustering resolution, UMAP, annotation
-5.  Batch Effects and Integration 🔗 — Harmony/scVI, and over-correction
-6.  Statistical Testing 📊 — why per-cell tests are invalid; pseudobulk; differential abundance
-7.  Dynamics, Mechanism, Space, and Atlases 🌈 — trajectories, regulons, cell–cell communication, spatial, HCA, strength of evidence
+2.  Before You Sequence 🧫 — cells vs nuclei; dissociation bias; donor-level design
+3.  Sequencing Technology 🧪 — droplet vs plate vs combinatorial; barcodes and UMIs; 3′ vs 5′; sparsity
+4.  Pre-processing 🧮 — the pipeline, QC by step (cell calling, ambient RNA, doublets), PCA, integration, clustering, UMAP, annotation
+5.  Statistical Testing 📊 — pseudoreplication; pseudobulk; differential abundance
+6.  Downstream Analysis 🌈 — trajectories, regulons, cell–cell communication, reference atlases, strength of evidence
+7.  Other Methods 🧩 — spatial transcriptomics, snATAC-seq, multiome
 
 ⚠️ **The trap** — per-cell tests across conditions are invalid. n = the number of donors, not cells
 

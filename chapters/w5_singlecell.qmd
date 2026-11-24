@@ -169,6 +169,8 @@ By the end of this chapter you should be able to:
 
 ## 2) Barcodes and UMIs {#w5-s3-2}
 
+![The oligos on a real gel bead (a 5′ kit bead, §3.3). Every oligo on the bead carries the same cell barcode and a different UMI. Lower: an antibody-conjugated oligo, which reads out surface protein with the same barcode (CITE-seq).](images/clipboard-150401913.png){fig-align="center"}
+
 Every read carries two tags:
 
 -   **Cell barcode** — which cell it came from
@@ -177,8 +179,6 @@ Every read carries two tags:
 → Count matrix = number of **molecules** per cell × gene
 
 ![](/assets/img/w5/barcode_umi.png){fig-align="center"}
-
-![The oligos on a real gel bead (a 5′ kit bead, §3.3). Every oligo on the bead carries the same cell barcode and a different UMI. Lower: an antibody-conjugated oligo, which reads out surface protein with the same barcode (CITE-seq).](images/clipboard-150401913.png){fig-align="center"}
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 Going further — the TSO, and what UMIs cannot fix
@@ -191,11 +191,12 @@ Every read carries two tags:
 
 ## 3) 3′ vs. 5′ {#w5-s3-3}
 
--   Droplet kits read only **one end** of each transcript, not the full length → enough to count genes
+-   Droplet kits read only the **3′ or 5′ end region** of each transcript, not the full length → enough to count genes
+-   ⚠️ This is not single-end sequencing — the run itself is **paired-end**: Read 1 = cell barcode + UMI, Read 2 = cDNA. The cDNA is read by Read 2 alone, and Read 2 comes from near one end of the transcript (🔗 [W1 §2.1②](w1_intro.qmd#w1-s2-1-2))
 -   Most data is **3′**. Need T/B cell receptor (TCR/BCR) sequences? → **5′**
 
 ::: {.callout-note collapse="true" icon=false}
-## 🔍 Going further — why only one end is read
+## 🔍 Going further — why only one end of the transcript is read
 
 ![](/assets/img/w5/three_vs_five_prime.png){fig-align="center"}
 
@@ -339,7 +340,7 @@ Cells that burst during dissociation and loading release their mRNA into the sus
 ## 🔍 Going further — reading the three numbers
 
 | Metric | Too low → | Too high → |
-|------------------------|------------------------|------------------------|
+|------------------|------------------------|------------------------------|
 | Total UMIs | empty droplet, debris, broken cell | doublet — or a large, transcriptionally active cell |
 | Genes detected | as above | as above |
 | Mitochondrial % (mito %) | — | dying cell — or a genuinely mitochondria-rich one |
@@ -374,7 +375,7 @@ Cells that burst during dissociation and loading release their mRNA into the sus
 -   The rate rises with loading: \~0.8% per 1,000 cells recovered on standard 10x → **10,000 cells → \~8% doublets**
 
 |   | **Heterotypic** | **Homotypic** |
-|-------------------|------------------------|------------------------|
+|--------------|--------------------------------|--------------------------|
 | Made of | two different cell types (T cell + monocyte) | two cells of the same type |
 | Looks like | markers of both types; a fake "intermediate" cluster | one cell with \~2× the counts |
 | Detectable from expression | ✅ yes | ❌ almost never |
@@ -398,7 +399,7 @@ Cells that burst during dissociation and loading release their mRNA into the sus
 ## 🔍 Going further — what each step does
 
 | Step | What it does | Why |
-|-------------------|------------------------|------------------------|
+|------------|--------------------------|----------------------------------|
 | **Normalise** | divide by the cell's total UMIs, × 10,000, then log(1 + x) | capture efficiency differs several-fold between cells for technical reasons; the log tames a few huge values |
 | **Select HVGs** | keep \~2,000 genes whose variance exceeds what their mean predicts | most genes are flat or noise; HVGs carry the cell-type signal |
 | **Scale** | per gene: subtract the mean, divide by the SD | so a highly expressed gene does not dominate PCA simply by being large |
@@ -687,7 +688,7 @@ Unit of replication = the donor → **the number of donors is your n** (§2.2)
 ## 🔍 Going further — within a cell: regulons and gene programs
 
 |   | Within a cell | Between cells |
-|-------------------|------------------------|------------------------|
+|----------|--------------------------------------|------------------------|
 | Pair | gene ↔ gene | ligand ↔ receptor |
 | Result | **Regulon** (TF-centred) / **gene program** (genes that move together) | **Cell–cell communication** |
 | Typical tools | SCENIC, decoupleR / cNMF | CellPhoneDB, CellChat, NicheNet |
@@ -820,7 +821,7 @@ CellPhoneDB, CellChat, NicheNet score ligand–receptor pairs co-expressed betwe
 ![](/assets/img/w5/snatac.png){fig-align="center"}
 
 |   | scRNA-seq | snATAC-seq |
-|------------------------|------------------------|------------------------|
+|------------|--------------------------|----------------------------------|
 | Columns (features) | genes | peaks (or fixed-width tiles across the genome) |
 | Values | UMI counts (0, 1, 2, … hundreds) | almost all 0/1 → often binarised |
 | Share of zeros | over 90% | 95–99% |

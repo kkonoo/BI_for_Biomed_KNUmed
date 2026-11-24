@@ -71,5 +71,7 @@ c.set_title("(c) Median genes per cell", loc="left", fontsize=12, fontweight="se
 c.text(0, 1.03, "one number per sample", transform=c.transAxes, fontsize=8.8, color=TEXT2)
 fig.text(0.01, 0.02, "Example values from one simulated sample. Compare samples with each other: one sample far below "
          "the rest → look at its dissociation or loading.", fontsize=8.4, color=TEXT2)
-header(a, "Single-cell RNA-seq · the first QC report", "Five numbers to read before anything else", dy=40, x1=3.55)
+pa, pc = a.get_position(), c.get_position()          # rule ends at the right edge of (c), so no blank margin
+header(a, "Single-cell RNA-seq · the first QC report", "Five numbers to read before anything else", dy=40,
+       x1=(pc.x1 - pa.x0) / pa.width)
 fig.savefig(OUT + "qc_metrics.png"); print("ok k33 qc metrics", round(med))

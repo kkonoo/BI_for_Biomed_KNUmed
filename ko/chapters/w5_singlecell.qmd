@@ -169,6 +169,8 @@ execute:
 
 ## 2) Barcode와 UMI {#w5-s3-2}
 
+![실제 gel bead의 oligo 구조(5′ kit bead, §3.3). Bead의 모든 oligo = 같은 cell barcode + 서로 다른 UMI. 아래: antibody에 붙은 oligo → 같은 barcode로 표면 단백질까지 읽음(CITE-seq)](../../chapters/images/clipboard-150401913.png){fig-align="center"}
+
 모든 read에 두 가지 꼬리표가 붙음:
 
 -   **Cell barcode** — 어느 세포에서 왔나
@@ -177,8 +179,6 @@ execute:
 → Count matrix = 세포 × 유전자별 **분자 수**
 
 ![](/assets/img/w5/barcode_umi.png){fig-align="center"}
-
-![실제 gel bead의 oligo 구조(5′ kit bead, §3.3). Bead의 모든 oligo = 같은 cell barcode + 서로 다른 UMI. 아래: antibody에 붙은 oligo → 같은 barcode로 표면 단백질까지 읽음(CITE-seq)](../../chapters/images/clipboard-150401913.png){fig-align="center"}
 
 ::: {.callout-note collapse="true" icon=false}
 ## 🔍 더 알아보기 — TSO, 그리고 UMI의 한계
@@ -191,11 +191,12 @@ execute:
 
 ## 3) 3′ vs 5′ {#w5-s3-3}
 
--   Droplet kit은 transcript 전체가 아니라 **한쪽 끝**만 읽음 → 유전자 세기엔 충분
+-   Droplet kit은 transcript 전체가 아니라 **3′ 또는 5′ 말단 부분**만 읽음 → 유전자 세기엔 충분
+-   ⚠️ Single-end와는 다른 얘기 — sequencing 자체는 **paired-end**: Read 1 = cell barcode + UMI, Read 2 = cDNA. cDNA 서열은 Read 2 하나로만 읽고, 그 Read 2가 transcript의 말단 근처에서 나옴 (🔗 [W1 §2.1②](w1_intro.qmd#w1-s2-1-2))
 -   대부분 **3′ kit**. T/B cell 수용체(TCR/BCR) 서열이 필요하면 **5′ kit**
 
 ::: {.callout-note collapse="true" icon=false}
-## 🔍 더 알아보기 — 왜 한쪽 끝만 읽히나
+## 🔍 더 알아보기 — 왜 transcript의 한쪽 말단만 읽히나
 
 ![](/assets/img/w5/three_vs_five_prime.png){fig-align="center"}
 
@@ -339,7 +340,7 @@ QC로 걸러내는 네 가지:
 ## 🔍 더 알아보기 — 세 가지 숫자 읽기
 
 | 지표 | 너무 낮으면 → | 너무 높으면 → |
-|------------------------|------------------------|------------------------|
+|------------------|------------------------|------------------------------|
 | 총 UMI 수 | 빈 droplet, 잔해, 깨진 세포 | doublet — 또는 크고 전사가 활발한 세포 |
 | 검출 유전자 수 | 위와 같음 | 위와 같음 |
 | 미토콘드리아 비율(mito %) | — | 죽어가는 세포 — 또는 원래 미토콘드리아가 많은 세포 |
@@ -374,7 +375,7 @@ QC로 걸러내는 네 가지:
 -   Loading할수록 ↑: 표준 10x에서 회수 세포 1,000개당 약 0.8% → **10,000개 회수 시 약 8%**
 
 |   | **Heterotypic** | **Homotypic** |
-|-------------------|------------------------|------------------------|
+|--------------|--------------------------------|--------------------------|
 | 구성 | 서로 다른 세포 유형 (T cell + monocyte) | 같은 유형의 세포 둘 |
 | 보이는 모습 | 두 유형의 marker가 동시에; 가짜 "중간" cluster | count가 약 2배인 세포 하나 |
 | 발현으로 검출 | ✅ 가능 | ❌ 거의 불가 |
@@ -398,7 +399,7 @@ QC로 걸러내는 네 가지:
 ## 🔍 더 알아보기 — 단계별로 하는 일
 
 | 단계 | 하는 일 | 이유 |
-|-------------------|------------------------|------------------------|
+|------------|--------------------------|----------------------------------|
 | **정규화** | 세포의 총 UMI로 나누고 × 10,000 → log(1 + x) | 포획 효율이 기술적 이유로 세포마다 몇 배씩 다름; log로 소수의 큰 값을 눌러줌 |
 | **HVG 선택** | 평균에 비해 분산이 큰 유전자 약 2,000개만 남김 | 대부분의 유전자는 평평하거나 noise; 세포 유형 신호는 HVG에 |
 | **Scaling** | 유전자마다 평균 빼고 SD로 나눔 | 발현량이 크다는 이유만으로 PCA를 지배하지 않게 |
@@ -687,7 +688,7 @@ Cluster에 반영될 수 있는 것:
 ## 🔍 더 알아보기 — 세포 안: regulon과 gene program
 
 |   | 세포 안 (within cell) | 세포 사이 (between cells) |
-|-------------------|------------------------|------------------------|
+|----------|--------------------------------------|------------------------|
 | 짝 | 유전자 ↔ 유전자 | ligand ↔ receptor |
 | 결과 | **Regulon**(TF 중심) / **gene program**(함께 움직이는 유전자 묶음) | **세포–세포 소통** |
 | 대표 도구 | SCENIC, decoupleR / cNMF | CellPhoneDB, CellChat, NicheNet |
@@ -820,7 +821,7 @@ CellPhoneDB, CellChat, NicheNet = cluster 쌍 사이에서 함께 발현되는 l
 ![](/assets/img/w5/snatac.png){fig-align="center"}
 
 |   | scRNA-seq | snATAC-seq |
-|------------------------|------------------------|------------------------|
+|------------|--------------------------|----------------------------------|
 | 열 (feature) | 유전자 | peak (또는 genome을 일정 간격으로 자른 tile) |
 | 값 | UMI count (0, 1, 2, … 수백) | 거의 0/1 → 흔히 0/1로 바꿔서(binarise) 사용 |
 | 0의 비율 | 90% 이상 | 95–99% |

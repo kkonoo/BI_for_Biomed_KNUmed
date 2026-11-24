@@ -121,7 +121,7 @@ editor: visual
 3.  Sequencing Technology 🧪 — droplet vs microwell vs plate vs combinatorial; barcodes and UMIs; 3′ vs 5′; sparsity
 4.  Pre-processing 🧮 — the pipeline, QC by step (cell calling, ambient RNA, doublets), PCA, integration, clustering, UMAP, annotation
 5.  Statistical Testing 📊 — pseudoreplication; pseudobulk; differential abundance
-6.  Downstream Analysis 🌈 — trajectories, regulons, cell–cell communication, reference atlases, strength of evidence
+6.  Downstream Analysis 🌈 — trajectories, regulons, cell–cell communication, reference atlases, how far each result can be claimed
 7.  Other Methods 🧩 — spatial transcriptomics, snATAC-seq, multiome
 
 ⚠️ **The trap** — per-cell tests across conditions are invalid. n = the number of donors, not cells

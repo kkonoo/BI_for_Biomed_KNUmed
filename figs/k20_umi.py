@@ -5,17 +5,23 @@ W, H = 9.8, 4.3
 fig = plt.figure(figsize=(W, H))
 ax = fig.add_axes([0, 0, 1, (H - 0.8) / H]); ax.set_xlim(0, W); ax.set_ylim(0, H - 0.8); ax.axis("off")
 DARK = "#5E6670"; MONO = "DejaVu Sans Mono"
-# (a) what one read carries
+# (a) one capture oligo on the bead, 5′ → 3′, with the cDNA it primes
 ax.text(0.1, 3.3, "(a) What one read carries", ha="left", va="center", fontsize=11.6, fontweight="semibold", color=TEXT)
-parts = [("cell barcode", "16 nt", DARK, 1.6), ("UMI", "12 nt", CRIMSON, 1.15), ("poly(dT)", "", "#C9CED6", 0.8),
-         ("cDNA → which gene", "", tint(0.3), 2.4)]
-x = 0.1
+ax.add_patch(mp.Circle((0.36, 2.73), 0.26, fc="#8C939C", ec="none"))
+ax.text(0.36, 2.73, "bead", ha="center", va="center", fontsize=7.8, color="white", fontweight="semibold")
+ax.plot([0.62, 0.78], [2.73, 2.73], color=TEXT2, lw=1.2)
+ax.text(0.78, 3.0, "5′", ha="center", va="bottom", fontsize=9.5, color=TEXT, fontweight="bold")
+parts = [("cell barcode", "16 nt", DARK, 1.45), ("UMI", "12 nt", CRIMSON, 1.0), ("poly(dT)", "", "#C9CED6", 0.75),
+         ("cDNA → which gene", "", tint(0.3), 2.05)]
+x = 0.78
 for nm, ln, c, w in parts:
     ax.add_patch(mp.Rectangle((x, 2.55), w, 0.36, fc=c, ec="white", lw=1.5))
     ax.text(x + w / 2, 2.73, nm, ha="center", va="center", fontsize=8.6, color="white" if c in (DARK, CRIMSON) else TEXT,
             fontweight="semibold")
     if ln: ax.text(x + w / 2, 2.35, ln, ha="center", va="center", fontsize=7.8, color=TEXT2)
     x += w
+ax.text(x, 3.0, "3′", ha="center", va="bottom", fontsize=9.5, color=TEXT, fontweight="bold")
+ax.text(x - 2.05 / 2, 2.35, "made by RT from the captured mRNA", ha="center", va="center", fontsize=7.8, color=TEXT2)
 ax.text(0.1, 1.95, "cell barcode = which droplet (cell)", ha="left", va="center", fontsize=8.8, color=TEXT)
 ax.text(0.1, 1.65, "UMI = which original molecule, tagged before PCR", ha="left", va="center", fontsize=8.8, color=CRIMSON)
 ax.text(0.1, 1.35, "cDNA = which gene", ha="left", va="center", fontsize=8.8, color=TEXT)

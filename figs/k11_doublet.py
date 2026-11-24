@@ -3,7 +3,7 @@ from sklearn.neighbors import NearestNeighbors
 rng = np.random.default_rng(11)
 
 # Doublet detection: simulate artificial doublets, embed with real cells, score each cell by its share of
-# artificial neighbours (pANN), then cut at the expected doublet count
+# artificial neighbours (pANN); the pANN distribution is bimodal, so cut at the expected doublet count
 fig = plt.figure(figsize=(9.8, 4.7))
 gs = fig.add_gridspec(1, 3, width_ratios=[0.9, 1.15, 1.0], wspace=0.25, left=0.02, right=0.99, top=0.8, bottom=0.14)
 DARK = "#5E6670"; TC = "#8A929C"; MC = "#C3C8CF"
@@ -69,23 +69,43 @@ b.legend([Line2D([], [], marker="o", ls="", color=CRIMSON, ms=4.5),
          ["real doublets (hidden truth)", "artificial doublets"], loc="lower right", frameon=False, fontsize=8,
          handletextpad=0.2, labelcolor=TEXT2, borderaxespad=0.1)
 
-# (c) rank by pANN and cut
+# (c) the pANN distribution of a larger toy run: two humps, cut at the expected number of doublets
+from scipy.stats import gaussian_kde
+T2 = rng.normal([-2.2, 0.0], 0.55, (3000, 2)); M2 = rng.normal([2.2, 0.6], 0.55, (2000, 2))
+nd = 300                                             # ~6% heterotypic doublets
+D2 = (T2[rng.integers(0, 3000, nd)] + M2[rng.integers(0, 2000, nd)]) / 2 + rng.normal(0, 0.25, (nd, 2))
+real2 = np.vstack([T2, M2, D2]); isdb = np.r_[np.zeros(5000), np.ones(nd)]
+pr = rng.integers(0, len(real2), (len(real2) // 3, 2))  # artificial doublets = 1/3 of the real cells
+art2 = (real2[pr[:, 0]] + real2[pr[:, 1]]) / 2 + rng.normal(0, 0.2, (len(pr), 2))
+all2 = np.vstack([real2, art2]); isart2 = np.r_[np.zeros(len(real2)), np.ones(len(art2))]
+k2 = 40
+_, idx2 = NearestNeighbors(n_neighbors=k2 + 1).fit(all2).kneighbors(real2)
+p2 = isart2[idx2[:, 1:]].mean(1)
 c = fig.add_subplot(gs[2])
-bins = np.linspace(0, 1, 17)
-c.hist(pann[kind < 2], bins=bins, color=MC, lw=0, label="singlets")
-c.hist(pann[kind == 2], bins=bins, color=CRIMSON, lw=0, label="doublets")
-cut = np.sort(pann)[::-1][24]
-c.axvline(cut + 0.03, color=TEXT, lw=0.9, ls=(0, (4, 3)))
-c.text(cut + 0.06, c.get_ylim()[1] * 0.92, "cut: top n = expected\ndoublet rate × cells", fontsize=8.3,
-       color=TEXT, va="top", linespacing=1.2)
-c.set_yscale("log"); c.set_xlabel("pANN", color=TEXT2, fontsize=9); c.set_ylabel("cells", color=TEXT2, fontsize=9)
+xs = np.linspace(0, 1, 400)
+dens = gaussian_kde(p2, bw_method=0.16)(xs) * len(p2) / 100   # cells per 0.01 of pANN
+cut = np.sort(p2)[::-1][nd]
+c.fill_between(xs, dens, color=MC, lw=0)
+c.fill_between(xs, dens, where=xs >= cut, color=CRIMSON, lw=0)
+c.plot(xs, dens, color=DARK, lw=0.8)
+c.axvline(cut, color=TEXT, lw=0.9, ls=(0, (4, 3)))
+ytop = dens.max() * 1.08; c.set_ylim(0, ytop)
+hump = xs[(xs > cut)][np.argmax(dens[xs > cut])]
+c.annotate("singlets", (0.12, dens[np.searchsorted(xs, 0.12)]), xytext=(0.28, ytop * 0.78), fontsize=8.6, color=TEXT,
+           arrowprops=dict(arrowstyle="-", color=TEXT2, lw=0.7))
+c.annotate("doublets", (hump, dens.max() * 0.06), xytext=(hump - 0.02, ytop * 0.4), fontsize=8.6, color=CRIMSON,
+           fontweight="semibold", ha="center", arrowprops=dict(arrowstyle="-", color=CRIMSON, lw=0.7))
+c.text(cut + 0.02, ytop * 0.97, "cut: top n = expected\ndoublet rate × cells", fontsize=8.1, color=TEXT, va="top",
+       linespacing=1.2)
+c.set_xlim(0, 1); c.set_yticks([])
+c.set_xlabel("pANN", color=TEXT2, fontsize=9); c.set_ylabel("number of cells", color=TEXT2, fontsize=9)
 for sp in ("left", "bottom"): c.spines[sp].set_color(LINE)
-c.tick_params(colors=TEXT2, labelsize=8); c.minorticks_off()
-c.legend(frameon=False, fontsize=8.3, loc="center right", labelcolor=TEXT2, handlelength=1)
-c.set_title("③ Rank by pANN and cut", loc="left", fontsize=12.3, fontweight="semibold", color=TEXT, pad=22)
-c.text(0, 1.03, "two humps → separable", transform=c.transAxes, fontsize=9, color=TEXT2)
+c.tick_params(colors=TEXT2, labelsize=8)
+c.set_title("③ Two humps, then cut", loc="left", fontsize=12.3, fontweight="semibold", color=TEXT, pad=22)
+c.text(0, 1.03, f"pANN of all {len(p2):,} cells (larger toy run, k = {k2})", transform=c.transAxes, fontsize=9,
+       color=TEXT2)
 fig.text(0.02, 0.0, "A T cell + T cell doublet lands inside the T-cell cloud: homotypic doublets are invisible to this test.",
          fontsize=8.8, color=TEXT2)
 header(a, "Single-cell RNA-seq · doublets", "Make fake doublets, then ask which real cells look like them",
        dy=40, x1=3.75)
-fig.savefig(OUT + "doublet_detection.png"); print("ok k11 doublet", pann[kind == 2].mean().round(2), pann[kind < 2].mean().round(2))
+fig.savefig(OUT + "doublet_detection.png"); print("ok k11 doublet", pann[kind == 2].mean().round(2), p2[isdb == 1].mean().round(2), p2[isdb == 0].mean().round(2), round(cut, 2))
